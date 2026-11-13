@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#14161c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>ChaosBrawl</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<div id="view">
+  <canvas id="game" width="800" height="450"></canvas>
+  <div id="tools">
+    <button id="btn-debug" type="button">盒子</button>
+    <button id="btn-scn" type="button">場景</button>
+    <button id="btn-reset" type="button">重置</button>
+    <button id="btn-menu" type="button">選單</button>
+  </div>
+  <div id="touch"></div>
+</div>
+<div id="menu">
+  <div class="panel">
+    <h1>ChaosBrawl</h1>
+    <section id="local">
+      <h2>單機遊玩<span>不用連網、可單人(其餘座位由電腦補位)</span></h2>
+      <div class="row"><label for="sel-mode">模式</label>
+        <select id="sel-mode">
+          <option value="brawl">大亂鬥(單命、5 分鐘)</option>
+          <option value="team">分隊戰(2~4 隊、5 分鐘)</option>
+          <option value="timed">時間賽(3 分鐘、重生)</option>
+          <option value="practice">練習(木樁 / 簡易對手,只用座位 1)</option>
+        </select>
+        <label for="sel-ff">友軍傷害</label>
+        <select id="sel-ff"><option value="0">關</option><option value="1">部分</option><option value="2">全開</option></select>
+      </div>
+      <div id="slots"></div>
+      <button id="btn-start" type="button">單機開始(離線可玩)</button>
+    </section>
+    <details id="online">
+      <summary>連線對戰(Firebase,最多 8 人;需要網路)</summary>
+      <div><span id="net-note"></span></div>
+      <div class="row">
+        <button id="btn-create" type="button">建立房間</button>
+        <input id="in-code" maxlength="4" placeholder="房號" size="5">
+        <button id="btn-join" type="button">加入</button>
+      </div>
+      <div id="lobby" class="hide">
+        房號 <b id="lb-code"></b>
+        <div id="lb-host" class="row">
+          <label>補滿到<select id="lb-fill"></select>人</label>
+          <label>電腦<select id="lb-lvl"><option value="0">新手</option><option value="1" selected>普通</option><option value="2">困難</option><option value="3">魔王</option></select></label>
+          <label>隊數<select id="lb-teams"><option>2</option><option>3</option><option>4</option></select></label>
+          <label>友軍傷害<select id="lb-ff"><option value="0">關</option><option value="1">部分</option><option value="2">全開</option></select></label>
+          <label>保留<select id="lb-keep"><option value="10">10 分</option><option value="30" selected>30 分</option><option value="60">60 分</option></select></label>
+        </div>
+        <div id="lb-seats"></div>
+        <div class="row"><button id="btn-go" type="button">開始對戰(房主,可單人)</button><button id="btn-leave" type="button">離開</button></div>
+      </div>
+    </details>
+    <small>鍵盤 P1:WASD 移動 / J 攻擊 / K 跳 / L 防禦;防 + 方向 + 攻/跳 = 必殺。遊戲中 N 換場景(練習)、R 重置、B 盒子、Enter 回選單</small>
+  </div>
+</div>
+<div id="rotate"><div><div class="phone"></div>請把手機轉橫</div></div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$code": {
+        ".read": true,
+        ".write": "!data.exists() || data.child('meta/lastSeen').val() < now - (data.child('meta/state').val() == 'match' ? 1800000 : 300000)",
+        "meta": {
+          ".write": true,
+          ".validate": "newData.hasChildren(['state'])"
+        },
+        "seats": {
+          "$n": {
+            ".write": true,
+            ".validate": "newData.hasChildren(['kind'])"
+          }
+        },
+        "h": {
+          "in": {
+            "$n": {
+              ".write": true,
+              ".validate": "newData.hasChildren(['q', 'a', 'd']) && newData.child('d').val().length < 64"
+            }
+          }
+        },
+        "c": {
+          "snap": {
+            ".write": "newData.child('e').val() == root.child('rooms').child($code).child('save/e').val()",
+            ".validate": "newData.hasChildren(['e', 't', 'd']) && newData.child('d').val().length < 12000"
+          },
+          "host": {
+            ".write": "newData.child('e').val() == root.child('rooms').child($code).child('save/e').val()"
+          },
+          "ev": {
+            ".write": true
+          }
+        },
+        "save": {
+          ".write": "!data.exists() || newData.child('e').val() >= data.child('e').val()",
+          ".validate": "newData.hasChildren(['e', 'seat', 'tick', 'd']) && newData.child('d').val().length < 12000"
+        },
+        "result": {
+          ".write": true
+        }
+      }
+    },
+    "latency": {
+      "$r": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "usage": {
+      "$ym": {
+        ".read": true,
+        ".write": true
+      }
+    }
+  }
+}

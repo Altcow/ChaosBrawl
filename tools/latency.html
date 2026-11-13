@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChaosBrawl 連線延遲實測</title>
+<style>
+  body { font-family: "Microsoft JhengHei", sans-serif; background: #14161c; color: #eee; margin: 16px; max-width: 720px; }
+  input, select, button { font-size: 15px; padding: 6px 8px; margin: 2px 0; background: #222733; color: #eee; border: 1px solid #556; border-radius: 6px; }
+  input { width: 100%; box-sizing: border-box; }
+  pre { background: #0c0e12; padding: 10px; border-radius: 6px; white-space: pre-wrap; min-height: 6em; }
+  small { color: #99a; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<h2>連線延遲實測(M3 第一步)</h2>
+<p><small>需要使用者自建的 Firebase RTDB(asia-southeast1)。網址只留在本頁輸入框(不存檔、不上傳到別處);資料庫規則請先貼上 docs/firebase-rules.json。本頁只顯示實際量到的數字,沒有預設或假資料。</small></p>
+
+<label>資料庫網址(https://…firebasedatabase.app)</label>
+<input id="url" placeholder="https://xxxx-default-rtdb.asia-southeast1.firebasedatabase.app" autocomplete="off">
+
+<h3>A. 單機:REST 往返與推送往返</h3>
+<p><small>量兩件事:(1) REST 寫入的往返時間;(2) 寫入後自己的 EventSource 收到推送的時間(= 上行 + 下行,約等於一般「按鍵 → 房主 → 回來」中繼來回的一半以上,不含房主等快照)。取樣數:</small>
+<select id="n"><option>30</option><option selected>60</option><option>120</option></select>
+<button id="runA">開始單機量測</button></p>
+
+<h3>B. 兩台裝置:乒乓(最接近真實對戰)</h3>
+<p><small>兩台裝置打開本頁、填同一個房碼。裝置 1 按「當發球方」,裝置 2 按「當回球方」。發球方寫 ping、回球方收到後立刻寫 pong、發球方量往返時間;單程以往返的一半估算。</small></p>
+<div class="row"><input id="room" placeholder="房碼(任意 4~8 字元,兩台相同)" style="width:200px">
+<button id="runPing">當發球方</button><button id="runPong">當回球方</button><button id="stop">停止</button></div>
+
+<h3>結果</h3>
+<pre id="out">尚未量測。</pre>
+<p><small>判準(草案 5-4):單程中位數 ≤ 120 ms 且 p95 ≤ 250 ms 才算過關;不過關回報給設計討論是否升級 WebRTC。單程 = 往返 ÷ 2(假設上下行對稱)。</small></p>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let es = null;
+let stopped = false;
+const out = (t) => { $('out').textContent = t; };
+const base = () => $('url').value.trim().replace(/\/+$/, '');
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const stat = (a) => {
+  const s = a.slice().sort((x, y) => x - y);
+  const q = (p) => s[Math.min(s.length - 1, Math.floor(p * s.length))];
+  return { n: s.length, min: s[0], med: q(0.5), p95: q(0.95), max: s[s.length - 1] };
+};
+const fmt = (name, a) => {
+  if (!a.length) return name + ':無資料';
+  const r = stat(a);
+  return name + ':n=' + r.n + ' min=' + r.min.toFixed(0) + ' 中位=' + r.med.toFixed(0) + ' p95=' + r.p95.toFixed(0) + ' max=' + r.max.toFixed(0) + ' ms';
+};
+function verdict(oneWay) {
+  if (!oneWay.length) return '';
+  const r = stat(oneWay);
+  return '\n單程估算(往返÷2):中位 ' + r.med.toFixed(0) + ' ms、p95 ' + r.p95.toFixed(0) + ' ms → ' + (r.med <= 120 && r.p95 <= 250 ? '達標' : '未達標(回報給設計)');
+}
+
+$('runA').onclick = async () => {
+  if (!base()) { out('請先填資料庫網址'); return; }
+  stopped = false;
+  const n = parseInt($('n').value, 10);
+  const id = 'a' + Math.random().toString(36).slice(2, 8);
+  const rest = [];
+  const push = [];
+  let waiter = null;
+  try {
+    es = new EventSource(base() + '/latency/' + id + '.json');
+    es.addEventListener('put', (e) => {
+      const m = JSON.parse(e.data);
+      if (m.data && m.data.t && waiter) { const w = waiter; waiter = null; w(performance.now()); }
+    });
+    await sleep(1500);
+    for (let i = 0; i < n && !stopped; i++) {
+      const t0 = performance.now();
+      const p = new Promise((r) => { waiter = r; setTimeout(() => r(null), 3000); });
+      const res = await fetch(base() + '/latency/' + id + '.json', { method: 'PUT', body: JSON.stringify({ t: i + 1, s: Date.now() }) });
+      const t1 = performance.now();
+      if (!res.ok) { out('寫入失敗 HTTP ' + res.status + '(請檢查規則是否包含 latency)'); break; }
+      rest.push(t1 - t0);
+      const t2 = await p;
+      if (t2) push.push(t2 - t0);
+      out('量測中 ' + (i + 1) + '/' + n + '\n' + fmt('REST 寫入往返', rest) + '\n' + fmt('寫入→自己收到推送', push));
+      await sleep(120);
+    }
+    await fetch(base() + '/latency/' + id + '.json', { method: 'DELETE' });
+  } catch (e) { out('錯誤:' + e.message); }
+  if (es) es.close();
+  out(fmt('REST 寫入往返', rest) + '\n' + fmt('寫入→自己收到推送', push) + verdict(push.map((x) => x / 1)));
+};
+
+function startRoom(role) {
+  if (!base() || !$('room').value.trim()) { out('請填資料庫網址與房碼'); return; }
+  stopped = false;
+  const room = $('room').value.trim();
+  const url = base() + '/latency/' + encodeURIComponent(room);
+  const rtts = [];
+  const sent = {};
+  let seq = 0;
+  es = new EventSource(url + '.json');
+  es.addEventListener('put', async (e) => {
+    const m = JSON.parse(e.data);
+    const d = m.data;
+    if (!d || typeof d !== 'object') return;
+    if (role === 'pong' && d.ping && d.ping.q) {
+      fetch(url + '/pong.json', { method: 'PUT', body: JSON.stringify({ q: d.ping.q }) });
+    }
+    if (role === 'ping' && d.pong && d.pong.q && sent[d.pong.q]) {
+      rtts.push(performance.now() - sent[d.pong.q]);
+      delete sent[d.pong.q];
+      out(fmt('往返', rtts) + verdict(rtts.map((x) => x / 2)));
+    }
+  });
+  if (role === 'ping') {
+    (async () => {
+      await sleep(1500);
+      while (!stopped && seq < 200) {
+        seq++;
+        sent[seq] = performance.now();
+        fetch(url + '/ping.json', { method: 'PUT', body: JSON.stringify({ q: seq }) });
+        await sleep(400);
+      }
+    })();
+  }
+  out(role === 'ping' ? '發球中…(另一台要先按「當回球方」)' : '回球中…');
+}
+$('runPing').onclick = () => startRoom('ping');
+$('runPong').onclick = () => startRoom('pong');
+$('stop').onclick = () => { stopped = true; if (es) es.close(); };
+</script>
+</body>
+</html>

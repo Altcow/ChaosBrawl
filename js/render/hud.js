@@ -1,0 +1,123 @@
+import { STATE_NAMES } from '../sim/fighter.js';
+
+const FONT = '"Microsoft JhengHei", "PingFang TC", sans-serif';
+export const SLOT_COLORS = ['#ff5555', '#55a0ff', '#55dd77', '#ffcc33', '#d070ff', '#ff9040', '#40e0d0', '#f080b0'];
+
+function bar(ctx, x, y, w, h, frac, color, back) {
+  ctx.fillStyle = back || 'rgba(0,0,0,0.55)';
+  ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = color;
+  ctx.fillRect(x, y, Math.max(0, Math.min(1, frac)) * w, h);
+}
+
+// 練習模式:單角色詳細面板
+function drawPracticeHud(ctx, w, stats, debug) {
+  const f = w.fighters[0];
+  const def = w.defs[f.charId];
+  const hp = f.hp / def.hp;
+  const gray = (f.hp + f.gray) / def.hp;
+  ctx.font = '12px ' + FONT;
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#fff';
+  ctx.fillText(def.name, 12, 8);
+  ctx.fillStyle = 'rgba(0,0,0,0.55)';
+  ctx.fillRect(12, 24, 200, 14);
+  ctx.fillStyle = '#888';
+  ctx.fillRect(12, 24, Math.min(1, gray) * 200, 14);
+  ctx.fillStyle = '#e44';
+  ctx.fillRect(12, 24, Math.min(1, hp) * 200, 14);
+  ctx.fillStyle = '#fff';
+  ctx.fillText(Math.ceil(f.hp / 256) + ' / ' + (def.hp >> 8), 16, 25);
+  bar(ctx, 12, 42, 200, 8, f.mp / def.mp, '#48f');
+  bar(ctx, 12, 54, 200, 5, f.fall / 100, '#f90');
+  bar(ctx, 12, 62, 200, 5, f.bdef / 100, '#6cf');
+  ctx.fillStyle = '#ccc';
+  ctx.font = '10px ' + FONT;
+  ctx.fillText('MP ' + Math.floor(f.mp / 256) + '   fall ' + f.fall + '   bdef ' + f.bdef, 12, 70);
+  ctx.font = '12px ' + FONT;
+  ctx.fillText(STATE_NAMES[f.state] + (f.move ? ' · ' + f.move : ''), 12, 86);
+  if (debug) {
+    ctx.fillStyle = '#9f9';
+    ctx.fillText('tick ' + w.tick + '  fps ' + stats.fps + '  tps ' + stats.tps, 12, 102);
+  }
+}
+
+// 多人:上方 2 排 × 4 的小型條(不遮戰場),只顯示隊色圈、不顯示名字
+function drawGridHud(ctx, w, stats, debug) {
+  ctx.textBaseline = 'top';
+  ctx.font = '10px ' + FONT;
+  for (let i = 0; i < w.fighters.length; i++) {
+    const f = w.fighters[i];
+    const def = w.defs[f.charId];
+    const x = 8 + (i % 4) * 148;
+    const y = 6 + (i >> 2) * 26;
+    ctx.globalAlpha = f.dead ? 0.35 : 1;
+    ctx.fillStyle = SLOT_COLORS[f.team % 8];
+    ctx.beginPath();
+    ctx.arc(x + 6, y + 8, 6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.font = 'bold 9px ' + FONT;
+    ctx.fillText(String(i + 1), x + 3.5, y + 4);
+    const gray = (f.hp + f.gray) / def.hp;
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
+    ctx.fillRect(x + 16, y + 2, 100, 8);
+    ctx.fillStyle = '#888';
+    ctx.fillRect(x + 16, y + 2, Math.min(1, gray) * 100, 8);
+    ctx.fillStyle = '#e44';
+    ctx.fillRect(x + 16, y + 2, Math.min(1, f.hp / def.hp) * 100, 8);
+    bar(ctx, x + 16, y + 12, 100, 3, f.mp / def.mp, '#48f');
+    if (w.mode.type === 'timed') {
+      ctx.fillStyle = '#fff';
+      ctx.font = '10px ' + FONT;
+      ctx.fillText(String(f.kills), x + 120, y + 1);
+    }
+    ctx.globalAlpha = 1;
+  }
+  if (debug) {
+    ctx.fillStyle = '#9f9';
+    ctx.font = '12px ' + FONT;
+    ctx.fillText('tick ' + w.tick + '  fps ' + stats.fps + '  tps ' + stats.tps, 8, 64);
+  }
+}
+
+export function drawHud(ctx, w, stats, debug) {
+  if (w.mode.type === 'practice') drawPracticeHud(ctx, w, stats, debug);
+  else {
+    drawGridHud(ctx, w, stats, debug);
+    // 計時
+    const left = Math.max(0, w.mode.limit - w.mode.t);
+    const sec = Math.ceil(left / 60);
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 20px ' + FONT;
+    ctx.textAlign = 'center';
+    ctx.fillText(Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0') + (w.mode.overtime ? ' 加賽' : ''), 722, 44);
+    ctx.textAlign = 'left';
+  }
+}
+
+export function drawResult(ctx, w, nameOf) {
+  if (!w.mode.over) return;
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(0, 150, 800, 120);
+  ctx.fillStyle = '#fff';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = 'bold 30px ' + FONT;
+  ctx.fillText(w.mode.winner < 0 ? '平手' : w.mode.type === 'team' ? '隊伍 ' + (w.mode.winner + 1) + ' 獲勝' : '勝者:' + nameOf(w.mode.winner), 400, 195);
+  ctx.font = '14px ' + FONT;
+  ctx.fillStyle = '#ccc';
+  ctx.fillText('按「選單」或 Enter 回到選單', 400, 240);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+}
+
+// 假人 / 電腦頭上小血條
+export function drawOverhead(ctx, w, f, sx, sy) {
+  const def = w.defs[f.charId];
+  bar(ctx, sx - 22, sy - 78, 44, 5, f.hp / def.hp, '#e44');
+  if (w.mode.type === 'practice') {
+    bar(ctx, sx - 22, sy - 72, 44, 3, f.fall / 100, '#f90');
+    bar(ctx, sx - 22, sy - 68, 44, 3, f.bdef / 100, '#6cf');
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "ChaosBrawl",
+  "short_name": "ChaosBrawl",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#14161c",
+  "theme_color": "#14161c",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f0a030'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%2314161c'%3ECB%3C/text%3E%3C/svg%3E",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
