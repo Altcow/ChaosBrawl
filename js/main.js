@@ -7,6 +7,9 @@ import { Renderer } from './render/renderer.js';
 import { setupTouch } from './ui/touch.js';
 import { setupHome } from './ui/select.js';
 import { setupRoom } from './ui/room.js';
+import { setupMoves, listMoves, cmdText, defaultDevice } from './ui/moves.js';
+import { setupTip } from './ui/tip.js';
+import { setHudHint } from './render/hud.js';
 
 // 練習場景:木樁 / 簡易對手
 const SCENARIOS = [['post'], ['post', 'post', 'post'], ['post', 'puncher'], ['puncher']];
@@ -28,23 +31,51 @@ let started = false;
 let home = null;
 let room = null;
 let online = null; // 連線中的 Session
+let movesPanel = null;
+let movesOpen = false;
+let tip = null;
+let hasTouch = false;
 
 const input = new Input();
 input.attach();
 const renderer = new Renderer($('game'));
-const touch = setupTouch($('touch'), input, assist);
+const touch = setupTouch($('touch'), input, assist, specials);
 
-function assist() {
+// 本機 P1 玩家的角色(單機 / 連線通用);沒有時回傳 null
+function myFighter() {
   let w = world;
   let i = srcOf.indexOf('P1');
   if (online) {
     w = online.role === 'host' ? online.world : online.pw;
     i = online.fid;
   }
-  if (!w || i < 0) return;
-  const f = w.fighters[i];
-  const cmd = w.defs[f.charId].assist;
-  if (cmd) input.queueMacro('P1', commandMacro(cmd, f.face));
+  if (!w || i < 0 || !w.fighters[i]) return null;
+  return { w, f: w.fighters[i] };
+}
+
+// 必殺鈕:cmd = 指定招式(面板點選);沒給 = 第一招(assist)
+function assist(cmd) {
+  const me = myFighter();
+  if (!me) return;
+  const c = cmd || me.w.defs[me.f.charId].assist;
+  if (c) input.queueMacro('P1', commandMacro(c, me.f.face));
+}
+
+// 觸控必殺面板的資料:目前角色全部必殺(名稱 / 指令簡寫 / MP 消耗)與目前 MP
+function specials() {
+  const me = myFighter();
+  if (!me || !chars) return null;
+  const j = chars[me.f.charId];
+  return { items: listMoves(j).map((m) => ({ cmd: m.cmd, name: m.name, short: cmdText(m.cmd, 'touch', true), cost: m.cost })), mp: me.f.mp };
+}
+
+// 招式表:遊戲中打開當前玩家角色;首頁依選定角色
+function openMoves(charId, dev) {
+  if (!movesPanel) return;
+  const me = started ? myFighter() : null;
+  const id = charId || (me ? me.f.charId : home.getPrefChar() === 'random' ? Object.keys(chars)[0] : home.getPrefChar());
+  const src = srcOf.find((s) => s) || 'P1';
+  movesPanel.open(id, dev || defaultDevice(src, hasTouch));
 }
 
 function buildWorld() {
@@ -100,6 +131,7 @@ const loop = new Loop(step, (alpha) => {
   if (online) {
     const v = online.view();
     if (v) {
+      setHudHint([online.fid], hasTouch);
       renderer.draw(v, 1, loop, [online.fid], (i) => (online.cfg.seats[i].name || '#' + (i + 1)));
       const me = v.fighters[online.fid];
       if (me && typeof me.rage === 'number') touch.setRage(me.rage / (100 * 256));
@@ -110,12 +142,13 @@ const loop = new Loop(step, (alpha) => {
   if (!world) return;
   showResult(!!world.mode.over);
   const focus = world.fighters.map((f, i) => (f.kind === 'human' ? i : -1)).filter((i) => i >= 0);
+  setHudHint(focus.filter((i) => srcOf[i] === 'P1'), hasTouch);
   renderer.draw(world, alpha, loop, focus, nameOf);
 });
 
 function updatePause() {
   const portrait = window.matchMedia('(orientation: portrait)').matches;
-  const paused = !started || portrait || document.hidden;
+  const paused = !started || portrait || document.hidden || (movesOpen && !online); // 連線局不能暫停,招式表只蓋在上面
   if (paused !== loop.paused) {
     loop.setPaused(paused);
     input.clear();
@@ -147,6 +180,7 @@ function start(c) {
   started = true;
   updatePause();
   if (!qs.has('nofs')) enterFullscreen();
+  tip.show();
 }
 
 function startOnline(sess) {
@@ -162,9 +196,12 @@ function startOnline(sess) {
   started = true;
   updatePause();
   if (!qs.has('nofs')) enterFullscreen();
+  tip.show();
 }
 
 function toMenu() {
+  movesPanel.close();
+  tip.hide();
   if (online) {
     online.stop();
     online = null;
@@ -183,8 +220,17 @@ async function boot() {
   stage = await (await fetch('data/stages/market.json')).json();
   home = setupHome($('menu'), {
     chars, charIds: ids, onStart: start, onPractice: start,
-    onOnline: () => { room.onOpen(); home.showScreen('netpanel'); }
+    onOnline: () => { room.onOpen(); home.showScreen('netpanel'); },
+    onMoves: () => openMoves()
   });
+  hasTouch = qs.has('touch') || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  movesPanel = setupMoves($('moves'), {
+    chars, charIds: ids,
+    onToggle: (on) => { movesOpen = on; updatePause(); }
+  });
+  tip = setupTip($('tip'), { isTouch: () => hasTouch });
+  $('btn-moves').addEventListener('click', () => openMoves());
+  $('btn-help-tip').addEventListener('click', () => tip.show(true));
   room = setupRoom($('menu'), { chars, stage, charIds: ids, getChar: () => home.getChar(), onSession: startOnline });
   $('btn-net-back').onclick = () => home.showScreen('home');
   room.rejoin();
@@ -194,7 +240,6 @@ async function boot() {
   // 開發用按鈕(盒子 / 場景 / 重置)只在網址帶 ?debug 時顯示
   document.body.classList.toggle('debug', qs.has('debug'));
 
-  const hasTouch = qs.has('touch') || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   if (hasTouch) touch.show();
   if (qs.has('debug')) setDebug(true);
 
@@ -205,7 +250,12 @@ async function boot() {
   $('btn-again').addEventListener('click', () => start(cfg && cfg.mode === 'practice' ? cfg : home.getCfg()));
   $('btn-scn').addEventListener('click', () => { scn = (scn + 1) % SCENARIOS.length; buildWorld(); });
   window.addEventListener('keydown', (e) => {
-    if (!started || online && e.code !== 'KeyB' && e.code !== 'Enter') return;
+    if (started && e.code === 'KeyH' && !e.repeat) {
+      if (movesPanel.isOpen()) movesPanel.close();
+      else openMoves();
+      return;
+    }
+    if (!started || movesPanel.isOpen() || online && e.code !== 'KeyB' && e.code !== 'Enter') return;
     if (e.code === 'KeyB') setDebug(!renderer.debug);
     else if (e.code === 'KeyR') buildWorld();
     else if (e.code === 'KeyN' && cfg.mode === 'practice') { scn = (scn + 1) % SCENARIOS.length; buildWorld(); }

@@ -48,6 +48,76 @@ html, body {
 #touch .b-ult.ready { background: rgba(255,196,0,.55); border-color: #fff6b0; color: #000; animation: ultPulse .5s ease-in-out infinite alternate; }
 @keyframes ultPulse { from { box-shadow: 0 0 4px 1px rgba(255,196,0,.6); } to { box-shadow: 0 0 16px 6px rgba(255,246,176,.95); } }
 
+/* ---- 必殺展開面板 / 大招提示(觸控) ---- */
+#touch .sp-mask { position: absolute; inset: 0; pointer-events: auto; touch-action: none; display: none; z-index: 5; }
+#touch .sp-mask.show { display: block; }
+#touch .sp-panel {
+  position: absolute; right: 18px; bottom: 182px; width: 232px; z-index: 6; display: none;
+  grid-template-columns: 1fr 1fr; gap: 6px; pointer-events: auto;
+}
+#touch .sp-panel.show { display: grid; }
+#touch .sp-chip {
+  min-height: 46px; padding: 4px 6px; border-radius: 10px; border: 2px solid rgba(255,255,255,.55);
+  background: rgba(30,34,46,.92); color: #fff; display: flex; flex-direction: column; justify-content: center;
+  align-items: center; text-align: center; touch-action: none;
+}
+#touch .sp-chip b { font-size: 13px; line-height: 1.2; }
+#touch .sp-chip span { font-size: 10px; color: #cdd; line-height: 1.2; }
+#touch .sp-chip:active { background: rgba(255,255,255,.35); }
+#touch .sp-chip.off { opacity: .35; filter: grayscale(1); }
+#touch .b-sp.down { background: rgba(255,255,255,.4); }
+#touch .ult-tip {
+  position: absolute; right: 8px; bottom: 178px; display: none; pointer-events: none; z-index: 3;
+  padding: 3px 10px; border-radius: 12px; background: rgba(0,0,0,.65); color: #ffd84a; font-size: 13px; font-weight: bold;
+  animation: tipBlink .6s ease-in-out infinite alternate;
+}
+#touch .ult-tip.show { display: block; }
+@keyframes tipBlink { from { opacity: 1; } to { opacity: .45; } }
+
+/* ---- 招式表面板(首頁與遊戲中共用) ---- */
+#moves {
+  position: fixed; inset: 0; z-index: 25; background: #0a0c10; display: flex; flex-direction: column;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+#moves.hide { display: none; }
+#moves button { font-size: 14px; background: #222733; color: #eee; border: 1px solid #556; border-radius: 8px; padding: 4px 10px; height: 34px; }
+#moves .mv-head { display: flex; justify-content: space-between; align-items: center; padding: 6px 14px 2px; }
+#moves h2 { margin: 0; font-size: 18px; color: #8d8; }
+#mv-tabs { display: flex; gap: 4px; padding: 4px 14px; overflow-x: auto; flex: none; touch-action: pan-x; }
+#mv-tabs button { flex: none; height: 30px !important; font-size: 13px !important; padding: 2px 10px !important; }
+#mv-tabs button.on { background: #3a7 !important; color: #08140c !important; border-color: #3a7 !important; font-weight: bold; }
+#mv-body { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; padding: 0 14px 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; align-content: start; }
+#mv-body h3 { margin: 8px 0 4px; font-size: 14px; color: #8d8; }
+#mv-body ul { margin: 2px 0; padding-left: 18px; font-size: 13px; line-height: 1.5; }
+.mv-row { background: #1b1f2a; border-radius: 8px; padding: 6px 10px; margin: 5px 0; }
+.mv-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; }
+.mv-cost { font-size: 12px; color: #6cf; }
+.mv-ult .mv-cost { color: #ffc400; }
+.mv-cmd { font-size: 13px; color: #ffd84a; margin: 2px 0; }
+.mv-desc { font-size: 13px; color: #cdd; line-height: 1.5; margin: 3px 0; }
+.mv-note { font-size: 12px; color: #99a; margin-top: 6px; line-height: 1.5; }
+@media (max-width: 700px), (max-height: 420px) and (max-width: 700px) { #mv-body { grid-template-columns: 1fr; } }
+@media (max-height: 420px) {
+  #moves .mv-head { padding: 3px 12px 0; }
+  #moves h2 { font-size: 16px; }
+  #moves button { height: 30px; font-size: 13px; }
+  #mv-tabs { padding: 3px 12px; }
+  #mv-tabs button { height: 26px !important; }
+  #mv-body { padding: 0 12px 6px; }
+  #mv-body h3 { margin: 5px 0 2px; }
+  .mv-row { padding: 4px 8px; margin: 3px 0; }
+  .mv-desc, .mv-cmd { margin: 1px 0; }
+}
+
+/* ---- 第一次戰鬥提示層 ---- */
+#tip { position: fixed; inset: 0; z-index: 26; background: rgba(0,0,0,.5); display: flex; align-items: center; justify-content: center; }
+#tip.hide { display: none; }
+.tip-card { width: min(520px, 94%); background: rgba(20,24,34,.95); border: 2px solid #8d8; border-radius: 12px; padding: 10px 16px; }
+.tip-card h3 { margin: 0 0 6px; font-size: 16px; color: #8d8; text-align: center; }
+.tip-row { display: flex; gap: 10px; font-size: 14px; line-height: 1.5; padding: 2px 0; }
+.tip-row b { flex: none; width: 92px; color: #ffd84a; }
+@media (max-height: 420px) { .tip-card { padding: 6px 14px; } .tip-row { font-size: 13px; line-height: 1.35; } }
+
 .dev { display: none; }
 body.debug .dev { display: inline-block; }
 

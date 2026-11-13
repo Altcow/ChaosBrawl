@@ -57,7 +57,7 @@ export function seg(el, options, value, onPick) {
   return mark;
 }
 
-export function setupHome(root, { chars, charIds, onStart, onPractice, onOnline }) {
+export function setupHome(root, { chars, charIds, onStart, onPractice, onOnline, onMoves }) {
   const $ = (s) => root.querySelector(s);
   const prefs = loadPrefs();
   if (prefs.char !== 'random' && charIds.indexOf(prefs.char) < 0) prefs.char = charIds[0];
@@ -185,6 +185,7 @@ export function setupHome(root, { chars, charIds, onStart, onPractice, onOnline 
   $('#btn-start').onclick = () => onStart(buildCfg());
   $('#btn-practice').onclick = () => onPractice({ mode: 'practice', ff: 0, slots: [{ kind: 'P1', char: pickChar(), team: 0 }] });
   $('#btn-online').onclick = () => onOnline();
+  $('#btn-moves-home').onclick = () => onMoves && onMoves();
   $('#btn-more').onclick = () => showScreen('more');
   $('#btn-more-done').onclick = () => showScreen('home');
   $('#btn-seats').onclick = () => {

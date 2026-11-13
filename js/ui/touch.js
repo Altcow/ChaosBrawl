@@ -2,13 +2,14 @@ import { BIT } from '../core/input.js';
 import { ULT_MACRO } from '../sim/command.js';
 
 // 觸控:左側動態虛擬搖桿(8 向,死區 25%)+ 攻 / 跳 / 防 + 必殺輔助鍵
-// 必殺輔助鍵:點一下 → 呼叫 onAssist(),由主程式依面向自動放出該角色第一招必殺
+// 必殺鈕:點一下展開小面板,列出該角色所有必殺,點選即放(onAssist(cmd),由主程式依面向排入 commandMacro)
+// getSpecials() 由主程式提供:回傳 { items: [{ cmd, name, short, cost }], mp } 或 null;MP 不足的招式灰色不可按
 // 大招鈕:爆氣滿(100)才亮起,點一下排入 ULT_MACRO;爆氣來源:主程式呼叫 setRage(0~1),沒呼叫時讀 window.__cb.world
 const STICK_R = 56;
 const DEAD = 0.25;
 const RAGE_FULL = 100 * 256; // 爆氣滿值(sim/ult.js RAGE_MAX = 100 * FX,FX = 256)
 
-export function setupTouch(root, input, onAssist) {
+export function setupTouch(root, input, onAssist, getSpecials) {
   root.innerHTML = '';
   const zone = el('div', 'zone');
   const hint = el('div', 'stick-hint');
@@ -74,25 +75,80 @@ export function setupTouch(root, input, onAssist) {
   const sp = el('div', 'btn b-sp');
   sp.textContent = '必殺';
   root.append(sp);
+  const spMask = el('div', 'sp-mask');
+  const spPanel = el('div', 'sp-panel');
+  root.append(spMask, spPanel);
+  let spChips = [];
+  const spOpen = () => spPanel.classList.contains('show');
+  const spClose = () => {
+    spPanel.classList.remove('show');
+    spMask.classList.remove('show');
+    sp.classList.remove('down');
+  };
+  const spPaint = () => {
+    const d = getSpecials && getSpecials();
+    if (!d || d.items.length !== spChips.length) return;
+    spChips.forEach((c, i) => c.classList.toggle('off', d.mp < d.items[i].cost * 256));
+  };
+  const spBuild = () => {
+    const d = getSpecials && getSpecials();
+    spPanel.innerHTML = '';
+    spChips = [];
+    if (!d || !d.items.length) return false;
+    spPanel.style.gridTemplateColumns = d.items.length > 1 ? '1fr 1fr' : '1fr';
+    d.items.forEach((it) => {
+      const c = el('div', 'sp-chip');
+      const a = el('b', '');
+      a.textContent = it.name;
+      const b = el('span', '');
+      b.textContent = it.short + '  MP' + it.cost;
+      c.append(a, b);
+      c.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (c.classList.contains('off')) return;
+        spClose();
+        if (onAssist) onAssist(it.cmd);
+      });
+      spPanel.append(c);
+      spChips.push(c);
+    });
+    spPaint();
+    return true;
+  };
   sp.addEventListener('pointerdown', (e) => {
     e.preventDefault();
+    if (spOpen()) {
+      spClose();
+      return;
+    }
+    if (!spBuild()) {
+      if (onAssist) onAssist();
+      return;
+    }
     sp.classList.add('down');
-    if (onAssist) onAssist();
+    spPanel.classList.add('show');
+    spMask.classList.add('show');
   });
-  const spUp = () => sp.classList.remove('down');
-  sp.addEventListener('pointerup', spUp);
-  sp.addEventListener('pointercancel', spUp);
+  spMask.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    spClose();
+  });
 
   // 大招鈕:rageRatio = null(未知,視為可按)/ 0~1
   const ult = el('div', 'btn b-ult');
   ult.textContent = '大招';
   root.append(ult);
+  const ultTip = el('div', 'ult-tip');
+  ultTip.textContent = '大招可用!點這裡 ▶';
+  root.append(ultTip);
   let rageRatio = null;
   let manualAt = 0;
   const ultReady = () => rageRatio === null || rageRatio >= 1;
   const paintUlt = () => {
     ult.classList.toggle('off', rageRatio !== null && rageRatio < 1);
     ult.classList.toggle('ready', rageRatio !== null && rageRatio >= 1);
+    ultTip.classList.toggle('show', rageRatio !== null && rageRatio >= 1);
   };
   ult.addEventListener('pointerdown', (e) => {
     e.preventDefault();
@@ -110,6 +166,7 @@ export function setupTouch(root, input, onAssist) {
   let raf = 0;
   const poll = () => {
     raf = requestAnimationFrame(poll);
+    if (spOpen()) spPaint();
     if (Date.now() - manualAt < 500) return;
     const w = window.__cb && window.__cb.world;
     let r = null;
@@ -156,6 +213,7 @@ export function setupTouch(root, input, onAssist) {
       if (!raf) raf = requestAnimationFrame(poll);
     },
     hide() {
+      spClose();
       root.classList.remove('show');
       cancelAnimationFrame(raf);
       raf = 0;
@@ -169,6 +227,7 @@ export function setupTouch(root, input, onAssist) {
       }
     },
     reset() {
+      spClose();
       sid = null;
       stickBits = 0;
       btnBits.atk = btnBits.jump = btnBits.def = 0;

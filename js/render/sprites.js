@@ -223,6 +223,14 @@ export function drawFighter(ctx, f, def, sx, sy, face, hitFlash) {
   if (!drawArt(ctx, f, def, sx, sy, face, hitFlash)) drawPlaceholder(ctx, f, def, sx, sy, face, hitFlash);
 }
 
+// 特寫圖原始尺寸(未載入 / 沒有 art.cutin = null),供特寫排版算縮放
+export function cutinSize(charId) {
+  const e = artCache.get(charId);
+  if (!e || e.st !== 'ready' || !e.art.cutin) return null;
+  const fr = e.atlas.frames && e.atlas.frames[e.art.cutin.frame];
+  return fr ? { w: fr.w, h: fr.h } : null;
+}
+
 // 特寫圖:art.cutin = { frame };畫在 (cx, cy)(圖的底邊中心),scale 為放大倍率。圖集 / 幀缺漏回傳 false
 export function drawCutinArt(ctx, charId, cx, cy, scale, flip) {
   const e = artCache.get(charId);

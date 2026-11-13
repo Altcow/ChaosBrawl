@@ -10,10 +10,44 @@ function bar(ctx, x, y, w, h, frac, color, back) {
   ctx.fillRect(x, y, Math.max(0, Math.min(1, frac)) * w, h);
 }
 
-// 爆氣條(0~100 定點數 ×256):金色;滿了閃爍
-function rageBar(ctx, x, y, w, h, rage) {
+// 本機玩家(大招提示用):主程式每幀設定 ids = 本機真人角色 id、touch = 是否顯示觸控鈕
+let hint = { ids: [], touch: false };
+export function setHudHint(ids, touch) {
+  hint = { ids, touch: !!touch };
+}
+
+// 爆氣條(0~100 定點數 ×256):金色;滿了閃爍;條旁標示「大招」
+function rageBar(ctx, x, y, w, h, rage, fs, ly) {
   const full = rage >= 100 * 256;
-  bar(ctx, x, y, w, h, rage / (100 * 256), full && (Date.now() >> 7) & 1 ? '#fff6b0' : '#ffc400');
+  const flash = full && (Date.now() >> 7) & 1;
+  bar(ctx, x, y, w, h, rage / (100 * 256), flash ? '#fff6b0' : '#ffc400');
+  ctx.fillStyle = full ? (flash ? '#fff6b0' : '#ffc400') : '#c8b060';
+  ctx.font = (full ? 'bold ' : '') + fs + 'px ' + FONT;
+  ctx.fillText('大招', x + w + 3, ly);
+}
+
+// 爆氣滿了:畫面上方閃爍提示(只給本機玩家)
+function drawUltHint(ctx, w) {
+  if (w.mode.over || (w.ult && w.ult.on === false)) return;
+  let ready = false;
+  for (const id of hint.ids) {
+    const f = w.fighters[id];
+    if (f && !f.dead && !f.ult && f.rage >= 100 * 256 && w.defs[f.charId].hasUlt) ready = true;
+  }
+  if (!ready) return;
+  const msg = hint.touch ? '大招可用!點右側「大招」鈕 ▶' : '大招可用!按 防+攻+跳(鍵盤 U / 手把 Y)';
+  ctx.font = 'bold 15px ' + FONT;
+  const tw = ctx.measureText(msg).width + 24;
+  ctx.globalAlpha = (Date.now() >> 8) & 1 ? 1 : 0.55;
+  ctx.fillStyle = 'rgba(0,0,0,0.6)';
+  ctx.fillRect(400 - tw / 2, 60, tw, 24);
+  ctx.fillStyle = '#ffd84a';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(msg, 400, 72);
+  ctx.globalAlpha = 1;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
 }
 
 // 練習模式:單角色詳細面板
@@ -35,7 +69,7 @@ function drawPracticeHud(ctx, w, stats, debug) {
   ctx.fillStyle = '#fff';
   ctx.fillText(Math.ceil(f.hp / 256) + ' / ' + (def.hp >> 8), 16, 25);
   bar(ctx, 12, 42, 200, 8, f.mp / def.mp, '#48f');
-  if (def.hasUlt) rageBar(ctx, 12, 74, 200, 6, f.rage || 0);
+  if (def.hasUlt) rageBar(ctx, 12, 74, 200, 6, f.rage || 0, 10, 71);
   bar(ctx, 12, 54, 200, 5, f.fall / 100, '#f90');
   bar(ctx, 12, 62, 200, 5, f.bdef / 100, '#6cf');
   ctx.fillStyle = '#ccc';
@@ -74,7 +108,7 @@ function drawGridHud(ctx, w, stats, debug) {
     ctx.fillStyle = '#e44';
     ctx.fillRect(x + 16, y + 2, Math.min(1, f.hp / def.hp) * 100, 8);
     bar(ctx, x + 16, y + 12, 100, 3, f.mp / def.mp, '#48f');
-    if (def.hasUlt) rageBar(ctx, x + 16, y + 16, 100, 3, f.rage || 0);
+    if (def.hasUlt) rageBar(ctx, x + 16, y + 16, 100, 3, f.rage || 0, 8, y + 14);
     if (w.mode.type === 'timed') {
       ctx.fillStyle = '#fff';
       ctx.font = '10px ' + FONT;
@@ -102,6 +136,7 @@ export function drawHud(ctx, w, stats, debug) {
     ctx.fillText(Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0') + (w.mode.overtime ? ' 加賽' : ''), 722, 44);
     ctx.textAlign = 'left';
   }
+  drawUltHint(ctx, w);
 }
 
 export function drawResult(ctx, w, nameOf) {

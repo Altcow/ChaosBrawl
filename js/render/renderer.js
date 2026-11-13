@@ -1,5 +1,5 @@
 import { drawFighter, drawProjectileArt, drawMoveFx } from './sprites.js';
-import { drawUltOverlay } from './ult.js';
+import { drawUltOverlay, drawNight, ultCutinFade } from './ult.js';
 import { drawHud, drawOverhead, drawResult, SLOT_COLORS } from './hud.js';
 import { drawBoxes } from './debug.js';
 import { S } from '../sim/fighter.js';
@@ -143,7 +143,10 @@ export class Renderer {
     if (this.debug) drawBoxes(ctx, w, camX, FLOOR_Y);
 
     ctx.setTransform(this.k, 0, 0, this.k, 0, 0);
+    drawNight(ctx, w);
+    ctx.globalAlpha = 1 - 0.9 * ultCutinFade(w); // 大招特寫期間 HUD 淡出
     drawHud(ctx, w, stats, this.debug);
+    ctx.globalAlpha = 1;
     drawUltOverlay(ctx, w);
     drawResult(ctx, w, nameOf || ((i) => '#' + (i + 1)));
   }
