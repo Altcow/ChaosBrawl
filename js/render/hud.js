@@ -10,6 +10,12 @@ function bar(ctx, x, y, w, h, frac, color, back) {
   ctx.fillRect(x, y, Math.max(0, Math.min(1, frac)) * w, h);
 }
 
+// 爆氣條(0~100 定點數 ×256):金色;滿了閃爍
+function rageBar(ctx, x, y, w, h, rage) {
+  const full = rage >= 100 * 256;
+  bar(ctx, x, y, w, h, rage / (100 * 256), full && (Date.now() >> 7) & 1 ? '#fff6b0' : '#ffc400');
+}
+
 // 練習模式:單角色詳細面板
 function drawPracticeHud(ctx, w, stats, debug) {
   const f = w.fighters[0];
@@ -29,16 +35,17 @@ function drawPracticeHud(ctx, w, stats, debug) {
   ctx.fillStyle = '#fff';
   ctx.fillText(Math.ceil(f.hp / 256) + ' / ' + (def.hp >> 8), 16, 25);
   bar(ctx, 12, 42, 200, 8, f.mp / def.mp, '#48f');
+  if (def.hasUlt) rageBar(ctx, 12, 74, 200, 6, f.rage || 0);
   bar(ctx, 12, 54, 200, 5, f.fall / 100, '#f90');
   bar(ctx, 12, 62, 200, 5, f.bdef / 100, '#6cf');
   ctx.fillStyle = '#ccc';
   ctx.font = '10px ' + FONT;
-  ctx.fillText('MP ' + Math.floor(f.mp / 256) + '   fall ' + f.fall + '   bdef ' + f.bdef, 12, 70);
+  ctx.fillText('MP ' + Math.floor(f.mp / 256) + '   fall ' + f.fall + '   bdef ' + f.bdef, 12, 84);
   ctx.font = '12px ' + FONT;
-  ctx.fillText(STATE_NAMES[f.state] + (f.move ? ' · ' + f.move : ''), 12, 86);
+  ctx.fillText(STATE_NAMES[f.state] + (f.move ? ' · ' + f.move : ''), 12, 100);
   if (debug) {
     ctx.fillStyle = '#9f9';
-    ctx.fillText('tick ' + w.tick + '  fps ' + stats.fps + '  tps ' + stats.tps, 12, 102);
+    ctx.fillText('tick ' + w.tick + '  fps ' + stats.fps + '  tps ' + stats.tps, 12, 116);
   }
 }
 
@@ -67,6 +74,7 @@ function drawGridHud(ctx, w, stats, debug) {
     ctx.fillStyle = '#e44';
     ctx.fillRect(x + 16, y + 2, Math.min(1, f.hp / def.hp) * 100, 8);
     bar(ctx, x + 16, y + 12, 100, 3, f.mp / def.mp, '#48f');
+    if (def.hasUlt) rageBar(ctx, x + 16, y + 16, 100, 3, f.rage || 0);
     if (w.mode.type === 'timed') {
       ctx.fillStyle = '#fff';
       ctx.font = '10px ' + FONT;

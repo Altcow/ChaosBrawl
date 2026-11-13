@@ -1,4 +1,5 @@
-import { drawFighter } from './sprites.js';
+import { drawFighter, drawProjectileArt, drawMoveFx } from './sprites.js';
+import { drawUltOverlay } from './ult.js';
 import { drawHud, drawOverhead, drawResult, SLOT_COLORS } from './hud.js';
 import { drawBoxes } from './debug.js';
 import { S } from '../sim/fighter.js';
@@ -16,7 +17,7 @@ export class Renderer {
     this.debug = false;
     this.prev = [];
     this.k = 1;
-    this.zoom = 1;
+    this.zoom = this.zoomMax || 1;
     this.camX = 0;
     this.resize();
   }
@@ -58,7 +59,7 @@ export class Renderer {
       if (x < minX) minX = x;
       if (x > maxX) maxX = x;
     }
-    const tz = Math.max(0.6, Math.min(1, LW / (maxX - minX + 360)));
+    const tz = Math.max(this.zoomMin || 0.6, Math.min(this.zoomMax || 1, LW / (maxX - minX + 360)));
     this.zoom += (tz - this.zoom) * 0.12;
     const zoom = this.zoom;
     const vw = LW / zoom;
@@ -104,9 +105,17 @@ export class Renderer {
       const sx = p.x - camX;
       const sy = FLOOR_Y + p.z - p.y;
       ctx.globalAlpha = f.inv > 0 && (f.inv & 4) ? 0.4 : 1;
+      drawMoveFx(ctx, f, w.defs[f.charId], sx, sy, f.face, true);
       drawFighter(ctx, f, w.defs[f.charId], sx, sy, f.face, f.hitstop > 0 && f.sinceHit < 6);
+      drawMoveFx(ctx, f, w.defs[f.charId], sx, sy, f.face, false);
       ctx.globalAlpha = 1;
-      if (i > 0 || w.mode.type !== 'practice') drawOverhead(ctx, w, f, sx, sy);
+      if (i > 0 || w.mode.type !== 'practice') {
+        // 頭上血條與縮放脫鉤:用畫面座標(寬度固定 44),位置貼在縮小後的頭頂上方
+        ctx.save();
+        ctx.setTransform(this.k, 0, 0, this.k, 0, 0);
+        drawOverhead(ctx, w, f, sx * zoom, ty + sy * zoom - 64 * zoom - 12 + 78);
+        ctx.restore();
+      }
     }
     // 射彈與場地物件
     for (const pr of w.projectiles) {
@@ -123,7 +132,7 @@ export class Renderer {
       } else if (pd.wall) {
         ctx.fillStyle = '#8a5a2a';
         ctx.fillRect(sx - 6, sy - 80, 12, 80);
-      } else {
+      } else if (!drawProjectileArt(ctx, pr.ch, pr.kind, pr.life, sx, sy, pr.face)) {
         ctx.fillStyle = '#ffd24a';
         ctx.fillRect(sx - 8, sy - 8, 16, 16);
         ctx.strokeStyle = '#a60';
@@ -135,6 +144,7 @@ export class Renderer {
 
     ctx.setTransform(this.k, 0, 0, this.k, 0, 0);
     drawHud(ctx, w, stats, this.debug);
+    drawUltOverlay(ctx, w);
     drawResult(ctx, w, nameOf || ((i) => '#' + (i + 1)));
   }
   _world(ctx, w, camX, vw) {

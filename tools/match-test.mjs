@@ -13,6 +13,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ids = JSON.parse(readFileSync(join(root, 'data/chars/index.json'), 'utf8'));
 const chars = {};
 for (const id of ids) chars[id] = JSON.parse(readFileSync(join(root, 'data/chars/' + id + '.json'), 'utf8'));
+for (const id of ['ada', 'grandma', 'librarian', 'cat']) chars[id] = JSON.parse(readFileSync(join(root, 'tools/fixtures/chars/' + id + '.json'), 'utf8')); // 舊 4 人僅供測試(不在正式名單)
 const stage = JSON.parse(readFileSync(join(root, 'data/stages/market.json'), 'utf8'));
 
 let pass = 0;

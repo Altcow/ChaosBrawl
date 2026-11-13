@@ -1,16 +1,20 @@
 import { BIT } from '../core/input.js';
+import { ULT_MACRO } from '../sim/command.js';
 
 // 觸控:左側動態虛擬搖桿(8 向,死區 25%)+ 攻 / 跳 / 防 + 必殺輔助鍵
 // 必殺輔助鍵:點一下 → 呼叫 onAssist(),由主程式依面向自動放出該角色第一招必殺
+// 大招鈕:爆氣滿(100)才亮起,點一下排入 ULT_MACRO;爆氣來源:主程式呼叫 setRage(0~1),沒呼叫時讀 window.__cb.world
 const STICK_R = 56;
 const DEAD = 0.25;
+const RAGE_FULL = 100 * 256; // 爆氣滿值(sim/ult.js RAGE_MAX = 100 * FX,FX = 256)
 
 export function setupTouch(root, input, onAssist) {
   root.innerHTML = '';
   const zone = el('div', 'zone');
+  const hint = el('div', 'stick-hint');
   const base = el('div', 'stick-base');
   const knob = el('div', 'stick-knob');
-  root.append(zone, base, knob);
+  root.append(zone, hint, base, knob);
 
   const btnBits = { atk: 0, jump: 0, def: 0 };
   let stickBits = 0;
@@ -28,6 +32,7 @@ export function setupTouch(root, input, onAssist) {
     const r = root.getBoundingClientRect();
     ox = e.clientX - r.left;
     oy = e.clientY - r.top;
+    hint.style.display = 'none';
     base.style.cssText = 'display:block;left:' + ox + 'px;top:' + oy + 'px';
     knob.style.cssText = 'display:block;left:' + ox + 'px;top:' + oy + 'px';
     stickBits = 0;
@@ -53,6 +58,7 @@ export function setupTouch(root, input, onAssist) {
     if (e.pointerId !== sid) return;
     sid = null;
     stickBits = 0;
+    hint.style.display = '';
     base.style.display = 'none';
     knob.style.display = 'none';
     emit();
@@ -76,6 +82,46 @@ export function setupTouch(root, input, onAssist) {
   const spUp = () => sp.classList.remove('down');
   sp.addEventListener('pointerup', spUp);
   sp.addEventListener('pointercancel', spUp);
+
+  // 大招鈕:rageRatio = null(未知,視為可按)/ 0~1
+  const ult = el('div', 'btn b-ult');
+  ult.textContent = '大招';
+  root.append(ult);
+  let rageRatio = null;
+  let manualAt = 0;
+  const ultReady = () => rageRatio === null || rageRatio >= 1;
+  const paintUlt = () => {
+    ult.classList.toggle('off', rageRatio !== null && rageRatio < 1);
+    ult.classList.toggle('ready', rageRatio !== null && rageRatio >= 1);
+  };
+  ult.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    if (!ultReady()) return;
+    ult.classList.add('down');
+    input.queueMacro('P1', ULT_MACRO);
+  });
+  const ultUp = () => ult.classList.remove('down');
+  ult.addEventListener('pointerup', ultUp);
+  ult.addEventListener('pointercancel', ultUp);
+  ult.addEventListener('lostpointercapture', ultUp);
+  paintUlt();
+
+  // 讀爆氣:setRage 優先;否則讀本機單機局(__cb.world)第一個真人角色
+  let raf = 0;
+  const poll = () => {
+    raf = requestAnimationFrame(poll);
+    if (Date.now() - manualAt < 500) return;
+    const w = window.__cb && window.__cb.world;
+    let r = null;
+    if (w) {
+      const f = w.fighters.find((x) => x.kind === 'human');
+      if (f) r = w.defs[f.charId].hasUlt ? Math.min(1, (f.rage || 0) / RAGE_FULL) : 0;
+    }
+    if (r !== rageRatio) {
+      rageRatio = r;
+      paintUlt();
+    }
+  };
 
   function addButton(key, label, cls, bit) {
     const b = el('div', 'btn ' + cls);
@@ -105,12 +151,28 @@ export function setupTouch(root, input, onAssist) {
 
   root.addEventListener('contextmenu', (e) => e.preventDefault());
   return {
-    show() { root.classList.add('show'); },
-    hide() { root.classList.remove('show'); },
+    show() {
+      root.classList.add('show');
+      if (!raf) raf = requestAnimationFrame(poll);
+    },
+    hide() {
+      root.classList.remove('show');
+      cancelAnimationFrame(raf);
+      raf = 0;
+    },
+    // 主程式可直接餵爆氣比例(0~1);null = 未知
+    setRage(ratio) {
+      manualAt = Date.now();
+      if (ratio !== rageRatio) {
+        rageRatio = ratio;
+        paintUlt();
+      }
+    },
     reset() {
       sid = null;
       stickBits = 0;
       btnBits.atk = btnBits.jump = btnBits.def = 0;
+      hint.style.display = '';
       base.style.display = 'none';
       knob.style.display = 'none';
       emit();

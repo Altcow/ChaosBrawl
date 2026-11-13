@@ -1,0 +1,437 @@
+{
+  "id": "librarian",
+  "name": "館長書蟲",
+  "nicknames": ["書蟲館長", "安靜姐", "借書王", "逾期君", "書牆哥", "圖書魔", "索書號", "閱覽室長"],
+  "color": "#4080c0",
+  "hp": 420,
+  "mp": 500,
+  "mpStart": 200,
+  "mpRegen": 6,
+  "assist": "sp_fwd_atk",
+  "walk": {
+    "x": 2.5,
+    "z": 1.6
+  },
+  "run": {
+    "x": 5.5,
+    "z": 1.0
+  },
+  "jump": {
+    "vy": 9,
+    "g": 0.5,
+    "squat": 3,
+    "vx": 2.5
+  },
+  "dash": {
+    "keep": 0.8,
+    "vy": 9
+  },
+  "runStop": 8,
+  "roll": {
+    "dur": 24,
+    "invFrom": 4,
+    "invTo": 16,
+    "speed": 4,
+    "cd": 30,
+    "specialCancel": 15
+  },
+  "lying": 45,
+  "getup": 18,
+  "stun": 70,
+  "body": {
+    "x": -14,
+    "y": 0,
+    "w": 28,
+    "h": 60
+  },
+  "moves": {
+    "attack1": {
+      "next": "attack2",
+      "cancel": 10,
+      "frames": [
+        {
+          "wait": 3,
+          "mvx": 0.8
+        },
+        {
+          "wait": 3,
+          "mvx": 1.5,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 36,
+              "h": 20,
+              "zr": 12,
+              "dmg": 25,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 12,
+          "mvx": 0
+        }
+      ]
+    },
+    "attack2": {
+      "next": "attack3",
+      "cancel": 10,
+      "frames": [
+        {
+          "wait": 3,
+          "mvx": 0.8
+        },
+        {
+          "wait": 3,
+          "mvx": 1.5,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 36,
+              "h": 20,
+              "zr": 12,
+              "dmg": 25,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 12,
+          "mvx": 0
+        }
+      ]
+    },
+    "attack3": {
+      "cancel": 8,
+      "frames": [
+        {
+          "wait": 5,
+          "mvx": 1
+        },
+        {
+          "wait": 3,
+          "mvx": 2.0,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 40,
+              "h": 24,
+              "zr": 12,
+              "dmg": 35,
+              "fall": 60,
+              "bdef": 35,
+              "kx": 4,
+              "ky": 6,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 16,
+          "mvx": 0
+        }
+      ]
+    },
+    "sp_fwd_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 2,
+          "spawn": [
+            {
+              "proj": "book",
+              "x": 20,
+              "y": 35,
+              "vz": -1.2
+            },
+            {
+              "proj": "book",
+              "x": 20,
+              "y": 35,
+              "vz": 0
+            },
+            {
+              "proj": "book",
+              "x": 20,
+              "y": 35,
+              "vz": 1.2
+            }
+          ]
+        },
+        {
+          "wait": 16
+        }
+      ]
+    },
+    "sp_down_atk": {
+      "cost": 125,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 8
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "hush",
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "wait": 14
+        }
+      ]
+    },
+    "sp_up_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 8
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "bookwall",
+            "x": 40,
+            "y": 0
+          }
+        },
+        {
+          "wait": 12
+        }
+      ]
+    },
+    "runatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 4,
+          "mvx": 5
+        },
+        {
+          "wait": 6,
+          "mvx": 4,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 40,
+              "h": 24,
+              "zr": 12,
+              "dmg": 40,
+              "fall": 100,
+              "bdef": 35,
+              "kx": 5,
+              "ky": 6,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 14,
+          "mvx": 1
+        }
+      ]
+    },
+    "jumpatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 4
+        },
+        {
+          "wait": 10,
+          "itr": [
+            {
+              "x": 8,
+              "y": 10,
+              "w": 34,
+              "h": 30,
+              "zr": 12,
+              "dmg": 35,
+              "fall": 60,
+              "bdef": 20,
+              "kx": 3,
+              "ky": 3,
+              "stun": 14,
+              "stop": 4,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8
+        }
+      ]
+    },
+    "dashatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 6
+        },
+        {
+          "wait": 8,
+          "itr": [
+            {
+              "x": 8,
+              "y": 10,
+              "w": 40,
+              "h": 30,
+              "zr": 12,
+              "dmg": 40,
+              "fall": 100,
+              "bdef": 35,
+              "kx": 5,
+              "ky": 5,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8
+        }
+      ]
+    }
+  },
+  "projectiles": {
+    "book": {
+      "vx": 5,
+      "life": 70,
+      "chase": 0,
+      "bdy": {
+        "x": -6,
+        "y": -6,
+        "w": 12,
+        "h": 12
+      },
+      "itr": {
+        "x": -6,
+        "y": -6,
+        "w": 12,
+        "h": 12,
+        "zr": 12,
+        "dmg": 25,
+        "fall": 20,
+        "bdef": 15,
+        "kx": 2,
+        "ky": 0,
+        "stun": 12,
+        "stop": 3,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      }
+    },
+    "hush": {
+      "vx": 0,
+      "life": 180,
+      "zone": {
+        "r": 150,
+        "zr": 60,
+        "type": "silence"
+      }
+    },
+    "bookwall": {
+      "vx": 0,
+      "life": 240,
+      "wall": true,
+      "bdy": {
+        "x": -6,
+        "y": 0,
+        "w": 12,
+        "h": 80,
+        "zr": 40
+      }
+    }
+  },
+  "ai": {
+    "style": "ranged",
+    "range": 44,
+    "specials": [
+      {
+        "cmd": "sp_down_atk",
+        "min": 0,
+        "max": 110,
+        "zr": 50
+      },
+      {
+        "cmd": "sp_fwd_atk",
+        "min": 110,
+        "max": 420,
+        "zr": 14
+      }
+    ]
+  },
+  "art": {
+    "atlas": "art/librarian/atlas.json",
+    "scale": 0.5,
+    "states": {
+      "idle": { "mode": "loop", "rate": 24, "frames": ["idle_0", "idle_1"] },
+      "walk": { "mode": "loop", "rate": 8, "frames": ["walk_0", "walk_1", "walk_2", "walk_3"] },
+      "run": { "mode": "loop", "rate": 5, "frames": ["run_0", "run_1", "run_2", "run_3"] },
+      "runstop": { "mode": "hold", "frames": ["runstop_0"] },
+      "squat": { "mode": "hold", "frames": ["squat_0"] },
+      "jump": { "mode": "vy", "frames": ["jump_up", "jump_down"] },
+      "dash": { "mode": "hold", "frames": ["dash_0"] },
+      "defend": { "mode": "hold", "frames": ["defend_0"] },
+      "roll": { "mode": "progress", "total": "roll.dur", "frames": ["roll_0", "roll_1", "roll_2"] },
+      "hurt": { "mode": "stunt", "at": 16, "frames": ["hurt_light", "hurt_heavy"] },
+      "fall": { "mode": "vy", "frames": ["fall_up", "fall_down"] },
+      "lying": { "mode": "hold", "frames": ["lying_0"] },
+      "dead": { "mode": "hold", "frames": ["lying_0"] },
+      "getup": { "mode": "progress", "total": "getup", "frames": ["getup_0", "getup_1"] },
+      "stun": { "mode": "loop", "rate": 10, "frames": ["stun_0", "stun_1"] }
+    },
+    "moves": {
+      "attack1": { "mode": "move", "frames": ["attack1_0", "attack1_1", "attack1_1"] },
+      "attack2": { "mode": "move", "frames": ["attack2_0", "attack2_1", "attack2_1"] },
+      "attack3": { "mode": "move", "frames": ["attack3_0", "attack3_1", "attack3_1"] },
+      "sp_fwd_atk": { "mode": "move", "frames": ["sp_fwd_atk_0", "sp_fwd_atk_1", "sp_fwd_atk_2"] },
+      "sp_down_atk": { "mode": "move", "frames": ["sp_down_atk_0", "sp_down_atk_1", "sp_down_atk_2"] },
+      "sp_up_atk": { "mode": "move", "frames": ["sp_up_atk_0", "sp_up_atk_1", "sp_up_atk_2"] },
+      "runatk": { "mode": "move", "frames": ["runatk_0", "runatk_1", "runatk_1"] },
+      "jumpatk": { "mode": "move", "frames": ["jumpatk_0", "jumpatk_1", "jumpatk_1"] },
+      "dashatk": { "mode": "move", "frames": ["dashatk_0", "dashatk_1", "dashatk_1"] }
+    }
+  }
+}

@@ -7,17 +7,19 @@ import { VClock, MemHub } from '../js/net/mem.js';
 import { FbTransport, applyEvent } from '../js/net/fb.js';
 import { createRoom, joinRoom, startMatch, setSeat, expired, planSeats, applyPlan, leaveSeat } from '../js/net/lobby.js';
 import { Session, TICK_MS, buildNetWorld } from '../js/net/sync.js';
-import { makeCtx, encodeWorld, decodeWorld, b64enc, b64dec } from '../js/net/codec.js';
+import { makeCtx, encodeWorld, decodeWorld, encodeDelta, applyDelta, b64enc, b64dec } from '../js/net/codec.js';
 import { Usage } from '../js/net/usage.js';
 import { serializeWorld, restoreWorld, stepWorld, hashWorld } from '../js/sim/world.js';
 import { Rng } from '../js/core/rng.js';
 import { BIT } from '../js/core/input.js';
 import { S } from '../js/sim/fighter.js';
+import { RAGE_MAX } from '../js/sim/ult.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ids = JSON.parse(readFileSync(join(root, 'data/chars/index.json'), 'utf8'));
 const chars = {};
 for (const id of ids) chars[id] = JSON.parse(readFileSync(join(root, 'data/chars/' + id + '.json'), 'utf8'));
+for (const id of ['ada', 'grandma', 'librarian', 'cat']) chars[id] = JSON.parse(readFileSync(join(root, 'tools/fixtures/chars/' + id + '.json'), 'utf8')); // 舊 4 人僅供測試(不在正式名單)
 const stage = JSON.parse(readFileSync(join(root, 'data/stages/market.json'), 'utf8'));
 const LONG = process.argv[2] === 'long';
 
@@ -411,6 +413,7 @@ if (true) await offlineCase('10 分鐘', 600);
 async function failover(opts) {
   const R = await makeRoom({ humans: 4, base: opts.base || 100, jitter: opts.jitter === undefined ? 30 : opts.jitter, mode: 'practice' });
   const fn = wander(31);
+  if (opts.pre) opts.pre(R);
   await R.drive(6000, fn);
   const old = R.hostPeer();
   const oldTick = old.sess.world.tick;
@@ -546,6 +549,8 @@ const ALPH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   check('8 真人流量 ≤ 250 MB/房間小時', mb <= 250, mb.toFixed(0) + ' MB/h');
   const c = R.peers[3].sess.stats;
   console.log('INFO 座位 3 客戶端:每分鐘修正 ' + (c.corr / 15).toFixed(0) + ' 次、平均 ' + (c.corr ? (c.corrDist / c.corr).toFixed(1) : 0) + ' px、房主遲到輸入 ' + hostSess.stats.lateInputs);
+  const hst = hostSess.stats;
+  console.log('INFO 快照訊息:完整 ' + hst.fullSent + ' 則、差量 ' + hst.deltaSent + ' 則,d 欄位平均 ' + Math.round(hst.snapBytes / (hst.fullSent + hst.deltaSent)) + ' B(base64);客戶端漏接差量 ' + R.peers.slice(1).reduce((x, p) => x + p.sess.stats.deltaMiss, 0) + ' 次');
   const slimBytes = encodeWorld(Object.assign({}, snap, { fighters: snap.fighters.map((f) => Object.assign({}, f, { hist: [], hitLog: {}, prev: 0, pend: 0 })) }), ctx).length;
   console.log('INFO 縮減估算:去掉 hist/hitLog/prev/pend → ' + slimBytes + ' B(二進位)');
 }
@@ -592,6 +597,219 @@ const ALPH = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const tr3 = R2.hub.client({ base: 20, jitter: 0 });
   const other = (await R2.wait(createRoom(tr3, R2.clock, { dev: 'new', name: 'N', rand: () => seq[qj++ % 8] }))).code;
   check('保留時間內(對戰中 29 分鐘)房號不會被覆寫', other !== R2.code, other);
+}
+
+// ================= 差量快照 =================
+const fnv = (str, h = 0x811c9dc5) => {
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h >>> 0;
+};
+
+// ---------- 14. 差量編碼:往返一致、決定性 ----------
+{
+  const ctx = makeCtx(chars);
+  const canonC = (v) => (Array.isArray(v) ? v.map(canonC) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, canonC(v[k])])) : v);
+  const noAiC = (sn) => JSON.stringify(canonC(Object.assign({}, sn, { fighters: sn.fighters.map((f) => Object.assign({}, f, { ai: null })) })));
+  const run = () => {
+    const seats = [0, 1, 2, 3, 4, 5, 6, 7].map((i) => ({ seat: i, kind: i < 4 ? 'human' : 'ai', char: ids[i % ids.length], lvl: 2 }));
+    const w = buildNetWorld(chars, stage, { mode: 'brawl', seed: 11, seats });
+    const r = new Rng(123);
+    const cur4 = [0, 0, 0, 0];
+    let chain = null;
+    let prev = null;
+    let bad = 0;
+    let h = 0x811c9dc5;
+    let nDelta = 0;
+    let nKey = 0;
+    let bytesDelta = 0;
+    let bytesKey = 0;
+    let maxDelta = 0;
+    let fullBad = 0;
+    const cov = { pause: 0, queue: 0, dmg: 0, projUlt: 0, cd: 0 };
+    for (let t = 1; t <= 10800; t++) { // 3 分鐘
+      if (t % 20 === 0) for (let i = 0; i < 4; i++) cur4[i] = r.next() & 127;
+      if (t % 240 === 1) for (const f of w.fighters) f.rage = RAGE_MAX; // 讓大招持續發生
+      if (t % 240 === 2) cur4[0] = BIT.DEF | BIT.ATK | BIT.JUMP;
+      if (t % 240 === 3) cur4[0] = 0;
+      stepWorld(w, cur4);
+      if (w.ult.cur >= 0) cov.pause++;
+      if (w.ult.q.length) cov.queue++;
+      if (w.ult.cd > 0) cov.cd++;
+      if (w.fighters.some((f) => Object.keys(f.ultDmg).length)) cov.dmg++;
+      if (w.projectiles.some((p) => p.ult !== undefined)) cov.projUlt++;
+      if (t % 4) continue;
+      const snap = serializeWorld(w);
+      const full = decodeWorld(encodeWorld(snap, ctx), ctx);
+      if (noAiC(snap) !== noAiC(full)) fullBad++; // 完整編碼:除 AI 內部思考狀態外,所有欄位(含大招)完全保留
+      let rec;
+      if (!prev || t % 60 === 0) {
+        const b = encodeWorld(snap, ctx);
+        nKey++;
+        bytesKey += b.length;
+        rec = decodeWorld(b, ctx);
+      } else {
+        const d = encodeDelta(prev, snap, ctx);
+        nDelta++;
+        bytesDelta += d.length;
+        maxDelta = Math.max(maxDelta, d.length);
+        rec = applyDelta(chain, d, ctx);
+      }
+      const a = JSON.stringify(rec);
+      if (a !== JSON.stringify(full)) bad++;
+      h = fnv(a, h);
+      chain = rec;
+      prev = snap;
+    }
+    return { fullBad, cov, bad, h, nDelta, nKey, avgDelta: bytesDelta / nDelta, avgKey: bytesKey / nKey, maxDelta, w };
+  };
+  const a = run();
+  const b = run();
+  check('差量編碼:8 角色(4 真人 + 4 AI)跑 3 分鐘,每則差量套用後與完整編碼逐欄位一致', a.bad === 0 && a.nDelta > 2500, 'mismatch=' + a.bad + ' delta=' + a.nDelta + ' key=' + a.nKey);
+  const cv = a.cov;
+  check('8 人 3 分鐘含大招:完整編碼保留全部欄位(僅 AI 內部狀態除外)', a.fullBad === 0 && cv.pause > 100 && cv.queue > 0 && cv.dmg > 100 && cv.cd > 100, 'fullBad=' + a.fullBad + ' 特寫暫停 tick=' + cv.pause + ' 排隊 tick=' + cv.queue + ' ultDmg tick=' + cv.dmg + ' 大招射彈 tick=' + cv.projUlt);
+  check('差量編碼:同種子同輸入跑 3 分鐘,兩次雜湊一致(決定性)', a.h === b.h && hashWorld(a.w) === hashWorld(b.w), a.h.toString(16));
+  console.log('INFO 差量大小:平均 ' + a.avgDelta.toFixed(0) + ' B(二進位)、最大 ' + a.maxDelta + ' B;關鍵格平均 ' + a.avgKey.toFixed(0) + ' B');
+  // 角色數不同 → 不可差量
+  const wA = buildNetWorld(chars, stage, { mode: 'practice', seed: 1, seats: [0, 1].map((i) => ({ seat: i, kind: 'human', char: ids[i], lvl: 1 })) });
+  const wB = buildNetWorld(chars, stage, { mode: 'practice', seed: 1, seats: [0, 1, 2].map((i) => ({ seat: i, kind: 'human', char: ids[i], lvl: 1 })) });
+  check('差量編碼:角色數不同時拒絕(呼叫端改送完整快照)', encodeDelta(serializeWorld(wA), serializeWorld(wB), ctx) === null);
+}
+
+{
+  // 大招狀態還原:在「特寫暫停中」與「大招出手中」各取一次快照,還原到另一個世界後每 tick 雜湊都一致
+  const ctx = makeCtx(chars);
+  const seats = [0, 1].map((i) => ({ seat: i, kind: 'human', char: i ? 'ada' : 'fanfan', lvl: 1 }));
+  const canonR = (v) => (Array.isArray(v) ? v.map(canonR) : v && typeof v === 'object' ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, canonR(v[k])])) : v);
+  const strip = (w) => { const sn = serializeWorld(w); for (const f of sn.fighters) f.ai = null; return fnv(JSON.stringify(canonR(sn))); };
+  const restoreRun = (pick) => {
+    const mk = () => buildNetWorld(chars, stage, { mode: 'practice', seed: 5, seats });
+    const w1 = mk();
+    const w2 = mk();
+    const ins = (t) => [t % 200 === 2 ? BIT.DEF | BIT.ATK | BIT.JUMP : 0, 0];
+    let snapped = false;
+    const o = { compared: 0, bad: 0, inShow: 0, snapped: false };
+    for (let t = 0; t < 1500; t++) {
+      if (t % 200 === 1) for (const f of w1.fighters) f.rage = RAGE_MAX;
+      if (t % 200 === 1 && snapped) for (const f of w2.fighters) f.rage = RAGE_MAX; // 外部注入的作弊同樣套給還原的世界
+      if (!snapped && t > 10 && pick(w1)) {
+        restoreWorld(w2, decodeWorld(encodeWorld(serializeWorld(w1), ctx), ctx));
+        snapped = true;
+        o.snapped = true;
+      }
+      stepWorld(w1, ins(t));
+      if (!snapped) continue;
+      stepWorld(w2, ins(t));
+      o.compared++;
+      if (strip(w1) !== strip(w2)) o.bad++;
+      if (w2.ult.cur >= 0) o.inShow++;
+    }
+    return o;
+  };
+  const o1 = restoreRun((w) => w.ult.cur >= 0 && w.ult.t > 20);
+  check('大招特寫暫停中取快照還原後續跑,每 tick 雜湊一致', o1.snapped && o1.bad === 0 && o1.inShow > 20, 'compared=' + o1.compared + ' bad=' + o1.bad + ' 還原後仍在特寫 tick=' + o1.inShow);
+  const o2 = restoreRun((w) => w.ult.cur < 0 && w.fighters.some((f) => f.ult === 2 && f.move === 'ultimate'));
+  check('大招出手中(含 ultDmg)取快照還原後續跑,每 tick 雜湊一致', o2.snapped && o2.bad === 0 && o2.compared > 100, 'compared=' + o2.compared + ' bad=' + o2.bad);
+}
+
+// 記錄房主每個快照 tick 的完整狀態,並持續比對每位客戶端套用後的狀態
+function attachRecorder(R, rage = true) {
+  const ctx = makeCtx(chars);
+  const rec = new Map();
+  const cmp = { n: 0, bad: 0, firstBad: '' };
+  const seen = new Map();
+  const msgs = [];
+  for (const p of R.peers) {
+    const orig = p.sess.net.broadcast.bind(p.sess.net);
+    p.sess.net.broadcast = (m) => {
+      msgs.push(m);
+      rec.set(m.e + ':' + m.t, JSON.stringify(decodeWorld(encodeWorld(serializeWorld(p.sess.world), ctx), ctx))); // 送出當下房主的完整狀態
+      return orig(m);
+    };
+  }
+  R.tickHook = () => {
+    if (rage) {
+      const h = R.hostPeer();
+      if (h && h.sess.hostReady && h.sess.world.tick % 240 === 1 && R.clock.now() !== R._rageAt) {
+        R._rageAt = R.clock.now();
+        for (const f of h.sess.world.fighters) f.rage = RAGE_MAX;
+      }
+    }
+    for (const p of R.peers) {
+      const s = p.sess;
+      if (p.dead || s.role !== 'client' || !s.chainS || seen.get(p.i) === s.chainS) continue;
+      seen.set(p.i, s.chainS);
+      const want = rec.get(s.chainE + ':' + s.chainS.tick);
+      if (want === undefined) continue;
+      cmp.n++;
+      if (want !== JSON.stringify(s.chainS)) {
+        cmp.bad++;
+        if (!cmp.firstBad) cmp.firstBad = 'seat ' + p.i + ' tick ' + s.chainS.tick;
+      }
+    }
+  };
+  return { rec, cmp, msgs };
+}
+
+// ---------- 15. 差量快照:一般連線、丟包、遷移 ----------
+{
+  const R = await makeRoom({ humans: 4, base: 100, jitter: 30, mode: 'brawl', ais: 2 });
+  const A = attachRecorder(R);
+  await R.drive(30000, wander(91));
+  const hs = R.hostPeer().sess.stats;
+  const missAll = R.peers.slice(1).reduce((x, p) => x + p.sess.stats.deltaMiss, 0);
+  check('差量快照(無丟包 30 s):客戶端套用後狀態與房主逐則一致、無漏接', A.cmp.n > 600 && A.cmp.bad === 0 && missAll === 0, 'compared=' + A.cmp.n + ' bad=' + A.cmp.bad + ' full=' + hs.fullSent + ' delta=' + hs.deltaSent);
+  check('差量快照:關鍵格約每秒一則(完整 / 差量比例約 1:14)', hs.fullSent >= 28 && hs.fullSent <= 33 && hs.deltaSent >= 400, 'full=' + hs.fullSent + ' delta=' + hs.deltaSent);
+}
+{
+  const R = await makeRoom({ humans: 4, base: 100, jitter: 30, drop: 0.2, mode: 'brawl', ais: 2 });
+  const A = attachRecorder(R);
+  await R.drive(40000, wander(92));
+  const miss = R.peers.slice(1).reduce((x, p) => x + p.sess.stats.deltaMiss, 0);
+  const frozen = R.peers.some((p) => p.sess.frozen || p.sess.stats.migrations > 0);
+  check('20% 丟包 40 s:有漏接差量但不凍結、不遷移、客戶端狀態從不發散', miss > 20 && !frozen && R.hosts().length === 1 && A.cmp.bad === 0 && A.cmp.n > 200, 'dropped=' + R.hub.stats.dropped + ' deltaMiss=' + miss + ' compared=' + A.cmp.n + ' bad=' + A.cmp.bad + ' ' + A.cmp.firstBad);
+  for (const p of R.peers) p.tr.drop = 0;
+  await R.drive(2500, wander(92));
+  const host = R.hostPeer();
+  const lag = R.peers.slice(1).map((p) => host.sess.world.tick - p.sess.chainS.tick);
+  check('丟包停止後 2.5 s 內全部客戶端回到最新(關鍵格修正)', lag.every((x) => x >= 0 && x <= 30), 'lag ticks=' + lag.join(','));
+}
+{
+  let A;
+  const r = await failover({ pre: (R0) => { A = attachRecorder(R0); } });
+  const { R, nh, fn } = r;
+  await R.drive(6000, fn);
+  const firstNew = A.msgs.find((m) => m.e === nh.sess.epoch);
+  check('房主遷移後:新房主第一則快照為完整快照、續打期間客戶端狀態與新房主逐則一致', !!firstNew && firstNew.b === undefined && A.cmp.n > 50 && A.cmp.bad === 0 && R.hosts().length === 1, 'epoch=' + nh.sess.epoch + ' compared=' + A.cmp.n + ' bad=' + A.cmp.bad + ' ' + A.cmp.firstBad);
+  const live = R.peers.filter((p) => !p.dead && p !== nh);
+  check('房主遷移後客戶端以新 epoch 的差量鏈持續更新', live.every((p) => p.sess.chainE === nh.sess.epoch && nh.sess.world.tick - p.sess.chainS.tick <= 30), live.map((p) => nh.sess.world.tick - p.sess.chainS.tick).join(','));
+}
+
+// ---------- 16. 大招特寫暫停中途房主遷移 ----------
+{
+  const R = await makeRoom({ humans: 4, ais: 2, base: 100, jitter: 30, mode: 'brawl' });
+  const A = attachRecorder(R);
+  const fn = wander(93);
+  const old = R.hostPeer();
+  const showMs = await R.until(() => old.sess.world.ult.cur >= 0 && old.sess.world.ult.t >= 15, 30000, fn);
+  const cutTick = old.sess.world.tick;
+  const cutT = old.sess.world.ult.t;
+  old.dead = true;
+  old.tr.setOnline(false);
+  const ms = await R.until(() => {
+    const h = R.hosts();
+    return h.length === 1 && R.peers.filter((p) => !p.dead).every((p) => p === h[0] || (p.sess.epoch === h[0].sess.epoch && !p.sess.frozen && p.sess.synced && R.clock.now() - p.sess.lastSnapAt < 500));
+  }, 15000, fn);
+  const nh = R.hostPeer();
+  const t0 = nh ? nh.sess.world.tick : 0;
+  const wasShow = nh && nh.sess.rollbackTo !== undefined;
+  await R.drive(6000, fn);
+  const w = nh.sess.world;
+  check('大招特寫暫停中房主斷線:≤ 6 s 內由新房主接手、本局續打(特寫狀態延續並結束、世界前進)', showMs >= 0 && ms >= 0 && ms <= 6000 && wasShow && w.tick - t0 > 240 && R.hosts().length === 1, 'cut@tick ' + cutTick + ' show.t=' + cutT + ' recover=' + Math.round(ms) + ' ms advanced=' + (w.tick - t0) + ' epoch=' + nh.sess.epoch);
+  const live = R.peers.filter((p) => !p.dead && p !== nh);
+  check('特寫暫停中遷移:客戶端與新房主狀態逐則一致、無發散', A.cmp.bad === 0 && A.cmp.n > 50 && live.every((p) => p.sess.chainE === nh.sess.epoch), 'compared=' + A.cmp.n + ' bad=' + A.cmp.bad + ' ' + A.cmp.firstBad);
 }
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');

@@ -14,55 +14,111 @@
 <div id="view">
   <canvas id="game" width="800" height="450"></canvas>
   <div id="tools">
-    <button id="btn-debug" type="button">盒子</button>
-    <button id="btn-scn" type="button">場景</button>
-    <button id="btn-reset" type="button">重置</button>
+    <button id="btn-debug" class="dev" type="button">盒子</button>
+    <button id="btn-scn" class="dev" type="button">場景</button>
+    <button id="btn-reset" class="dev" type="button">重置</button>
     <button id="btn-menu" type="button">選單</button>
+  </div>
+  <div id="result" class="hide">
+    <button id="btn-again" type="button">再來一局</button>
+    <button id="btn-home" type="button">回首頁</button>
   </div>
   <div id="touch"></div>
 </div>
+
 <div id="menu">
-  <div class="panel">
-    <h1>ChaosBrawl</h1>
-    <section id="local">
-      <h2>單機遊玩<span>不用連網、可單人(其餘座位由電腦補位)</span></h2>
-      <div class="row"><label for="sel-mode">模式</label>
-        <select id="sel-mode">
-          <option value="brawl">大亂鬥(單命、5 分鐘)</option>
-          <option value="team">分隊戰(2~4 隊、5 分鐘)</option>
-          <option value="timed">時間賽(3 分鐘、重生)</option>
-          <option value="practice">練習(木樁 / 簡易對手,只用座位 1)</option>
-        </select>
-        <label for="sel-ff">友軍傷害</label>
-        <select id="sel-ff"><option value="0">關</option><option value="1">部分</option><option value="2">全開</option></select>
+  <!-- 首頁:頭像列、開始、和朋友連線 / 練習場 / 更多設定 -->
+  <section id="home" class="screen">
+    <header><h1>ChaosBrawl</h1><span><button id="btn-about" type="button" class="small">關於與致謝</button> <button id="btn-help" type="button" class="small">操作說明</button></span></header>
+    <div id="avatars"></div>
+    <button id="btn-start" type="button">開始</button>
+    <div id="sub-row">
+      <button id="btn-online" type="button">和朋友連線</button>
+      <button id="btn-practice" type="button">練習場</button>
+      <button id="btn-more" type="button">更多設定</button>
+    </div>
+    <div id="join-hint">2P:按手把任一鍵 / 鍵盤小鍵盤 1 加入</div>
+  </section>
+
+  <!-- 更多設定(覆蓋面板,分段按鈕) -->
+  <section id="more" class="screen hide">
+    <header><h2>更多設定</h2><button id="btn-more-done" type="button" class="small">完成</button></header>
+    <div class="field"><label>模式</label><div id="seg-mode" class="seg"></div></div>
+    <div class="field"><label>總人數</label><div id="seg-total" class="seg"></div></div>
+    <div class="field"><label>電腦強度</label><div id="seg-lvl" class="seg"></div></div>
+    <div id="team-opts">
+      <div class="field"><label>隊數</label><div id="seg-teams" class="seg"></div></div>
+      <div class="field"><label>友軍傷害</label><div id="seg-ff" class="seg"></div></div>
+    </div>
+    <div class="field"><button id="btn-seats" type="button">自訂每個座位 &gt;</button><span id="custom-note"></span></div>
+  </section>
+
+  <!-- 自訂每個座位(第二層) -->
+  <section id="seats" class="screen hide">
+    <header><h2>自訂每個座位</h2><span><button id="btn-seats-reset" type="button" class="small">清除自訂</button> <button id="btn-seats-done" type="button" class="small">完成</button></span></header>
+    <div id="slots"></div>
+  </section>
+
+  <!-- 和朋友連線(獨立面板) -->
+  <section id="netpanel" class="screen hide">
+    <header><h2>和朋友連線</h2><button id="btn-net-back" type="button" class="small">返回</button></header>
+    <div id="net-note"></div>
+    <div id="net-enter" class="row">
+      <button id="btn-create" type="button">建立房間</button>
+      <span class="grow"></span>
+      <input id="in-code" maxlength="4" placeholder="房號" size="5" autocomplete="off">
+      <button id="btn-join" type="button">加入</button>
+    </div>
+    <div id="lobby" class="hide">
+      <div class="row"><b>房號 <span id="lb-code"></span></b><button id="btn-copy" type="button" class="small">複製房號</button><span class="grow"></span><button id="btn-leave" type="button" class="small">離開</button></div>
+      <div id="lb-seats"></div>
+      <div class="row"><label>我的角色</label><div id="lb-avatars"></div></div>
+      <div class="row"><button id="btn-go" type="button">開始對戰</button><button id="btn-room-set" type="button" class="small">房間設定 &gt;</button></div>
+      <div id="lb-host" class="hide">
+        <div class="field"><label>模式</label><div id="seg-lbmode" class="seg"></div></div>
+        <div class="field"><label>補滿到</label><div id="seg-lbfill" class="seg"></div></div>
+        <div class="field"><label>電腦</label><div id="seg-lblvl" class="seg"></div></div>
+        <div class="field lb-team"><label>隊數</label><div id="seg-lbteams" class="seg"></div></div>
+        <div class="field lb-team"><label>友軍傷害</label><div id="seg-lbff" class="seg"></div></div>
+        <div class="field"><label>保留</label><div id="seg-lbkeep" class="seg"></div></div>
       </div>
-      <div id="slots"></div>
-      <button id="btn-start" type="button">單機開始(離線可玩)</button>
-    </section>
-    <details id="online">
-      <summary>連線對戰(Firebase,最多 8 人;需要網路)</summary>
-      <div><span id="net-note"></span></div>
-      <div class="row">
-        <button id="btn-create" type="button">建立房間</button>
-        <input id="in-code" maxlength="4" placeholder="房號" size="5">
-        <button id="btn-join" type="button">加入</button>
-      </div>
-      <div id="lobby" class="hide">
-        房號 <b id="lb-code"></b>
-        <div id="lb-host" class="row">
-          <label>補滿到<select id="lb-fill"></select>人</label>
-          <label>電腦<select id="lb-lvl"><option value="0">新手</option><option value="1" selected>普通</option><option value="2">困難</option><option value="3">魔王</option></select></label>
-          <label>隊數<select id="lb-teams"><option>2</option><option>3</option><option>4</option></select></label>
-          <label>友軍傷害<select id="lb-ff"><option value="0">關</option><option value="1">部分</option><option value="2">全開</option></select></label>
-          <label>保留<select id="lb-keep"><option value="10">10 分</option><option value="30" selected>30 分</option><option value="60">60 分</option></select></label>
-        </div>
-        <div id="lb-seats"></div>
-        <div class="row"><button id="btn-go" type="button">開始對戰(房主,可單人)</button><button id="btn-leave" type="button">離開</button></div>
-      </div>
-    </details>
-    <small>鍵盤 P1:WASD 移動 / J 攻擊 / K 跳 / L 防禦;防 + 方向 + 攻/跳 = 必殺。遊戲中 N 換場景(練習)、R 重置、B 盒子、Enter 回選單</small>
-  </div>
+    </div>
+  </section>
+
+  <!-- 關於與致謝(內容可捲動) -->
+  <section id="about" class="screen hide">
+    <header><h2>關於與致謝</h2><button id="btn-about-done" type="button" class="small">返回</button></header>
+    <div id="about-body">
+    <p>本遊戲為非官方同人致敬作品,非營利,與原作者及公司無關,版權歸原權利人所有。</p>
+    <h3>致敬</h3>
+    <p>《小朋友齊打交》(Little Fighter 2)<br>作者:Marti Wong、Starsky Wong(拼法待使用者核對)</p>
+    <h3>靈感來源作品與原作者</h3>
+    <ul>
+      <li>《龍珠》(Dragon Ball):鳥山明(Akira Toriyama,待使用者核對)</li>
+      <li>《BLEACH》:久保帶人(Tite Kubo,待使用者核對)</li>
+      <li>《鬼滅之刃》:吾峠呼世晴(Koyoharu Gotouge,待使用者核對)</li>
+      <li>《一拳超人》:ONE、村田雄介(Yusuke Murata,待使用者核對)</li>
+      <li>《科學超電磁砲》:鎌池和馬(Kazuma Kamachi)、冬川基(Motoi Fuyukawa)(待使用者核對)</li>
+      <li>《夏目友人帳》:緑川ゆき(Yuki Midorikawa,待使用者核對)</li>
+    </ul>
+    <h3>歷史人物</h3>
+    <p>關羽、呂布為歷史人物(參見《三國志》《三國演義》)。</p>
+    <h3>諷刺戲仿</h3>
+    <p>遊戲中兩位政治人物角色為諷刺戲仿對象,並非致敬本人。</p>
+    </div>
+  </section>
+
+  <!-- 操作說明 -->
+  <section id="help" class="screen hide">
+    <header><h2>操作說明</h2><button id="btn-help-done" type="button" class="small">關閉</button></header>
+    <p>鍵盤 P1:WASD 移動、J 攻擊、K 跳、L 防禦。防禦 + 方向 + 攻擊/跳 = 必殺。爆氣條滿了按 U(或 防 + 攻 + 跳 同時按)放大招。</p>
+    <p>手機:左半邊滑動移動,右下 攻 / 跳 / 防,「必殺」一鍵放出第一招;爆氣滿了「大招」鈕亮起,點一下放大招。左下的虛線圈是搖桿位置,手指按下後搖桿會跟著手指。</p>
+    <p>2P:按手把任一鍵或小鍵盤 1 即加入(方向鍵移動、小鍵盤 1 攻 / 2 跳 / 3 防、小鍵盤 4 大招)。</p>
+    <p>手把:X 攻、A 跳、B / RB 防、Y 大招。</p>
+    <p>遊戲中:Enter 或「選單」回首頁。</p>
+  </section>
 </div>
+
 <div id="rotate"><div><div class="phone"></div>請把手機轉橫</div></div>
 <script type="module" src="js/main.js"></script>
 </body>

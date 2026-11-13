@@ -99,5 +99,37 @@
       "bdy": { "x": -8, "y": -8, "w": 16, "h": 16 },
       "itr": { "x": -8, "y": -8, "w": 16, "h": 16, "zr": 12, "dmg": 35, "fall": 35, "bdef": 50, "kx": 3, "ky": 0, "stun": 16, "stop": 5, "rehit": 0, "gain": 0, "kind": "hit" }
     }
+  },
+  "art": {
+    "atlas": "art/ada/atlas.json",
+    "scale": 0.5,
+    "states": {
+      "idle": { "mode": "loop", "rate": 24, "frames": ["idle_0", "idle_1"] },
+      "walk": { "mode": "loop", "rate": 8, "frames": ["walk_0", "walk_1", "walk_2", "walk_3"] },
+      "run": { "mode": "loop", "rate": 5, "frames": ["run_0", "run_1", "run_2", "run_3"] },
+      "runstop": { "mode": "hold", "frames": ["runstop_0"] },
+      "squat": { "mode": "hold", "frames": ["squat_0"] },
+      "jump": { "mode": "vy", "frames": ["jump_up", "jump_down"] },
+      "dash": { "mode": "hold", "frames": ["dash_0"] },
+      "defend": { "mode": "hold", "frames": ["defend_0"] },
+      "roll": { "mode": "progress", "total": "roll.dur", "frames": ["roll_0", "roll_1", "roll_2"] },
+      "hurt": { "mode": "stunt", "at": 16, "frames": ["hurt_light", "hurt_heavy"] },
+      "fall": { "mode": "vy", "frames": ["fall_up", "fall_down"] },
+      "lying": { "mode": "hold", "frames": ["lying_0"] },
+      "dead": { "mode": "hold", "frames": ["lying_0"] },
+      "getup": { "mode": "progress", "total": "getup", "frames": ["getup_0", "getup_1"] },
+      "stun": { "mode": "loop", "rate": 10, "frames": ["stun_0", "stun_1"] }
+    },
+    "moves": {
+      "attack1": { "mode": "move", "frames": ["attack1_0", "attack1_1", "attack1_1"] },
+      "attack2": { "mode": "move", "frames": ["attack2_0", "attack2_1", "attack2_1"] },
+      "attack3": { "mode": "move", "frames": ["attack3_0", "attack3_1", "attack3_1"] },
+      "runatk": { "mode": "move", "frames": ["runatk_0", "runatk_1", "runatk_1"] },
+      "jumpatk": { "mode": "move", "frames": ["jumpatk_0", "jumpatk_1", "jumpatk_1"] },
+      "dashatk": { "mode": "move", "frames": ["dashatk_0", "dashatk_1", "dashatk_1"] },
+      "sp_fwd_atk": { "mode": "move", "frames": ["sp_fwd_atk_0", "sp_fwd_atk_1", "sp_fwd_atk_2"] },
+      "sp_up_atk": { "mode": "move", "frames": ["sp_up_atk_0", "sp_up_atk_1", "sp_up_atk_2"] },
+      "sp_fwd_jump": { "mode": "move", "frames": ["sp_fwd_jump_0", "sp_fwd_jump_1", "sp_fwd_jump_2"] }
+    }
   }
 }

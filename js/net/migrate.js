@@ -115,6 +115,7 @@ export function demote(s) {
   s.synced = false;
   s.frozen = false;
   s.snaps = [];
+  s.chainS = null;
   s.demotedAt = s.clock.now();
   s.stats.demotions = (s.stats.demotions || 0) + 1;
   s.startClient();

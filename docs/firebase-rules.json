@@ -5,14 +5,14 @@
     "rooms": {
       "$code": {
         ".read": true,
-        ".write": "!data.exists() || data.child('meta/lastSeen').val() < now - (data.child('meta/state').val() == 'match' ? 1800000 : 300000)",
+        ".write": "!data.exists() || !data.child('meta/lastSeen').exists() || data.child('meta/lastSeen').val() < now - (data.child('meta/state').val() == 'match' ? 1800000 : 300000)",
         "meta": {
           ".write": true,
           ".validate": "newData.hasChildren(['state'])"
         },
         "seats": {
+          ".write": true,
           "$n": {
-            ".write": true,
             ".validate": "newData.hasChildren(['kind'])"
           }
         },

@@ -1,6 +1,7 @@
 import { BIT } from '../core/input.js';
 import { px } from '../core/fixed.js';
-import { S } from './fighter.js';
+import { S, boomOut } from './fighter.js';
+import { RAGE_MAX, ULT_MACRO } from './ult.js';
 import { commandMacro } from './command.js';
 
 // 電腦 AI(草案 4-2):只輸出「輸入位元組」,與真人走同一套程式。
@@ -125,6 +126,24 @@ function thinkAi(w, f) {
     return BIT.DEF;
   }
 
+  // 大招:爆氣滿,且(範圍內敵人 >= n 或 HP < 30%且有敵人在範圍內);只用延遲後看到的位置
+  if (canAct && def.hasUlt && w.ult.on && f.ult === 0 && f.rage >= RAGE_MAX && facing && (w.tick + f.id) % 15 === 0) {
+    const u = info.ult || {};
+    let n = 0;
+    for (const o of w.fighters) {
+      if (o === f || o.dead || o.team === f.team) continue;
+      const so = seen[o.id];
+      if (!so) continue;
+      const ddx = (so[0] - mx) * f.face;
+      if (ddx > 0 && ddx <= (u.range || 320) && Math.abs(so[1] - mz) <= (u.zr || 130)) n++;
+    }
+    if ((n >= (u.n || 2) || (n >= 1 && f.hp < def.hp * 0.3)) && w.rng.int(100) < Math.max(50, L.special * 100)) {
+      ai.script = ULT_MACRO.slice();
+      ai.lastIn = ai.script.shift();
+      return ai.lastIn;
+    }
+  }
+
   let out = 0;
   const range = info.range || 44;
   const ranged = info.style === 'ranged';
@@ -146,7 +165,8 @@ function thinkAi(w, f) {
     if (w.rng.int(100) < L.special * 100 && info.specials) {
       for (const sp of info.specials) {
         const m = def.moves[sp.cmd];
-        if (!m || f.mp < m.cost || f.silence > 0) continue;
+        if (!m || f.mp < m.cost || f.silence > 0 || (m.boom && boomOut(w, f))) continue;
+        if ((sp.hpBelow && f.hp >= def.hp * sp.hpBelow) || (sp.mpBelow && f.mp >= def.mp * sp.mpBelow)) continue; // 回血 / 回魔類:低於門檻才用
         if (adx >= sp.min && adx <= sp.max && Math.abs(dz) <= (sp.zr || 10)) {
           ai.script = commandMacro(sp.cmd, f.face);
           ai.lastIn = ai.script.shift();

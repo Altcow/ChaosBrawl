@@ -1,16 +1,14 @@
-const VERSION = 4;
+const VERSION = 8;
 const CACHE = 'chaosbrawl-v' + VERSION;
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './css/main.css',
   './js/main.js',
   './js/core/loop.js', './js/core/input.js', './js/core/rng.js', './js/core/fixed.js',
-  './js/sim/world.js', './js/sim/fighter.js', './js/sim/command.js', './js/sim/hit.js',
-  './js/sim/projectiles.js', './js/sim/ai.js', './js/sim/box.js', './js/sim/modes.js',
-  './js/render/renderer.js', './js/render/sprites.js', './js/render/fx.js', './js/render/hud.js', './js/render/debug.js',
+  './js/sim/world.js', './js/sim/fighter.js', './js/sim/command.js', './js/sim/hit.js', './js/sim/projectiles.js', './js/sim/ai.js', './js/sim/box.js', './js/sim/modes.js', './js/sim/ult.js',
+  './js/render/renderer.js', './js/render/sprites.js', './js/render/fx.js', './js/render/hud.js', './js/render/debug.js', './js/render/ult.js',
   './js/ui/touch.js', './js/ui/select.js', './js/ui/room.js',
-  './js/net/net.js', './js/net/fb.js', './js/net/mem.js', './js/net/codec.js', './js/net/config.js', './js/net/lobby.js',
-  './js/net/sync.js', './js/net/migrate.js', './js/net/usage.js',
-  './data/chars/index.json', './data/chars/ada.json', './data/chars/grandma.json', './data/chars/librarian.json', './data/chars/cat.json',
+  './js/net/net.js', './js/net/fb.js', './js/net/mem.js', './js/net/codec.js', './js/net/config.js', './js/net/lobby.js', './js/net/sync.js', './js/net/migrate.js', './js/net/usage.js',
+  './data/chars/index.json', './data/chars/fanfan.json', './data/chars/areh.json', './data/chars/guanyu.json', './data/chars/lubu.json', './data/chars/cilin.json', './data/chars/huhu.json', './data/chars/liushui.json', './data/chars/erhao.json', './data/art/fanfan/atlas.json', './data/art/fanfan/atlas.png',
   './data/stages/market.json'
 ];
 

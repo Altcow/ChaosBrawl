@@ -6,15 +6,23 @@ const KEYMAPS = {
   P2: { ArrowUp: BIT.UP, ArrowDown: BIT.DOWN, ArrowLeft: BIT.LEFT, ArrowRight: BIT.RIGHT, Numpad1: BIT.ATK, Numpad2: BIT.JUMP, Numpad3: BIT.DEF }
 };
 const PAD_DEAD = 0.35;
+const ULT_KEY = 'KeyU'; // P1 鍵盤大招(也可防+攻+跳同時按);手把 Y(button 3)
+const ULT_KEY_P2 = 'Numpad4';
+const ULT_BITS = [BIT.DEF | BIT.ATK | BIT.JUMP, 0]; // 同 sim/ult.js ULT_MACRO(core 不反向 import sim)
 
 export class Input {
   constructor() {
     this.keys = { P1: 0, P2: 0 };
     this.touch = 0;
     this.macros = {};
+    this.padY = {};
   }
   attach() {
     window.addEventListener('keydown', (e) => {
+      if (!e.repeat && (e.code === ULT_KEY || e.code === ULT_KEY_P2)) {
+        this.queueMacro(e.code === ULT_KEY ? 'P1' : 'P2', ULT_BITS);
+        e.preventDefault();
+      }
       for (const src in KEYMAPS) {
         const b = KEYMAPS[src][e.code];
         if (b) {
@@ -72,6 +80,9 @@ export class Input {
       if (pressed(2)) b |= BIT.ATK; // X(□)
       if (pressed(0)) b |= BIT.JUMP; // A(×)
       if (pressed(1) || pressed(5)) b |= BIT.DEF; // B(○) / RB
+      const y = pressed(3); // Y(△):按下瞬間排入大招
+      if (y && !this.padY[n]) this.queueMacro('G' + (n + 1), ULT_BITS);
+      this.padY[n] = y;
     }
     return b;
   }

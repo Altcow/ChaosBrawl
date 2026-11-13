@@ -3,7 +3,7 @@
 import { createWorld, stepWorld, serializeWorld, restoreWorld } from '../sim/world.js';
 import { layoutSpawns } from '../sim/modes.js';
 import { Net } from './net.js';
-import { makeCtx, encodeWorld, decodeWorld, b64enc, b64dec, encodeInput, decodeInput } from './codec.js';
+import { makeCtx, encodeWorld, decodeWorld, encodeDelta, applyDelta, b64enc, b64dec, encodeInput, decodeInput } from './codec.js';
 import { Usage } from './usage.js';
 import { BIT } from '../core/input.js';
 import { S } from '../sim/fighter.js';
@@ -12,6 +12,7 @@ import { Migrator, promote, demote } from './migrate.js';
 export const TICK_MS = 1000 / 60;
 export const SNAP_EVERY = 4; // 15 Hz
 export const SAVE_EVERY = 30; // 2 Hz
+export const KEY_EVERY = 60; // 差量快照:每 60 tick(1 s)送一則完整關鍵格,丟包後最久等這麼久修正
 export const HOST_INPUT_DELAY = 4; // 房主本機輸入延遲(67 ms)
 export const AWAY_MS = 3000; // 3 s 沒輸入 → AI 暫代
 export const FREEZE_MS = 1500; // 1.5 s 沒收到快照 → 視為房主中斷
@@ -29,7 +30,7 @@ export function buildNetWorld(chars, stage, cfg) {
     charId: s.char, kind: s.kind === 'human' ? 'human' : 'ai', lvl: s.lvl || 1,
     team: s.team === undefined ? i : s.team, x: lay[i].x, z: lay[i].z, face: lay[i].face
   }));
-  return createWorld({ chars, seed: cfg.seed, stage, spawns, mode: cfg.mode, ff: cfg.ff || 0 });
+  return createWorld({ chars, seed: cfg.seed, stage, spawns, mode: cfg.mode, ff: cfg.ff || 0, ult: cfg.ult === undefined ? true : !!cfg.ult });
 }
 
 export class Session {
@@ -50,7 +51,7 @@ export class Session {
     this.frozen = false;
     this.synced = false;
     this.migrator = new Migrator(this);
-    this.stats = { corr: 0, corrDist: 0, sparks: 0, confirmed: 0, whiffs: 0, lateInputs: 0, migrations: 0 };
+    this.stats = { corr: 0, corrDist: 0, sparks: 0, confirmed: 0, whiffs: 0, lateInputs: 0, migrations: 0, fullSent: 0, deltaSent: 0, snapBytes: 0, deltaMiss: 0 };
     this.onFx = null; // (events) => void
     this.onNotice = null; // (text) => void
     this.log = new Map();
@@ -61,6 +62,9 @@ export class Session {
     this.lastAck = 0;
     this.predTick = 0;
     this.snaps = [];
+    this.chainS = null; // 差量鏈:客戶端最後套用成功的完整快照(下一則差量必須以它為底)
+    this.chainE = 0;
+    this.deltaBase = null; // 房主:上一則送出的快照(差量的底)
     this.pending = [];
     this.err = { dx: 0, dz: 0, t: 0 };
     this._net = (e) => {
@@ -88,6 +92,7 @@ export class Session {
     for (const s of this.cfg.seats) {
       if (s.kind === 'human' && s.seat !== this.seat) this.remote[s.seat] = { table: new Map(), held: 0, lastRecv: now, lastQ: -1, nonce: 0, ack: 0, regainedAt: -1, consumed: -1, edgeOr: 0 };
     }
+    this.deltaBase = null; // 新房主 / 遷移後:第一則一定送完整快照
     this.lastTouch = now;
     this.lastSucc = now;
     this.evN = this.evN || 0;
@@ -106,7 +111,10 @@ export class Session {
       if (save && !this.synced) {
         this.epoch = Math.max(this.epoch, save.e);
         this.hostSeat = save.seat;
-        this._adoptState(decodeWorld(b64dec(save.d), this.ctx), save.tick, false);
+        const S0 = decodeWorld(b64dec(save.d), this.ctx);
+        this.chainS = S0;
+        this.chainE = save.e;
+        this._adoptState(S0, save.tick, false);
       }
     } catch (e) { /* 斷線中:等快照 */ }
   }
@@ -199,8 +207,19 @@ export class Session {
   _broadcast() {
     const k = [];
     for (const s in this.remote) k[s] = this.remote[s].ack;
-    const msg = { e: this.epoch, t: this.world.tick, h: this.seat, k: Array.from(k, (v) => v || 0), d: this._encodeState() };
-    this.usage.snapshotSent(msg.d.length + 40, Object.keys(this.remote).length);
+    const snap = serializeWorld(this.world);
+    const msg = { e: this.epoch, t: snap.tick, h: this.seat, k: Array.from(k, (v) => v || 0) };
+    let delta = null;
+    if (this.deltaBase && snap.tick % KEY_EVERY !== 0 && snap.tick > this.deltaBase.tick) delta = encodeDelta(this.deltaBase, snap, this.ctx);
+    if (delta) {
+      msg.b = this.deltaBase.tick;
+      msg.d = b64enc(delta);
+    } else msg.d = b64enc(encodeWorld(snap, this.ctx));
+    this.deltaBase = snap;
+    if (delta) this.stats.deltaSent++;
+    else this.stats.fullSent++;
+    this.stats.snapBytes += msg.d.length;
+    this.usage.snapshotSent(JSON.stringify(msg).length, Object.keys(this.remote).length);
     this.net.broadcast(msg).catch(this._net);
   }
   _publishSucc() {
@@ -286,7 +305,16 @@ export class Session {
       if (this.rtts.length > 8) this.rtts.shift();
       for (const q of this.sentAt.keys()) if (q <= ack) this.sentAt.delete(q);
     }
-    const S = decodeWorld(b64dec(msg.d), this.ctx);
+    let S;
+    if (msg.b === undefined) S = decodeWorld(b64dec(msg.d), this.ctx);
+    else if (this.chainS && this.chainS.tick === msg.b && this.chainE === msg.e) S = applyDelta(this.chainS, b64dec(msg.d), this.ctx);
+    else {
+      // 差量的底不在手上(前面有訊息丟了):這則作廢,等下一個關鍵格修正;房主仍算活著(上面已更新 lastSnapAt)
+      this.stats.deltaMiss++;
+      return;
+    }
+    this.chainS = S;
+    this.chainE = msg.e;
     this.snaps.push({ t: S.tick, recv: now, S });
     if (this.snaps.length > 12) this.snaps.shift();
     this._checkHits(S);

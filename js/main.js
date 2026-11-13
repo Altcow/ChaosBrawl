@@ -5,12 +5,15 @@ import { layoutSpawns } from './sim/modes.js';
 import { commandMacro } from './sim/command.js';
 import { Renderer } from './render/renderer.js';
 import { setupTouch } from './ui/touch.js';
-import { setupMenu } from './ui/select.js';
+import { setupHome } from './ui/select.js';
 import { setupRoom } from './ui/room.js';
 
 // 練習場景:木樁 / 簡易對手
 const SCENARIOS = [['post'], ['post', 'post', 'post'], ['post', 'puncher'], ['puncher']];
 const SEED = 20261113;
+// 鏡頭縮放:基準 0.55(人物約 40 px 高),為了框住本機玩家可再縮小、不放大超過基準。
+// 需要 render/renderer.js 讀取 zoomMax / zoomMin(見回報);沒支援時退回 renderer 內建的 0.6~1.0。
+const CAM = { base: 0.55, min: 0.35 };
 
 const $ = (id) => document.getElementById(id);
 const qs = new URLSearchParams(location.search);
@@ -22,7 +25,7 @@ let cfg = null;
 let srcOf = []; // 每個角色對應的本機輸入來源(只有真人有)
 let scn = Math.min(SCENARIOS.length - 1, Math.max(0, parseInt(qs.get('s') || '0', 10) || 0));
 let started = false;
-let menu = null;
+let home = null;
 let room = null;
 let online = null; // 連線中的 Session
 
@@ -58,17 +61,19 @@ function buildWorld() {
     });
   } else {
     const active = cfg.slots.filter((s) => s.kind !== 'off');
-    const lay = layoutSpawns(active.length, stage);
+    const sides = cfg.mode === 'team' ? active.map((s) => s.team) : null; // 分隊戰:同隊站同側
+    const lay = layoutSpawns(active.length, stage, sides);
     active.forEach((s, i) => {
       const human = /^(P|G)/.test(s.kind);
       spawns.push({ charId: s.char, kind: human ? 'human' : 'ai', lvl: human ? 0 : parseInt(s.kind.slice(2), 10), team: cfg.mode === 'team' ? s.team : i, x: lay[i].x, z: lay[i].z, face: lay[i].face });
       srcOf.push(human ? s.kind : null);
     });
   }
-  world = createWorld({ chars, seed: SEED, stage, spawns, mode: cfg.mode, ff: cfg.ff || 0 });
+  world = createWorld({ chars, seed: SEED, stage, spawns, mode: cfg.mode, ff: cfg.ff || 0, ult: true });
   renderer.capturePrev(world);
   renderer.fx.clear();
-  renderer.zoom = 1;
+  renderer.zoom = CAM.base;
+  $('result').classList.add('hide');
 }
 
 function step() {
@@ -84,13 +89,26 @@ function step() {
 }
 
 const nameOf = (i) => '#' + (i + 1) + ' ' + world.defs[world.fighters[i].charId].name;
+let resultShown = false;
+function showResult(over) {
+  if (over === resultShown) return;
+  resultShown = over;
+  $('result').classList.toggle('hide', !over);
+  $('btn-again').style.display = online ? 'none' : ''; // 連線局由房主在大廳重開,這裡只回首頁
+}
 const loop = new Loop(step, (alpha) => {
   if (online) {
     const v = online.view();
-    if (v) renderer.draw(v, 1, loop, [online.fid], (i) => (online.cfg.seats[i].name || '#' + (i + 1)));
+    if (v) {
+      renderer.draw(v, 1, loop, [online.fid], (i) => (online.cfg.seats[i].name || '#' + (i + 1)));
+      const me = v.fighters[online.fid];
+      if (me && typeof me.rage === 'number') touch.setRage(me.rage / (100 * 256));
+      showResult(!!v.mode.over);
+    }
     return;
   }
   if (!world) return;
+  showResult(!!world.mode.over);
   const focus = world.fighters.map((f, i) => (f.kind === 'human' ? i : -1)).filter((i) => i >= 0);
   renderer.draw(world, alpha, loop, focus, nameOf);
 });
@@ -125,7 +143,7 @@ function start(c) {
   }
   cfg = c;
   buildWorld();
-  menu.hide();
+  home.hide();
   started = true;
   updatePause();
   if (!qs.has('nofs')) enterFullscreen();
@@ -136,9 +154,11 @@ function startOnline(sess) {
   world = null;
   renderer.prev = [];
   renderer.fx.clear();
-  renderer.zoom = 1;
+  renderer.zoom = CAM.base;
   sess.onFx = (evs) => { for (const e of evs) renderer.fx.add(e); };
-  menu.hide();
+  $('result').classList.add('hide');
+  resultShown = false;
+  home.hide();
   started = true;
   updatePause();
   if (!qs.has('nofs')) enterFullscreen();
@@ -150,7 +170,9 @@ function toMenu() {
     online = null;
   }
   started = false;
-  menu.show();
+  $('result').classList.add('hide');
+  resultShown = false;
+  home.show();
   updatePause();
 }
 
@@ -159,9 +181,18 @@ async function boot() {
   chars = {};
   for (const id of ids) chars[id] = await (await fetch('data/chars/' + id + '.json')).json();
   stage = await (await fetch('data/stages/market.json')).json();
-  menu = setupMenu($('menu'), ids.map((id) => ({ id, name: chars[id].name })), start);
-  room = setupRoom($('menu'), { chars, stage, charIds: ids, getMode: () => $('sel-mode').value, onSession: startOnline });
+  home = setupHome($('menu'), {
+    chars, charIds: ids, onStart: start, onPractice: start,
+    onOnline: () => { room.onOpen(); home.showScreen('netpanel'); }
+  });
+  room = setupRoom($('menu'), { chars, stage, charIds: ids, getChar: () => home.getChar(), onSession: startOnline });
+  $('btn-net-back').onclick = () => home.showScreen('home');
   room.rejoin();
+  renderer.zoomMax = CAM.base;
+  renderer.zoomMin = CAM.min;
+  renderer.zoom = CAM.base;
+  // 開發用按鈕(盒子 / 場景 / 重置)只在網址帶 ?debug 時顯示
+  document.body.classList.toggle('debug', qs.has('debug'));
 
   const hasTouch = qs.has('touch') || 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   if (hasTouch) touch.show();
@@ -170,6 +201,8 @@ async function boot() {
   $('btn-debug').addEventListener('click', () => setDebug(!renderer.debug));
   $('btn-reset').addEventListener('click', () => { if (!online) buildWorld(); });
   $('btn-menu').addEventListener('click', toMenu);
+  $('btn-home').addEventListener('click', toMenu);
+  $('btn-again').addEventListener('click', () => start(cfg && cfg.mode === 'practice' ? cfg : home.getCfg()));
   $('btn-scn').addEventListener('click', () => { scn = (scn + 1) % SCENARIOS.length; buildWorld(); });
   window.addEventListener('keydown', (e) => {
     if (!started || online && e.code !== 'KeyB' && e.code !== 'Enter') return;
@@ -177,6 +210,7 @@ async function boot() {
     else if (e.code === 'KeyR') buildWorld();
     else if (e.code === 'KeyN' && cfg.mode === 'practice') { scn = (scn + 1) % SCENARIOS.length; buildWorld(); }
     else if (e.code === 'Enter') toMenu();
+    else if (e.code === 'KeyR' && !qs.has('debug')) return;
   });
 
   window.addEventListener('resize', () => renderer.resize());
@@ -197,7 +231,7 @@ async function boot() {
   if ('serviceWorker' in navigator && (!dev || qs.has('sw'))) navigator.serviceWorker.register('sw.js').catch(() => {});
 
   // 測試用把手
-  window.__cb = { get world() { return world; }, input, loop, renderer, start, buildWorld, touch, menu, toMenu, startOnline };
+  window.__cb = { get world() { return world; }, input, loop, renderer, start, buildWorld, touch, home, toMenu, startOnline };
 }
 
 function setDebug(on) {

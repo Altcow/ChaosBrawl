@@ -1,0 +1,499 @@
+{
+  "id": "cilin",
+  "name": "磁鈴",
+  "nicknames": [
+    "磁鈴",
+    "螺絲妹",
+    "機車行學徒",
+    "磁鐵少女",
+    "避雷針",
+    "黏黏手",
+    "橘工作服",
+    "吸鐵石"
+  ],
+  "color": "#f08a1c",
+  "hp": 450,
+  "mp": 500,
+  "mpStart": 200,
+  "mpRegen": 6,
+  "assist": "sp_fwd_atk",
+  "ai": {
+    "style": "ranged",
+    "range": 44,
+    "specials": [
+      {
+        "cmd": "sp_up_atk",
+        "min": 30,
+        "max": 200,
+        "zr": 36
+      },
+      {
+        "cmd": "sp_down_atk",
+        "min": 60,
+        "max": 200,
+        "zr": 10
+      },
+      {
+        "cmd": "sp_fwd_atk",
+        "min": 100,
+        "max": 350,
+        "zr": 12
+      }
+    ],
+    "ult": {
+      "range": 1200,
+      "zr": 240,
+      "n": 2
+    }
+  },
+  "walk": {
+    "x": 2.5,
+    "z": 1.6
+  },
+  "run": {
+    "x": 5.5,
+    "z": 1
+  },
+  "jump": {
+    "vy": 9,
+    "g": 0.5,
+    "squat": 3,
+    "vx": 2.5
+  },
+  "dash": {
+    "keep": 0.8,
+    "vy": 9
+  },
+  "runStop": 8,
+  "roll": {
+    "dur": 24,
+    "invFrom": 4,
+    "invTo": 16,
+    "speed": 4,
+    "cd": 30,
+    "specialCancel": 15
+  },
+  "lying": 45,
+  "getup": 18,
+  "stun": 70,
+  "body": {
+    "x": -14,
+    "y": 0,
+    "w": 28,
+    "h": 60
+  },
+  "moves": {
+    "attack1": {
+      "next": "attack2",
+      "cancel": 10,
+      "frames": [
+        {
+          "wait": 3,
+          "mvx": 0.8
+        },
+        {
+          "wait": 3,
+          "mvx": 1.5,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 36,
+              "h": 20,
+              "zr": 12,
+              "dmg": 30,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 12,
+          "mvx": 0
+        }
+      ]
+    },
+    "attack2": {
+      "next": "attack3",
+      "cancel": 10,
+      "frames": [
+        {
+          "wait": 3,
+          "mvx": 0.8
+        },
+        {
+          "wait": 3,
+          "mvx": 1.5,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 36,
+              "h": 20,
+              "zr": 12,
+              "dmg": 30,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 12,
+          "mvx": 0
+        }
+      ]
+    },
+    "attack3": {
+      "cancel": 8,
+      "frames": [
+        {
+          "wait": 5,
+          "mvx": 1
+        },
+        {
+          "wait": 3,
+          "mvx": 2,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 40,
+              "h": 24,
+              "zr": 12,
+              "dmg": 40,
+              "fall": 60,
+              "bdef": 35,
+              "kx": 4,
+              "ky": 6,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 16,
+          "mvx": 0
+        }
+      ]
+    },
+    "runatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 4,
+          "mvx": 5
+        },
+        {
+          "wait": 6,
+          "mvx": 4,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 40,
+              "h": 24,
+              "zr": 12,
+              "dmg": 40,
+              "fall": 100,
+              "bdef": 35,
+              "kx": 5,
+              "ky": 6,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 14,
+          "mvx": 1
+        }
+      ]
+    },
+    "jumpatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 4
+        },
+        {
+          "wait": 10,
+          "itr": [
+            {
+              "x": 8,
+              "y": 10,
+              "w": 32,
+              "h": 30,
+              "zr": 12,
+              "dmg": 35,
+              "fall": 60,
+              "bdef": 20,
+              "kx": 3,
+              "ky": 3,
+              "stun": 14,
+              "stop": 4,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8
+        }
+      ]
+    },
+    "dashatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 6
+        },
+        {
+          "wait": 8,
+          "itr": [
+            {
+              "x": 8,
+              "y": 10,
+              "w": 38,
+              "h": 30,
+              "zr": 12,
+              "dmg": 40,
+              "fall": 100,
+              "bdef": 35,
+              "kx": 5,
+              "ky": 5,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8
+        }
+      ]
+    },
+    "sp_fwd_atk": {
+      "cost": 75,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 6
+        },
+        {
+          "wait": 4,
+          "spawn": {
+            "proj": "screw",
+            "x": 24,
+            "y": 36
+          }
+        },
+        {
+          "wait": 4,
+          "spawn": {
+            "proj": "screw",
+            "x": 24,
+            "y": 36
+          }
+        },
+        {
+          "wait": 14,
+          "spawn": {
+            "proj": "screw",
+            "x": 24,
+            "y": 36
+          }
+        }
+      ]
+    },
+    "sp_down_atk": {
+      "cost": 150,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "rod",
+            "x": 50,
+            "y": 0
+          }
+        },
+        {
+          "wait": 16
+        }
+      ]
+    },
+    "sp_up_atk": {
+      "cost": 125,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 24,
+          "pull": {
+            "range": 200,
+            "zr": 40,
+            "to": 20,
+            "speed": 8
+          }
+        },
+        {
+          "wait": 16
+        }
+      ]
+    },
+    "ultimate": {
+      "cost": 0,
+      "cancel": 0,
+      "ult": {
+        "type": "dodge",
+        "cap": 140,
+        "unblockable": false,
+        "name": "廢鐵大回收"
+      },
+      "frames": [
+        {
+          "wait": 14
+        },
+        {
+          "wait": 60,
+          "pull": {
+            "all": true,
+            "front": true,
+            "to": 40,
+            "speed": 24,
+            "zspeed": 3
+          }
+        },
+        {
+          "wait": 2,
+          "live": true,
+          "spawn": {
+            "proj": "fridge",
+            "x": 30,
+            "y": 0
+          }
+        },
+        {
+          "wait": 30
+        }
+      ]
+    }
+  },
+  "projectiles": {
+    "screw": {
+      "vx": 9,
+      "life": 40,
+      "chase": 0,
+      "bdy": {
+        "x": -5,
+        "y": -3,
+        "w": 10,
+        "h": 6
+      },
+      "itr": {
+        "x": -5,
+        "y": -3,
+        "w": 10,
+        "h": 6,
+        "zr": 12,
+        "dmg": 22,
+        "fall": 20,
+        "bdef": 15,
+        "kx": 1,
+        "ky": 0,
+        "stun": 10,
+        "stop": 2,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      }
+    },
+    "rod": {
+      "vx": 0,
+      "life": 300,
+      "chase": 0,
+      "pierce": true,
+      "limit": 1,
+      "bdy": {
+        "x": -6,
+        "y": 0,
+        "w": 12,
+        "h": 60
+      },
+      "itr": {
+        "x": -60,
+        "y": 0,
+        "w": 120,
+        "h": 70,
+        "zr": 60,
+        "dmg": 14,
+        "fall": 12,
+        "bdef": 15,
+        "kx": 0,
+        "ky": 0,
+        "stun": 20,
+        "stop": 3,
+        "rehit": 40,
+        "gain": 0,
+        "kind": "hit"
+      }
+    },
+    "fridge": {
+      "vx": 9,
+      "life": 70,
+      "chase": 0,
+      "bdy": {
+        "x": -20,
+        "y": 0,
+        "w": 40,
+        "h": 56
+      },
+      "itr": {
+        "x": -20,
+        "y": 0,
+        "w": 40,
+        "h": 56,
+        "zr": 40,
+        "dmg": 140,
+        "fall": 100,
+        "bdef": 50,
+        "kx": 7,
+        "ky": 6,
+        "stun": 20,
+        "stop": 5,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "pierce": true
+    }
+  }
+}

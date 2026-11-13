@@ -7,6 +7,7 @@ export class Fx {
     this.list.length = 0;
   }
   add(e) {
+    if (e.t === 'ult') return; // 大招演出由 render/ult.js 讀 w.ult 畫
     this.list.push({ t: e.t, x: e.x, y: e.y, z: e.z, age: 0, big: e.big });
   }
   tick() {

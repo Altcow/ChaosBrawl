@@ -8,7 +8,7 @@ import { S, isInvuln } from '../js/sim/fighter.js';
 import { Rng } from '../js/core/rng.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const ada = JSON.parse(readFileSync(join(root, 'data/chars/ada.json'), 'utf8'));
+const ada = JSON.parse(readFileSync(join(root, 'tools/fixtures/chars/ada.json'), 'utf8'));
 
 let pass = 0;
 let fail = 0;

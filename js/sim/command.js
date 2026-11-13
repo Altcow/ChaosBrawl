@@ -32,6 +32,9 @@ export function detectCommand(hist, trig, face) {
   return 'sp_' + dir + '_' + (trig === BIT.ATK ? 'atk' : 'jump');
 }
 
+// 大招輸入序列:防 + 攻 + 跳 同時按(AI 與觸控大招鈕共用,見 ult.js ULT_MACRO)
+export { ULT_MACRO } from './ult.js';
+
 // 把指令名(例 sp_fwd_atk)轉成逐 tick 的輸入序列:AI 與觸控「必殺輔助鍵」共用
 export function commandMacro(cmd, face) {
   const p = cmd.split('_');

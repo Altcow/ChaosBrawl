@@ -1,0 +1,422 @@
+{
+  "id": "grandma",
+  "name": "鐵拳阿嬤",
+  "nicknames": ["鐵拳嬤", "菜籃嬤", "廣場嬤", "阿嬤本嬤", "碎念嬤", "大嬸婆", "涼被嬤", "紅包嬤"],
+  "color": "#c06090",
+  "hp": 650,
+  "mp": 500,
+  "mpStart": 200,
+  "mpRegen": 6,
+  "assist": "sp_fwd_atk",
+  "walk": {
+    "x": 1.8,
+    "z": 1.2
+  },
+  "run": {
+    "x": 4.2,
+    "z": 0.8
+  },
+  "jump": {
+    "vy": 9,
+    "g": 0.5,
+    "squat": 3,
+    "vx": 2.5
+  },
+  "dash": {
+    "keep": 0.8,
+    "vy": 9
+  },
+  "runStop": 8,
+  "roll": {
+    "dur": 24,
+    "invFrom": 4,
+    "invTo": 16,
+    "speed": 4,
+    "cd": 30,
+    "specialCancel": 15
+  },
+  "lying": 45,
+  "getup": 18,
+  "stun": 70,
+  "body": {
+    "x": -14,
+    "y": 0,
+    "w": 28,
+    "h": 60
+  },
+  "moves": {
+    "attack1": {
+      "next": "attack2",
+      "cancel": 10,
+      "frames": [
+        {
+          "wait": 4,
+          "mvx": 0.8
+        },
+        {
+          "wait": 3,
+          "mvx": 1.0,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 36,
+              "h": 20,
+              "zr": 12,
+              "dmg": 35,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 14,
+          "mvx": 0
+        }
+      ]
+    },
+    "attack2": {
+      "next": "attack3",
+      "cancel": 10,
+      "frames": [
+        {
+          "wait": 4,
+          "mvx": 0.8
+        },
+        {
+          "wait": 3,
+          "mvx": 1.0,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 36,
+              "h": 20,
+              "zr": 12,
+              "dmg": 35,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 14,
+          "mvx": 0
+        }
+      ]
+    },
+    "attack3": {
+      "cancel": 8,
+      "frames": [
+        {
+          "wait": 6,
+          "mvx": 1
+        },
+        {
+          "wait": 3,
+          "mvx": 1.5,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 40,
+              "h": 24,
+              "zr": 12,
+              "dmg": 50,
+              "fall": 60,
+              "bdef": 35,
+              "kx": 4,
+              "ky": 6,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 18,
+          "mvx": 0
+        }
+      ]
+    },
+    "sp_fwd_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 12
+        },
+        {
+          "wait": 3,
+          "itr": [
+            {
+              "x": 6,
+              "y": 15,
+              "w": 34,
+              "h": 40,
+              "zr": 14,
+              "dmg": 55,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 5,
+              "ky": 6,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "grab"
+            }
+          ]
+        },
+        {
+          "wait": 16
+        }
+      ]
+    },
+    "sp_down_atk": {
+      "cost": 150,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 18
+        },
+        {
+          "wait": 4,
+          "itr": [
+            {
+              "x": -70,
+              "y": 0,
+              "w": 140,
+              "h": 50,
+              "zr": 40,
+              "dmg": 45,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 4,
+              "ky": 7,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 20
+        }
+      ]
+    },
+    "sp_up_jump": {
+      "cost": 125,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 16
+        },
+        {
+          "wait": 34,
+          "itr": [
+            {
+              "x": -30,
+              "y": -10,
+              "w": 60,
+              "h": 50,
+              "zr": 24,
+              "dmg": 60,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 6,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        }
+      ],
+      "launch": {
+        "vx": 2,
+        "vy": 10
+      }
+    },
+    "runatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 4,
+          "mvx": 5
+        },
+        {
+          "wait": 6,
+          "mvx": 4,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 40,
+              "h": 24,
+              "zr": 12,
+              "dmg": 40,
+              "fall": 100,
+              "bdef": 35,
+              "kx": 5,
+              "ky": 6,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 14,
+          "mvx": 1
+        }
+      ]
+    },
+    "jumpatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 4
+        },
+        {
+          "wait": 10,
+          "itr": [
+            {
+              "x": 8,
+              "y": 10,
+              "w": 34,
+              "h": 30,
+              "zr": 12,
+              "dmg": 35,
+              "fall": 60,
+              "bdef": 20,
+              "kx": 3,
+              "ky": 3,
+              "stun": 14,
+              "stop": 4,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8
+        }
+      ]
+    },
+    "dashatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 6
+        },
+        {
+          "wait": 8,
+          "itr": [
+            {
+              "x": 8,
+              "y": 10,
+              "w": 40,
+              "h": 30,
+              "zr": 12,
+              "dmg": 40,
+              "fall": 100,
+              "bdef": 35,
+              "kx": 5,
+              "ky": 5,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 5,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8
+        }
+      ]
+    }
+  },
+  "projectiles": {},
+  "ai": {
+    "style": "melee",
+    "range": 44,
+    "specials": [
+      {
+        "cmd": "sp_down_atk",
+        "min": 0,
+        "max": 60,
+        "zr": 30
+      },
+      {
+        "cmd": "sp_fwd_atk",
+        "min": 0,
+        "max": 40,
+        "zr": 10
+      },
+      {
+        "cmd": "sp_up_jump",
+        "min": 70,
+        "max": 160,
+        "zr": 16
+      }
+    ]
+  },
+  "armor": true,
+  "art": {
+    "atlas": "art/grandma/atlas.json",
+    "scale": 0.5,
+    "states": {
+      "idle": { "mode": "loop", "rate": 24, "frames": ["idle_0", "idle_1"] },
+      "walk": { "mode": "loop", "rate": 8, "frames": ["walk_0", "walk_1", "walk_2", "walk_3"] },
+      "run": { "mode": "loop", "rate": 5, "frames": ["run_0", "run_1", "run_2", "run_3"] },
+      "runstop": { "mode": "hold", "frames": ["runstop_0"] },
+      "squat": { "mode": "hold", "frames": ["squat_0"] },
+      "jump": { "mode": "vy", "frames": ["jump_up", "jump_down"] },
+      "dash": { "mode": "hold", "frames": ["dash_0"] },
+      "defend": { "mode": "hold", "frames": ["defend_0"] },
+      "roll": { "mode": "progress", "total": "roll.dur", "frames": ["roll_0", "roll_1", "roll_2"] },
+      "hurt": { "mode": "stunt", "at": 16, "frames": ["hurt_light", "hurt_heavy"] },
+      "fall": { "mode": "vy", "frames": ["fall_up", "fall_down"] },
+      "lying": { "mode": "hold", "frames": ["lying_0"] },
+      "dead": { "mode": "hold", "frames": ["lying_0"] },
+      "getup": { "mode": "progress", "total": "getup", "frames": ["getup_0", "getup_1"] },
+      "stun": { "mode": "loop", "rate": 10, "frames": ["stun_0", "stun_1"] }
+    },
+    "moves": {
+      "attack1": { "mode": "move", "frames": ["attack1_0", "attack1_1", "attack1_1"] },
+      "attack2": { "mode": "move", "frames": ["attack2_0", "attack2_1", "attack2_1"] },
+      "attack3": { "mode": "move", "frames": ["attack3_0", "attack3_1", "attack3_1"] },
+      "sp_fwd_atk": { "mode": "move", "frames": ["sp_fwd_atk_0", "sp_fwd_atk_1", "sp_fwd_atk_2"] },
+      "sp_down_atk": { "mode": "move", "frames": ["sp_down_atk_0", "sp_down_atk_1", "sp_down_atk_2"] },
+      "sp_up_jump": { "mode": "move", "frames": ["sp_up_jump_0", "sp_up_jump_1"] },
+      "runatk": { "mode": "move", "frames": ["runatk_0", "runatk_1", "runatk_1"] },
+      "jumpatk": { "mode": "move", "frames": ["jumpatk_0", "jumpatk_1", "jumpatk_1"] },
+      "dashatk": { "mode": "move", "frames": ["dashatk_0", "dashatk_1", "dashatk_1"] }
+    }
+  }
+}

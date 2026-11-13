@@ -1,0 +1,22 @@
+{
+ "id": "demo",
+ "out": "../out-cli",
+ "sheets": [
+  {
+   "file": "sheet1.png",
+   "cols": 3,
+   "rows": 2,
+   "frames": [
+    "idle_0",
+    "idle_1",
+    "walk_0",
+    "atk_0",
+    {
+     "name": "jump_up",
+     "air": true
+    },
+    null
+   ]
+  }
+ ]
+}

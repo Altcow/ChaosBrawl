@@ -1,0 +1,487 @@
+{
+  "id": "lubu",
+  "name": "呂布",
+  "nicknames": [
+    "呂布",
+    "奉先",
+    "飛將",
+    "戟神",
+    "雉雞翎",
+    "紅馬騎士",
+    "天下無雙",
+    "翎毛控"
+  ],
+  "color": "#8f2230",
+  "hp": 600,
+  "mp": 500,
+  "mpStart": 200,
+  "mpRegen": 6,
+  "assist": "sp_fwd_atk",
+  "ai": {
+    "style": "melee",
+    "range": 50,
+    "specials": [
+      {
+        "cmd": "sp_fwd_jump",
+        "min": 120,
+        "max": 400,
+        "zr": 18
+      },
+      {
+        "cmd": "sp_fwd_atk",
+        "min": 0,
+        "max": 60,
+        "zr": 14
+      },
+      {
+        "cmd": "sp_up_atk",
+        "min": 150,
+        "max": 500,
+        "zr": 10
+      }
+    ],
+    "ult": {
+      "range": 100,
+      "zr": 30,
+      "n": 2
+    }
+  },
+  "walk": {
+    "x": 1.8,
+    "z": 1.2
+  },
+  "run": {
+    "x": 4.4,
+    "z": 0.8
+  },
+  "jump": {
+    "vy": 9,
+    "g": 0.5,
+    "squat": 3,
+    "vx": 2.5
+  },
+  "dash": {
+    "keep": 0.8,
+    "vy": 9
+  },
+  "runStop": 8,
+  "roll": {
+    "dur": 24,
+    "invFrom": 4,
+    "invTo": 16,
+    "speed": 4,
+    "cd": 30,
+    "specialCancel": 15
+  },
+  "lying": 45,
+  "getup": 18,
+  "stun": 70,
+  "body": {
+    "x": -14,
+    "y": 0,
+    "w": 28,
+    "h": 60
+  },
+  "moves": {
+    "attack1": {
+      "next": "attack2",
+      "cancel": 10,
+      "frames": [
+        {
+          "wait": 3,
+          "mvx": 0.8
+        },
+        {
+          "wait": 3,
+          "mvx": 1.5,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 50,
+              "h": 20,
+              "zr": 12,
+              "dmg": 30,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 12,
+          "mvx": 0
+        }
+      ]
+    },
+    "attack2": {
+      "next": "attack3",
+      "cancel": 10,
+      "frames": [
+        {
+          "wait": 3,
+          "mvx": 0.8
+        },
+        {
+          "wait": 3,
+          "mvx": 1.5,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 50,
+              "h": 20,
+              "zr": 12,
+              "dmg": 30,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 12,
+          "mvx": 0
+        }
+      ]
+    },
+    "attack3": {
+      "cancel": 8,
+      "frames": [
+        {
+          "wait": 5,
+          "mvx": 1
+        },
+        {
+          "wait": 3,
+          "mvx": 2,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 54,
+              "h": 24,
+              "zr": 12,
+              "dmg": 40,
+              "fall": 60,
+              "bdef": 35,
+              "kx": 4,
+              "ky": 6,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 16,
+          "mvx": 0
+        }
+      ]
+    },
+    "runatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 4,
+          "mvx": 5
+        },
+        {
+          "wait": 6,
+          "mvx": 4,
+          "itr": [
+            {
+              "x": 10,
+              "y": 20,
+              "w": 54,
+              "h": 24,
+              "zr": 12,
+              "dmg": 40,
+              "fall": 100,
+              "bdef": 35,
+              "kx": 5,
+              "ky": 6,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 14,
+          "mvx": 1
+        }
+      ]
+    },
+    "jumpatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 4
+        },
+        {
+          "wait": 10,
+          "itr": [
+            {
+              "x": 8,
+              "y": 10,
+              "w": 46,
+              "h": 30,
+              "zr": 12,
+              "dmg": 35,
+              "fall": 60,
+              "bdef": 20,
+              "kx": 3,
+              "ky": 3,
+              "stun": 14,
+              "stop": 4,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8
+        }
+      ]
+    },
+    "dashatk": {
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 6
+        },
+        {
+          "wait": 8,
+          "itr": [
+            {
+              "x": 8,
+              "y": 10,
+              "w": 52,
+              "h": 30,
+              "zr": 12,
+              "dmg": 40,
+              "fall": 100,
+              "bdef": 35,
+              "kx": 5,
+              "ky": 5,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8
+        }
+      ]
+    },
+    "sp_fwd_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 8
+        },
+        {
+          "wait": 18,
+          "itr": [
+            {
+              "x": 0,
+              "y": 15,
+              "w": 70,
+              "h": 24,
+              "zr": 14,
+              "dmg": 18,
+              "fall": 20,
+              "bdef": 20,
+              "kx": 1.5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 1,
+              "rehit": 6,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 6,
+          "itr": [
+            {
+              "x": 0,
+              "y": 15,
+              "w": 74,
+              "h": 28,
+              "zr": 14,
+              "dmg": 30,
+              "fall": 100,
+              "bdef": 40,
+              "kx": 5,
+              "ky": 6,
+              "stun": 20,
+              "stop": 5,
+              "rehit": 1,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 16
+        }
+      ]
+    },
+    "sp_fwd_jump": {
+      "cost": 175,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 40,
+          "mvx": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 64,
+              "h": 64,
+              "zr": 20,
+              "dmg": 55,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 6,
+              "ky": 7,
+              "stun": 20,
+              "stop": 4,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 18
+        }
+      ]
+    },
+    "sp_up_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "arrow",
+            "x": 30,
+            "y": 40
+          }
+        },
+        {
+          "wait": 18
+        }
+      ]
+    },
+    "ultimate": {
+      "cost": 0,
+      "cancel": 0,
+      "steer": {
+        "x": 2,
+        "z": 1.2
+      },
+      "ult": {
+        "type": "dodge",
+        "cap": 160,
+        "unblockable": false,
+        "name": "天下無雙"
+      },
+      "frames": [
+        {
+          "wait": 14
+        },
+        {
+          "wait": 120,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 24
+        }
+      ]
+    }
+  },
+  "projectiles": {
+    "arrow": {
+      "vx": 12,
+      "life": 60,
+      "chase": 0,
+      "bdy": {
+        "x": -12,
+        "y": -4,
+        "w": 24,
+        "h": 8
+      },
+      "itr": {
+        "x": -12,
+        "y": -4,
+        "w": 24,
+        "h": 8,
+        "zr": 10,
+        "dmg": 40,
+        "fall": 40,
+        "bdef": 25,
+        "kx": 4,
+        "ky": 3,
+        "stun": 16,
+        "stop": 4,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "pierce": true
+    }
+  }
+}

@@ -31,7 +31,7 @@ export async function createRoom(tr, clock, { dev, name, char, rank, rand }) {
     const seats = {};
     for (let n = 0; n < SEAT_COUNT; n++) {
       seats[n] = n === 0
-        ? { dev, name, char: char || 'ada', team: n, kind: 'human', lvl: 1, rank: rank || 0 }
+        ? { dev, name, char: char || 'fanfan', team: n, kind: 'human', lvl: 1, rank: rank || 0 }
         : { kind: 'open', team: n };
     }
     await tr.set('rooms/' + code + '/seats', seats);
@@ -56,7 +56,7 @@ export async function joinRoom(tr, clock, code, { dev, name, char, rank }) {
       if (!s || (want === 'open' ? s.kind !== 'open' : !(s.kind === 'ai' && s.fill))) continue;
       const r = await tr.getEtag(path);
       if (!r.v || (want === 'open' ? r.v.kind !== 'open' : !(r.v.kind === 'ai' && r.v.fill))) continue;
-      const ok = await tr.setIf(path, { dev, name, char: char || 'ada', team: n, kind: 'human', lvl: 1, rank: rank || 0 }, r.etag);
+      const ok = await tr.setIf(path, { dev, name, char: char || 'fanfan', team: n, kind: 'human', lvl: 1, rank: rank || 0 }, r.etag);
       if (ok) return { seat: n, rejoin: false, meta };
     }
   }

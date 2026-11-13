@@ -1,11 +1,16 @@
-import { toFx, px } from '../core/fixed.js';
+import { toFx, px, clamp } from '../core/fixed.js';
 import { boxRect, overlaps } from './box.js';
 
 // 射彈 / 場地物件(書牆、安靜圈):獨立物件,有自己的 bdy / itr
 export function spawnProjectile(w, owner, def, spec) {
   const pd = def.projectiles[spec.proj];
   if (!pd) return;
-  w.projectiles.push({
+  if (pd.limit) {
+    // 場上限制(例:避雷針只能有 1 支):超過就清掉本人最舊的同種射彈
+    const mine = w.projectiles.filter((q) => q.owner === owner.id && q.kind === spec.proj && !q.dead);
+    for (let i = 0; i <= mine.length - pd.limit; i++) mine[i].dead = true;
+  }
+  const p = {
     id: w.nextSeq++,
     owner: owner.id,
     ch: owner.charId,
@@ -19,12 +24,51 @@ export function spawnProjectile(w, owner, def, spec) {
     life: pd.life,
     dead: false,
     hitLog: {}
-  });
+  };
+  if (owner.ult === 2 && owner.move === 'ultimate') p.ult = owner.ultSeq; // 大招射彈:帶發動序號,供傷害上限與保護判斷
+  w.projectiles.push(p);
+}
+
+// 迴力射彈(D3):去程飛 life tick(或碰到場邊)後折返,朝本人目前位置飛回,到手消失;去、回各自重置命中紀錄,所以各可中一次。
+// 去 / 回程不另存欄位(連線快照的射彈欄位固定):回程時 life 加上 BACK_LIFE,life >= BACK_LIFE 即回程
+export const BACK_LIFE = 1000;
+export const isBack = (p) => p.life >= BACK_LIFE;
+function stepBoomerang(w, p, pd) {
+  const o = w.fighters[p.owner];
+  if (!isBack(p)) {
+    p.x += p.vx;
+    p.z = clamp(p.z + p.vz, 0, w.stage.d * 256);
+    p.life--;
+    if (p.life <= 0 || px(p.x) < 0 || px(p.x) > w.stage.w) {
+      p.hitLog = {};
+      p.life = BACK_LIFE + pd.life * 2 + 120; // 回程保險:本人跑太遠 / 追不到就消失
+      p.vz = 0;
+    }
+    return;
+  }
+  p.life--;
+  if (!o || o.dead || p.life <= BACK_LIFE) {
+    p.dead = true;
+    return;
+  }
+  const dx = o.x - p.x;
+  const dz = o.z - p.z;
+  const sx = Math.min(pd.backVx, Math.abs(dx));
+  const sz = Math.min(pd.backVz, Math.abs(dz));
+  p.x += dx >= 0 ? sx : -sx;
+  p.z += dz >= 0 ? sz : -sz;
+  p.face = dx >= 0 ? 1 : -1;
+  p.vx = p.face * pd.backVx;
+  if (Math.abs(o.x - p.x) <= pd.backVx && Math.abs(o.z - p.z) <= toFx(8)) p.dead = true; // 回到手上
 }
 
 export function stepProjectiles(w) {
   for (const p of w.projectiles) {
     const pd = w.defs[p.ch].projectiles[p.kind];
+    if (pd.boomerang) {
+      stepBoomerang(w, p, pd);
+      continue;
+    }
     if (pd.zone) {
       for (const f of w.fighters) {
         if (f.id === p.owner || f.dead || f.team === w.fighters[p.owner].team) continue;

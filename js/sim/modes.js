@@ -13,14 +13,22 @@ export function initMode(w, type, ff) {
   w.mode = { type, t: 0, limit: MODE_DEF[type].limit, over: false, winner: -1, overtime: false, ff: ff || 0 };
 }
 
-// 依人數把角色平均排在舞台上,面向中央
-export function layoutSpawns(n, stage) {
+// 開局站位:兩側面對面站在舞台中段(座位 0 在左側面向右,座位 1 在右側面向左,依序輪流),
+// 真人與電腦在同一個畫面區域內;sides 可指定每個座位站左(0)或右(1)(分隊戰讓同隊站同側)。
+export function layoutSpawns(n, stage, sides) {
+  const cx = Math.round(stage.w / 2);
+  const side = [];
+  for (let i = 0; i < n; i++) side.push(sides ? sides[i] % 2 : i % 2);
+  const per = [0, 0];
+  for (const s of side) per[s]++;
+  const seen = [0, 0];
   const out = [];
-  const x0 = 200;
-  const x1 = stage.w - 200;
   for (let i = 0; i < n; i++) {
-    const x = n === 1 ? stage.w / 2 : x0 + Math.round((i * (x1 - x0)) / (n - 1));
-    out.push({ x, z: 40 + ((i * 97) % 160), face: x < stage.w / 2 ? 1 : -1 });
+    const s = side[i];
+    const k = seen[s]++;
+    const dx = 120 + (k % 2) * 70; // 兩欄交錯,避免疊在一起
+    const z = Math.round(50 + ((k + 0.5) * 140) / Math.max(1, per[s]));
+    out.push({ x: cx + (s ? dx : -dx), z, face: s ? -1 : 1 });
   }
   return out;
 }
