@@ -132,7 +132,7 @@ const loop = new Loop(step, (alpha) => {
     const v = online.view();
     if (v) {
       setHudHint([online.fid], hasTouch);
-      renderer.draw(v, 1, loop, [online.fid], (i) => (online.cfg.seats[i].name || '#' + (i + 1)));
+      renderer.draw(v, 1, loop, [online.fid], (i) => (online.cfg.seats[i].name || '#' + (i + 1)), (i) => (online.cfg.seats[i].name || v.defs[v.fighters[i].charId].name));
       const me = v.fighters[online.fid];
       if (me && typeof me.rage === 'number') touch.setRage(me.rage / (100 * 256));
       showResult(!!v.mode.over);
@@ -143,7 +143,7 @@ const loop = new Loop(step, (alpha) => {
   showResult(!!world.mode.over);
   const focus = world.fighters.map((f, i) => (f.kind === 'human' ? i : -1)).filter((i) => i >= 0);
   setHudHint(focus.filter((i) => srcOf[i] === 'P1'), hasTouch);
-  renderer.draw(world, alpha, loop, focus, nameOf);
+  renderer.draw(world, alpha, loop, focus, nameOf, (i) => world.defs[world.fighters[i].charId].name);
 });
 
 function updatePause() {

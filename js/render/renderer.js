@@ -1,6 +1,6 @@
 import { drawFighter, drawProjectileArt, drawMoveFx } from './sprites.js';
 import { drawUltOverlay, drawNight, ultCutinFade } from './ult.js';
-import { drawHud, drawOverhead, drawResult, SLOT_COLORS } from './hud.js';
+import { drawHud, drawOverhead, drawName, isLocalFighter, drawResult, SLOT_COLORS } from './hud.js';
 import { drawBoxes } from './debug.js';
 import { S } from '../sim/fighter.js';
 import { Fx } from './fx.js';
@@ -38,7 +38,7 @@ export class Renderer {
     this.prev = w.fighters.map((f) => ({ x: f.x, y: f.y, z: f.z }));
   }
   // focus:鏡頭要框住的角色 id(本機玩家);空 = 全部存活角色
-  draw(w, alpha, stats, focus, nameOf) {
+  draw(w, alpha, stats, focus, nameOf, labelOf) {
     const ctx = this.ctx;
     const pos = (f, i) => {
       const p = this.prev[i] || f;
@@ -114,6 +114,13 @@ export class Renderer {
         ctx.save();
         ctx.setTransform(this.k, 0, 0, this.k, 0, 0);
         drawOverhead(ctx, w, f, sx * zoom, ty + sy * zoom - 64 * zoom - 12 + 78);
+        ctx.restore();
+      }
+      if (labelOf) {
+        // 名字畫在血條上方,同樣與縮放脫鉤
+        ctx.save();
+        ctx.setTransform(this.k, 0, 0, this.k, 0, 0);
+        drawName(ctx, f, sx * zoom, ty + sy * zoom - 64 * zoom - 12, labelOf(i), isLocalFighter(i));
         ctx.restore();
       }
     }

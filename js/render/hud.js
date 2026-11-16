@@ -1,4 +1,7 @@
-import { STATE_NAMES } from '../sim/fighter.js';
+import { STATE_NAMES, S } from '../sim/fighter.js';
+
+const S_LYING = S.LYING;
+const S_FALL = S.FALL;
 
 const FONT = '"Microsoft JhengHei", "PingFang TC", sans-serif';
 export const SLOT_COLORS = ['#ff5555', '#55a0ff', '#55dd77', '#ffcc33', '#d070ff', '#ff9040', '#40e0d0', '#f080b0'];
@@ -163,4 +166,35 @@ export function drawOverhead(ctx, w, f, sx, sy) {
     bar(ctx, sx - 22, sy - 72, 44, 3, f.fall / 100, '#f90');
     bar(ctx, sx - 22, sy - 68, 44, 3, f.bdef / 100, '#6cf');
   }
+}
+
+// 頭上名字:畫在血條上方(by = 血條頂的畫面 y),白字黑描邊;本機玩家黃字加 ▼;太長截斷
+export function drawName(ctx, f, sx, by, label, isMe) {
+  if (!label) return;
+  let t = String(label);
+  if (t.length > 6) t = t.slice(0, 5) + '…';
+  ctx.save();
+  ctx.globalAlpha = f.state === S_LYING || f.state === S_FALL ? 0.45 : 1;
+  ctx.font = 'bold 9px ' + FONT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#000';
+  ctx.strokeText(t, sx, by - 2);
+  ctx.fillStyle = isMe ? '#ffe566' : '#fff';
+  ctx.fillText(t, sx, by - 2);
+  if (isMe) {
+    ctx.fillStyle = '#ffe566';
+    ctx.beginPath();
+    ctx.moveTo(sx - 3, by - 14);
+    ctx.lineTo(sx + 3, by - 14);
+    ctx.lineTo(sx, by - 10);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+export function isLocalFighter(i) {
+  return hint.ids.indexOf(i) >= 0;
 }

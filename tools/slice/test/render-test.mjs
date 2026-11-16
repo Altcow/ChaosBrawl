@@ -9,6 +9,7 @@ import { makeSheet, frameSpec } from './fake.mjs';
 import { drawFighter, setArtIO, pickFrame } from '../../../js/render/sprites.js';
 import { compileChar, S } from '../../../js/sim/fighter.js';
 import { FX } from '../../../js/core/fixed.js';
+import { drawName } from '../../../js/render/hud.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, '..', '..', '..');
@@ -147,6 +148,25 @@ check('死亡 / 蹲 / 防', pf({ state: S.DEAD }) === 'lying_0' && pf({ state: S
   drawFighter(c3, fighter({ charId: 'grandma' }), compileChar(JSON.parse(readFileSync(join(root, 'tools/fixtures/chars/grandma.json'), 'utf8'))), 1, 1, 1, false);
   await settle();
   check('角色 json 無法載入:佔位圖', c3.calls.some((x) => x[0] === 'fillRect'));
+}
+
+{
+  // 頭上名字:描邊 + 填字都有畫;長名截斷;空名不畫
+  const c = mkCtx();
+  c.strokeText = (...a) => c.calls.push(['strokeText', ...a]);
+  c.fillText = (...a) => c.calls.push(['fillText', ...a]);
+  drawName(c, fighter({ state: S.IDLE }), 100, 50, '帆帆', false);
+  const ft = c.calls.filter((x) => x[0] === 'fillText');
+  check('頭上名字:描邊與填字各畫一次', ft.length === 1 && ft[0][1] === '帆帆' && c.calls.some((x) => x[0] === 'strokeText'));
+  const c2 = mkCtx();
+  c2.strokeText = () => {};
+  c2.fillText = (...a) => c2.calls.push(['fillText', ...a]);
+  drawName(c2, fighter(), 100, 50, '非常長的玩家暱稱', true);
+  check('頭上名字:過長截斷、本機玩家畫小三角', c2.calls.find((x) => x[0] === 'fillText')[1].length === 6 && c2.calls.some((x) => x[0] === 'lineTo'));
+  const c3 = mkCtx();
+  c3.fillText = () => c3.calls.push(['fillText']);
+  drawName(c3, fighter(), 100, 50, '', false);
+  check('頭上名字:空名不畫', c3.calls.length === 0);
 }
 
 console.log('\n' + pass + ' PASS / ' + fail + ' FAIL');
