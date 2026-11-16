@@ -21,8 +21,9 @@
     }
 
 - `frames` 依列優先(左到右、上到下);`null` = 該格不用;字串 = 幀名;物件可加:
-  `wide`(寬招 256×160,僅用於超寬警告判斷)、`air`(空中格,見下)、`dx`/`dy`(輸出像素微調錨點)、`anchorX:"bbox"`(錨點 x 改用內容中心)。
+  `wide`(寬招 256×160,僅用於超寬警告判斷)、`air`(空中格,見下)、`dx`/`dy`(輸出像素微調錨點)、`anchorX`(`cell` 畫格中心[grid 預設]/ `bbox` 內容中心[components 預設]/ `feet` 底部 8% 內容的 x 中心,可設在 sheet、全域或單格)。
 - `layout`:`grid`(預設,依 cols×rows 等分,每格取內容邊界框)或 `components`(連通區域,格線不整齊時用;近距離碎塊用 `mergeGap` 合併、`minArea` 濾雜點;數量不符直接報錯)。
+- sheet 可選:`key`(只對該張覆蓋去背參數)、`despeckle`(清掉面積小於此值的孤立雜點,webp 圖用)、`footBand`。`key.bg:"auto"` = 背景色取四角內插(吃偏色 / 漸層),並濾掉畫格間 4px 內的白 / 粉紅細線(`key.lineBand`、`key.lines:false` 可調)。偏色圖 `lo/hi` 建議 0.15/0.5、`edge` 3。
 - 全域可選:`scale`(預設 auto = 160 ÷ 來源格高)、`cell`、`wideCell`、`footOffset`(8)、`pxPerUnit`(2)、`key:{lo,hi,edge}`、`maxW/maxH`(2048)。
 
 ## 做了什麼
@@ -45,3 +46,7 @@
 ## 渲染端對照(資料在 data/chars/<id>.json 的 `art` 欄位)
 
 `art.states.<狀態名>` / `art.moves.<招式名>` = `{ mode, frames:[幀名], rate, total, at }`;mode:`loop`、`hold`、`vy`(上升/頂點/下落)、`progress`(依 `total`=數字或 def 路徑如 `roll.dur`)、`stunt`(輕/重)、`move`(依招式邏輯格)。招式表優先於狀態表。找不到圖集、動畫或幀名時自動退回色塊佔位圖。
+
+## 來源圖是 webp 時
+
+工具只吃 PNG。先用 Pillow 轉到 `tools/slice/tmp/`(可隨時刪):`Image.open(f).convert('RGB').save(...)`;設定檔 `guanyu.json` 即引用該資料夾。已存在的角色設定:`areh.json`、`guanyu.json`(不含必殺 / 大招 / 射彈)。

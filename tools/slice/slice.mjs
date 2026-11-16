@@ -23,7 +23,36 @@ const DEF = {
 
 // ---- 去背 ----
 // 洋紅度 m = (min(R,B) - G) / 255;純洋紅 = 1,與前景混色時依混合比例下降
-export function keyOut(img, opt) {
+// bg:'auto' 時背景色不寫死:取四角色塊雙線性內插當各點背景色(吃 webp 偏色 / 漸層),
+// 並把畫格間 lines 條寬 band 內的亮色細線(白 / 粉紅)當背景濾掉(extra = { cols, rows })
+function bgModel(img) {
+  const { w, h, data } = img;
+  const ins = Math.min(10, Math.floor(Math.min(w, h) / 8));
+  const ps = Math.min(12, Math.floor(Math.min(w, h) / 8));
+  const corner = (x0, y0) => {
+    const c = [0, 0, 0];
+    for (let y = y0; y < y0 + ps; y++) {
+      for (let x = x0; x < x0 + ps; x++) {
+        const o = (y * w + x) * 4;
+        c[0] += data[o];
+        c[1] += data[o + 1];
+        c[2] += data[o + 2];
+      }
+    }
+    return c.map((v) => v / (ps * ps));
+  };
+  const c00 = corner(ins, ins);
+  const c10 = corner(w - ins - ps, ins);
+  const c01 = corner(ins, h - ins - ps);
+  const c11 = corner(w - ins - ps, h - ins - ps);
+  return (x, y, out) => {
+    const u = x / (w - 1);
+    const v = y / (h - 1);
+    for (let k = 0; k < 3; k++) out[k] = c00[k] * (1 - u) * (1 - v) + c10[k] * u * (1 - v) + c01[k] * (1 - u) * v + c11[k] * u * v;
+  };
+}
+
+export function keyOut(img, opt, extra) {
   const { w, h, data } = img;
   const n = w * h;
   let hasAlpha = false;
@@ -36,10 +65,34 @@ export function keyOut(img, opt) {
   if (hasAlpha && !opt.forceKey) return { skipped: true };
   const m = new Float32Array(n);
   const seed = new Uint8Array(n);
+  const auto = opt.bg === 'auto';
+  const bgAt = auto ? bgModel(img) : null;
+  const bgc = [255, 0, 255];
+  const band = opt.lineBand === undefined ? 4 : opt.lineBand;
+  const gx = auto && extra && extra.cols ? w / extra.cols : 0;
+  const gy = auto && extra && extra.rows ? h / extra.rows : 0;
+  const nearLine = (x, y) => {
+    if (!gx) return false;
+    const dx = Math.abs(x - Math.round(x / gx) * gx);
+    const dy = Math.abs(y - Math.round(y / gy) * gy);
+    return dx <= band || dy <= band;
+  };
   for (let i = 0; i < n; i++) {
     const o = i * 4;
-    const v = Math.min(data[o], data[o + 2]) - data[o + 1];
-    m[i] = v > 0 ? v / 255 : 0;
+    if (auto) {
+      const x = i % w;
+      const y = (i - x) / w;
+      bgAt(x, y, bgc);
+      const rn = Math.min(255, (data[o] * 255) / Math.max(1, bgc[0]));
+      const bn = Math.min(255, (data[o + 2] * 255) / Math.max(1, bgc[2]));
+      const gn = Math.max(0, ((data[o + 1] - bgc[1]) * 255) / Math.max(1, 255 - bgc[1]));
+      const v = Math.min(rn, bn) - gn;
+      m[i] = v > 0 ? v / 255 : 0;
+      if (opt.lines !== false && Math.min(rn, bn) >= 170 && nearLine(x, y)) m[i] = 1;
+    } else {
+      const v = Math.min(data[o], data[o + 2]) - data[o + 1];
+      m[i] = v > 0 ? v / 255 : 0;
+    }
     if (m[i] >= opt.hi) seed[i] = 1;
   }
   // 邊緣帶:距離透明種子 <= edge 的像素(Chebyshev)
@@ -75,9 +128,10 @@ export function keyOut(img, opt) {
       const a = Math.max(0, Math.min(1, 1 - (mm - opt.lo) / (opt.hi - opt.lo)));
       // 解混:c = m*K + (1-m)*F,K = (255,0,255)
       const d = 1 - mm;
-      data[o] = Math.max(0, Math.min(255, Math.round((data[o] - mm * 255) / d)));
-      data[o + 1] = Math.max(0, Math.min(255, Math.round(data[o + 1] / d)));
-      data[o + 2] = Math.max(0, Math.min(255, Math.round((data[o + 2] - mm * 255) / d)));
+      if (auto) bgAt(i % w, Math.floor(i / w), bgc);
+      data[o] = Math.max(0, Math.min(255, Math.round((data[o] - mm * bgc[0]) / d)));
+      data[o + 1] = Math.max(0, Math.min(255, Math.round((data[o + 1] - mm * bgc[1]) / d)));
+      data[o + 2] = Math.max(0, Math.min(255, Math.round((data[o + 2] - mm * bgc[2]) / d)));
       data[o + 3] = Math.round(a * 255);
     } else {
       data[o + 3] = 255;
@@ -223,6 +277,55 @@ function resample(img, box, ow, oh) {
   return { w: ow, h: oh, data: out };
 }
 
+// 清除面積小於 minArea 的孤立雜點(8 連通;webp 壓縮雜訊 / 殘留線段)
+function despeckle(img, amin, minArea) {
+  const { w, h, data } = img;
+  const lab = new Uint8Array(w * h);
+  const stack = [];
+  for (let s = 0; s < w * h; s++) {
+    if (lab[s] || data[s * 4 + 3] < amin) continue;
+    const pix = [];
+    lab[s] = 1;
+    stack.push(s);
+    while (stack.length) {
+      const p = stack.pop();
+      pix.push(p);
+      const x = p % w;
+      const y = (p - x) / w;
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const xx = x + dx;
+          const yy = y + dy;
+          if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue;
+          const q = yy * w + xx;
+          if (!lab[q] && data[q * 4 + 3] >= amin) {
+            lab[q] = 1;
+            stack.push(q);
+          }
+        }
+      }
+    }
+    if (pix.length < minArea) for (const p of pix) data[p * 4 + 3] = 0;
+  }
+}
+
+// 腳底中心 x(來源 px):框底部 band 內有內容像素的 x 平均
+function feetX(img, b, bandFrac) {
+  const hh = b.y1 - b.y0;
+  const bandH = Math.max(4, Math.round(hh * bandFrac));
+  let sum = 0;
+  let cnt = 0;
+  for (let y = Math.max(b.y0, b.y1 - bandH); y < b.y1; y++) {
+    for (let x = b.x0; x < b.x1; x++) {
+      if (img.data[(y * img.w + x) * 4 + 3] >= 16) {
+        sum += x + 0.5;
+        cnt++;
+      }
+    }
+  }
+  return cnt ? sum / cnt : (b.x0 + b.x1) / 2;
+}
+
 function normEntry(e) {
   if (e == null) return null;
   return typeof e === 'string' ? { name: e } : e;
@@ -238,10 +341,11 @@ export function sliceSheets(config, readImage) {
   for (const sheet of config.sheets) {
     const img = readImage(sheet.file);
     const lab = sheet.file;
-    const ks = keyOut(img, C.key);
-    if (ks.skipped) warnings.push(lab + ':已含透明,略過洋紅去背');
     const cols = sheet.cols || 1;
     const rows = sheet.rows || 1;
+    const ks = keyOut(img, Object.assign({}, C.key, sheet.key || {}), { cols, rows });
+    if (ks.skipped) warnings.push(lab + ':已含透明,略過洋紅去背');
+    else if (sheet.despeckle) despeckle(img, C.alphaMin, sheet.despeckle);
     const cw = img.w / cols;
     const chh = img.h / rows;
     const entries = (sheet.frames || []).map(normEntry);
@@ -294,7 +398,9 @@ export function sliceSheets(config, readImage) {
         if (layout !== 'grid' && e.air) warnings.push(e.name + ':air 只在 grid 版面有效,已改為腳底貼地');
         ay = oh;
       }
-      if (layout === 'grid' && sheet.anchorX !== 'bbox' && e.anchorX !== 'bbox') ax = ((b.cell.x0 + b.cell.x1) / 2 - b.x0) * rx;
+      const am = e.anchorX || sheet.anchorX || C.anchorX || (layout === 'grid' ? 'cell' : 'bbox');
+      if (am === 'cell' && layout === 'grid') ax = ((b.cell.x0 + b.cell.x1) / 2 - b.x0) * rx;
+      else if (am === 'feet') ax = (feetX(img, b, sheet.footBand || C.footBand || 0.08) - b.x0) * rx;
       else ax = ow / 2;
       ax += e.dx || 0;
       ay -= e.dy || 0;

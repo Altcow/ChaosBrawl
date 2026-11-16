@@ -149,6 +149,31 @@ check('atlas.json 含必要欄位', r.json.pxPerUnit === 2 && r.json.size.w === 
   check('超寬格未標 wide 時警告,標了就不警告', w1.warnings.some((x) => x.includes('超過')) && w2.warnings.length === 0 && w2.json.frames.w.wide === true, w1.warnings.join('|'));
 }
 
+// ---- bg:auto(偏色背景 + 畫格細線 + 雜點)+ anchorX:feet ----
+{
+  const W = 400;
+  const H = 200;
+  const d = new Uint8Array(W * H * 4);
+  const put = (x, y, r, g, b) => {
+    const o = (y * W + x) * 4;
+    d[o] = r;
+    d[o + 1] = g;
+    d[o + 2] = b;
+    d[o + 3] = 255;
+  };
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) put(x, y, 180, 2, 150);
+  for (let y = 0; y < H; y++) for (let x = 198; x < 202; x++) put(x, y, 255, 200, 255); // 畫格線
+  for (let y = 40; y < 180; y++) for (let x = 60; x < 100; x++) put(x, y, 30, 120, 40); // 角色 1:身體
+  for (let y = 170; y < 180; y++) for (let x = 60; x < 140; x++) put(x, y, 30, 120, 40); // 腳伸向右
+  for (let y = 40; y < 180; y++) for (let x = 260; x < 300; x++) put(x, y, 30, 120, 40); // 角色 2
+  put(20, 20, 30, 30, 30); // 雜點
+  const rr = sliceSheets({ scale: 1, anchorX: 'feet', key: { bg: 'auto' }, sheets: [{ file: 'm', cols: 2, rows: 1, despeckle: 10, frames: ['a', 'b'] }] }, () => ({ w: W, h: H, data: Uint8Array.from(d) }));
+  const A = rr.json.frames.a;
+  const B = rr.json.frames.b;
+  check('bg:auto 偏色背景去背,畫格線與雜點不入框', A.w === 80 && A.h === 140 && B.w === 40 && B.h === 140, A.w + 'x' + A.h + ' / ' + B.w + 'x' + B.h);
+  check('anchorX:feet 取底部像素中心', Math.abs(A.ax - 40) <= 1.5, A.ax);
+}
+
 // ---- CLI 端到端(寫 PNG + 設定檔 → 執行 → 讀回) ----
 {
   const { execFileSync } = await import('node:child_process');

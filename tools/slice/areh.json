@@ -1,0 +1,114 @@
+{
+ "id": "areh",
+ "out": "../../data/art/areh",
+ "scale": 0.22,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "sheets": [
+  {
+   "file": "../../給GPT/回收/阿熱_第1張.png",
+   "cols": 3,
+   "rows": 2,
+   "layout": "components",
+   "frames": [
+    "idle_0",
+    "idle_1",
+    "walk_0",
+    "walk_1",
+    "walk_2",
+    "walk_3"
+   ]
+  },
+  {
+   "file": "../../給GPT/回收/阿熱_第2張.png",
+   "cols": 3,
+   "rows": 2,
+   "layout": "components",
+   "frames": [
+    "run_0",
+    "run_1",
+    "run_2",
+    "run_3",
+    "runstop_0",
+    "squat_0"
+   ]
+  },
+  {
+   "file": "../../給GPT/回收/阿熱_第3張.png",
+   "cols": 3,
+   "rows": 2,
+   "layout": "components",
+   "frames": [
+    "jump_up",
+    "jump_down",
+    "dash_0",
+    "defend_0",
+    "hurt_light",
+    "hurt_heavy"
+   ]
+  },
+  {
+   "file": "../../給GPT/回收/阿熱_第4張.png",
+   "cols": 3,
+   "rows": 2,
+   "layout": "components",
+   "frames": [
+    "attack1_0",
+    "attack1_1",
+    "attack2_0",
+    "attack2_1",
+    "attack3_0",
+    "attack3_1"
+   ]
+  },
+  {
+   "file": "../../給GPT/回收/阿熱_第5張.png",
+   "cols": 3,
+   "rows": 2,
+   "layout": "components",
+   "frames": [
+    "runatk_0",
+    "runatk_1",
+    "jumpatk_0",
+    "jumpatk_1",
+    "dashatk_0",
+    "dashatk_1"
+   ]
+  },
+  {
+   "file": "../../給GPT/回收/阿熱_第6張.png",
+   "cols": 3,
+   "rows": 2,
+   "layout": "components",
+   "frames": [
+    "roll_0",
+    "roll_1",
+    "roll_2",
+    "fall_up",
+    "fall_down",
+    "lying_0"
+   ]
+  },
+  {
+   "file": "../../給GPT/回收/阿熱_第7張.png",
+   "cols": 2,
+   "rows": 2,
+   "layout": "components",
+   "frames": [
+    "getup_0",
+    "getup_1",
+    "stun_0",
+    "stun_1"
+   ]
+  }
+ ]
+}
