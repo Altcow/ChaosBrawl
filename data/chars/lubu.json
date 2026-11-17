@@ -359,7 +359,79 @@
           "wait": 10
         },
         {
-          "wait": 40,
+          "wait": 10,
+          "mvx": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 64,
+              "h": 64,
+              "zr": 20,
+              "dmg": 55,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 6,
+              "ky": 7,
+              "stun": 20,
+              "stop": 4,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "mvx": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 64,
+              "h": 64,
+              "zr": 20,
+              "dmg": 55,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 6,
+              "ky": 7,
+              "stun": 20,
+              "stop": 4,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "mvx": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 64,
+              "h": 64,
+              "zr": 20,
+              "dmg": 55,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 6,
+              "ky": 7,
+              "stun": 20,
+              "stop": 4,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
           "mvx": 10,
           "armor": true,
           "itr": [
@@ -425,7 +497,260 @@
           "wait": 14
         },
         {
-          "wait": 120,
+          "wait": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
+          "armor": true,
+          "itr": [
+            {
+              "x": -48,
+              "y": 0,
+              "w": 96,
+              "h": 64,
+              "zr": 30,
+              "dmg": 13,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 10,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 10,
           "armor": true,
           "itr": [
             {
@@ -459,13 +784,13 @@
       "life": 60,
       "chase": 0,
       "bdy": {
-        "x": -12,
+        "x": 4,
         "y": -4,
         "w": 24,
         "h": 8
       },
       "itr": {
-        "x": -12,
+        "x": 4,
         "y": -4,
         "w": 24,
         "h": 8,
@@ -672,39 +997,85 @@
       "sp_fwd_atk": {
         "mode": "move",
         "frames": [
-          "attack1_0",
-          "attack1_1",
-          "attack2_1",
-          "attack1_0"
+          "sp_fwd_atk_0",
+          "sp_fwd_atk_1",
+          "sp_fwd_atk_2",
+          "sp_fwd_atk_2"
         ]
       },
       "sp_fwd_jump": {
         "mode": "move",
         "frames": [
-          "dashatk_0",
-          "dashatk_1",
-          "dashatk_1"
+          "sp_fwd_atk_0",
+          "ride_0",
+          "ride_1",
+          "ride_0",
+          "ride_1",
+          "runstop_0"
         ]
       },
       "sp_up_atk": {
         "mode": "move",
         "frames": [
-          "attack3_0",
-          "attack3_1",
-          "attack3_1"
+          "sp_up_atk_0",
+          "sp_up_atk_1",
+          "sp_up_atk_1"
         ]
       },
       "ultimate": {
-        "mode": "loop",
-        "rate": 6,
+        "mode": "move",
         "frames": [
-          "attack1_0",
-          "attack1_1",
-          "attack2_0",
-          "attack2_1",
-          "attack3_0",
-          "attack3_1"
+          "ult_0",
+          "ult_spin_0",
+          "ult_spin_1",
+          "ult_spin_0",
+          "ult_spin_1",
+          "ult_spin_0",
+          "ult_spin_1",
+          "ult_spin_0",
+          "ult_spin_1",
+          "ult_spin_0",
+          "ult_spin_1",
+          "ult_spin_0",
+          "ult_spin_1",
+          "ult_2"
         ]
+      }
+    },
+    "projectiles": {
+      "arrow": {
+        "frames": [
+          "proj_arrow"
+        ],
+        "rate": 4
+      }
+    },
+    "cutin": {
+      "frame": "cutin"
+    },
+    "fx": {
+      "sp_fwd_atk": {
+        "frames": [
+          "fx_thrusts"
+        ],
+        "rate": 6,
+        "from": 1,
+        "to": 1,
+        "dx": 14,
+        "dy": 30,
+        "scale": 1
+      },
+      "ultimate": {
+        "frames": [
+          "fx_whirl_0",
+          "fx_whirl_1"
+        ],
+        "rate": 5,
+        "from": 1,
+        "to": 12,
+        "dx": 0,
+        "dy": 34,
+        "scale": 1
       }
     }
   }

@@ -420,7 +420,12 @@
               "gain": 0,
               "kind": "hit"
             }
-          ]
+          ],
+          "spawn": {
+            "proj": "cup",
+            "x": 22,
+            "y": 14
+          }
         },
         {
           "wait": 24,
@@ -430,7 +435,13 @@
       ]
     }
   },
-  "projectiles": {},
+  "projectiles": {
+    "cup": {
+      "vx": 0,
+      "life": 16,
+      "chase": 0
+    }
+  },
   "art": {
     "atlas": "art/guanyu/atlas.json",
     "scale": 0.72,
@@ -595,6 +606,73 @@
           "dashatk_1",
           "dashatk_1"
         ]
+      },
+      "sp_fwd_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_atk_0",
+          "sp_fwd_atk_1",
+          "sp_fwd_atk_1"
+        ]
+      },
+      "sp_fwd_jump": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_jump_0",
+          "sp_fwd_atk_0",
+          "sp_fwd_jump_1",
+          "sp_fwd_jump_1"
+        ]
+      },
+      "sp_down_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_down_atk_0",
+          "getup_1"
+        ]
+      },
+      "ultimate": {
+        "mode": "move",
+        "frames": [
+          "ult_0",
+          "ult_1",
+          "ult_2"
+        ]
+      }
+    },
+    "projectiles": {
+      "cup": {
+        "frames": [
+          "proj_cup"
+        ],
+        "rate": 4
+      }
+    },
+    "cutin": {
+      "frame": "cutin"
+    },
+    "fx": {
+      "sp_fwd_atk": {
+        "frames": [
+          "fx_crescent"
+        ],
+        "rate": 8,
+        "from": 1,
+        "to": 1,
+        "dx": 8,
+        "dy": 34,
+        "scale": 1
+      },
+      "ultimate": {
+        "frames": [
+          "fx_flash"
+        ],
+        "rate": 8,
+        "from": 1,
+        "to": 1,
+        "dx": 70,
+        "dy": 28,
+        "scale": 1
       }
     }
   },

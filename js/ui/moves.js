@@ -8,11 +8,11 @@ const KEYS = {
   kb: { def: '防(L)', atk: '攻(J)', jump: '跳(K)', up: '↑(W)', down: '↓(S)', fwd: '→', ult: '鍵盤 U' },
   p2: { def: '防(小鍵盤 3)', atk: '攻(小鍵盤 1)', jump: '跳(小鍵盤 2)', up: '↑', down: '↓', fwd: '→', ult: '小鍵盤 4' },
   pad: { def: '防(B)', atk: '攻(X)', jump: '跳(A)', up: '↑', down: '↓', fwd: '→', ult: '手把 Y' },
-  touch: { def: '防', atk: '攻', jump: '跳', up: '↑', down: '↓', fwd: '→', ult: '「大招」鈕' }
+  touch: { def: '防', atk: '攻', jump: '跳', up: '↑', down: '↓', fwd: '→', ult: '「最強」鈕' }
 };
 const SHORT = { def: '防', atk: '攻', jump: '跳', up: '↑', down: '↓', fwd: '→' };
 
-export const RAGE_HELP = '出招命中:造成傷害每 10 點 +2;被打:受到傷害每 10 點 +3、被擊倒 +5(防禦擋下的不算);大招命中不加。每局從 0 開始,時間賽復活保留一半。';
+export const RAGE_HELP = '出招命中:造成傷害每 10 點 +2;被打:受到傷害每 10 點 +3、被擊倒 +5(防禦擋下的不算);最強必殺技命中不加。每局從 0 開始,時間賽復活保留一半。';
 export const ULT_COND = '爆氣條滿(100)、人在地面且站 / 走 / 跑 / 防的時候才能發動;受擊、倒地、空中、被封招時不行。';
 
 // 'sp_fwd_atk' → ['fwd', 'atk'] 的顯示文字。short = 只用簡寫(防+→+攻)
@@ -24,7 +24,7 @@ export function cmdText(cmd, dev, short) {
 
 export function ultKeyText(dev) {
   const k = KEYS[dev] || KEYS.kb;
-  if (dev === 'touch') return '點右側「大招」鈕(爆氣滿了會亮起閃爍)';
+  if (dev === 'touch') return '點右側「最強」鈕(爆氣滿了會亮起閃爍)';
   return k.def + '+' + k.atk + '+' + k.jump + ' 同時按,或單按 ' + k.ult;
 }
 
@@ -96,14 +96,14 @@ export function setupMoves(root, { chars, charIds, onToggle }) {
     left.append(basic);
 
     // 必殺
-    left.append(h('h3', null, '必殺(吃 MP,MP 上限 ' + j.mp + ',會自動回復)'));
+    left.append(h('h3', null, '必殺技(吃 MP,MP 上限 ' + j.mp + ',會自動回復)'));
     const list = h('div', 'mv-list');
     for (const m of listMoves(j)) {
       const row = h('div', 'mv-row');
       const top = h('div', 'mv-top');
       top.append(h('b', null, m.name), h('span', 'mv-cost', 'MP ' + m.cost));
       row.append(top);
-      row.append(h('div', 'mv-cmd', dev === 'touch' ? '點「必殺」鈕選此招(指令 ' + cmdText(m.cmd, dev, true) + ')' : cmdText(m.cmd, dev)));
+      row.append(h('div', 'mv-cmd', dev === 'touch' ? '點「必殺技」鈕選此招(指令 ' + cmdText(m.cmd, dev, true) + ')' : cmdText(m.cmd, dev)));
       row.append(h('div', 'mv-desc', m.desc));
       list.append(row);
     }
@@ -111,7 +111,7 @@ export function setupMoves(root, { chars, charIds, onToggle }) {
     if (dev !== 'touch') left.append(h('div', 'mv-note', '→ 指面對的方向(面右按 D、面左按 A;P2 為 → / ←)。防、方向、攻 / 跳 在 0.25 秒內按完即可,順序不拘。'));
 
     // 大招
-    right.append(h('h3', null, '大招'));
+    right.append(h('h3', null, '最強必殺技'));
     const u = j.info && j.info.ult;
     const ur = h('div', 'mv-row mv-ult');
     ur.append(h('div', 'mv-top', ''));
@@ -122,7 +122,7 @@ export function setupMoves(root, { chars, charIds, onToggle }) {
     right.append(ur);
 
     right.append(h('h3', null, '爆氣條怎麼累積'));
-    right.append(h('div', 'mv-desc', 'HUD 上的金色細條(標示「大招」)就是爆氣條,與 MP 分開。'));
+    right.append(h('div', 'mv-desc', 'HUD 上的金色細條(標示「爆氣」)就是爆氣條,與 MP 分開。'));
     right.append(h('div', 'mv-desc', RAGE_HELP));
     if (j.info && j.info.note) {
       right.append(h('h3', null, '特色'));

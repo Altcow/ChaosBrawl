@@ -50,3 +50,17 @@
 ## 來源圖是 webp 時
 
 工具只吃 PNG。先用 Pillow 轉到 `tools/slice/tmp/`(可隨時刪):`Image.open(f).convert('RGB').save(...)`;設定檔 `guanyu.json` 即引用該資料夾。已存在的角色設定:`areh.json`、`guanyu.json`、`magnet.json`、`sun.json`、`lubu.json`(不含必殺 / 大招 / 射彈)。磁鈴 / 小孫 / 呂布第 4 張只有第 1 排有角色,角色腳底超出 3 等分的第 1 排高度,所以第 4 張設為 `rows:2`(後 4 格 null);scale 用 0.32 讓身高與關羽接近(來源格內人物較大)。
+
+## 必殺技畫格(2026-11-17)
+
+5 位角色(小孫 / 磁鈴 / 阿熱 / 關羽 / 呂布)的必殺技與最強必殺技畫格,從 `給GPT/回收/必殺技_*.webp` 切出來併進既有圖集:
+
+    python tools/slice/ult_prep.py                         # webp → tools/slice/tmp/ult_<id>_<N>.png,並擦掉烘進姿勢格的特效(小孫第 1 張第 2 格、磁鈴第 1 張第 8 格)
+    node tools/slice/slice.mjs tools/slice/ult_<id>.json   # 切到 tools/slice/tmp/ult_out/<id>/(components 版面;錨點:人物 feet、特效 left / right / bbox + anchorY)
+    node tools/slice/merge-atlas.mjs <基底資料夾> tools/slice/tmp/ult_out/<id> data/art/<id>   # 新圖集接在舊圖集下面,舊畫格像素與錨點完全不動
+
+基底 = 加必殺技之前的 `data/art/<id>/atlas.*`(git 舊版本;重跑時用 `git show <舊 commit>:data/art/<id>/atlas.png` 還原,幀名重複會報錯)。
+
+slice.mjs 新增:`anchorX: "left" | "right"`(特效以左 / 右端對齊,例如光束從手掌發出)、`anchorY: "mid" | "top"`(預設底邊)、components 版面切格時會遮掉落在方框內、但屬於相鄰物件的像素(相鄰格的武器尖端不會漏進來);mergeGap 可為負數(`-12`:bbox 只有輕微重疊的相鄰物件不合併)。
+
+遊戲端 `art.fx.<招式名>` 可為物件或陣列(同一招多組特效),欄位 `frames, rate, from, to(最後一格,含), dx, dy(往上位移 px), scale, under`;只動畫面,不影響模擬。檢查:`node tools/art-test.mjs`。

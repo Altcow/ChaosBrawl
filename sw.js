@@ -1,4 +1,4 @@
-const VERSION = 14;
+const VERSION = 15;
 const CACHE = 'chaosbrawl-v' + VERSION;
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './css/main.css',

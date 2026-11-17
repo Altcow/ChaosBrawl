@@ -1,0 +1,126 @@
+{
+ "id": "magnet_ult",
+ "out": "tmp/ult_out/magnet",
+ "scale": 0.32,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "key": {
+  "bg": "auto",
+  "lo": 0.15,
+  "hi": 0.5,
+  "edge": 3
+ },
+ "sheets": [
+  {
+   "file": "tmp/ult_magnet_1.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 12,
+   "frames": [
+    "sp_fwd_atk_0",
+    "sp_fwd_atk_1",
+    {
+     "name": "sp_down_atk_0",
+     "anchorX": "bbox"
+    },
+    "sp_up_atk_0",
+    {
+     "name": "sp_up_atk_1",
+     "dx": 22
+    },
+    {
+     "name": "sp_up_atk_2",
+     "dx": 8,
+     "dy": -8
+    },
+    {
+     "name": "ult_0",
+     "anchorX": "bbox"
+    },
+    {
+     "name": "ult_1",
+     "dx": 35
+    },
+    "ult_2"
+   ]
+  },
+  {
+   "file": "tmp/ult_magnet_2.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "fx_rail_ult_0",
+     "scale": 0.43,
+     "anchorX": "left",
+     "anchorY": "mid",
+     "wide": true
+    },
+    {
+     "name": "fx_rail_ult_1",
+     "scale": 0.43,
+     "anchorX": "left",
+     "anchorY": "mid",
+     "wide": true
+    },
+    {
+     "name": "proj_rail",
+     "scale": 0.19,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "fx_sand_0",
+     "scale": 0.26,
+     "anchorX": "left",
+     "anchorY": "mid"
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_magnet_3.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "fx_shock_0",
+     "scale": 0.236,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "fx_shock_1",
+     "scale": 0.236,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "fx_sand_1",
+     "scale": 0.27,
+     "anchorX": "left"
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_magnet_4.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "cutin",
+     "scale": 0.14,
+     "anchorX": "bbox"
+    }
+   ]
+  }
+ ]
+}

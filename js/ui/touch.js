@@ -73,7 +73,7 @@ export function setupTouch(root, input, onAssist, getSpecials) {
   addButton('jump', '跳', 'b-jump', BIT.JUMP);
   addButton('def', '防', 'b-def', BIT.DEF);
   const sp = el('div', 'btn b-sp');
-  sp.textContent = '必殺';
+  sp.textContent = '必殺技';
   root.append(sp);
   const spMask = el('div', 'sp-mask');
   const spPanel = el('div', 'sp-panel');
@@ -137,10 +137,10 @@ export function setupTouch(root, input, onAssist, getSpecials) {
 
   // 大招鈕:rageRatio = null(未知,視為可按)/ 0~1
   const ult = el('div', 'btn b-ult');
-  ult.textContent = '大招';
+  ult.textContent = '最強';
   root.append(ult);
   const ultTip = el('div', 'ult-tip');
-  ultTip.textContent = '大招可用!點這裡 ▶';
+  ultTip.textContent = '最強必殺技可用!點這裡 ▶';
   root.append(ultTip);
   let rageRatio = null;
   let manualAt = 0;

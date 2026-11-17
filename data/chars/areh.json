@@ -709,6 +709,74 @@
           "dashatk_1",
           "dashatk_1"
         ]
+      },
+      "sp_fwd_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_atk_0",
+          "sp_fwd_atk_1",
+          "sp_fwd_atk_1"
+        ]
+      },
+      "sp_fwd_jump": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_jump_0",
+          "sp_fwd_jump_1",
+          "sp_fwd_jump_2",
+          "attack3_1",
+          "sp_fwd_jump_2"
+        ]
+      },
+      "sp_up_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_up_atk_0",
+          "sp_up_atk_1",
+          "sp_up_atk_1"
+        ]
+      },
+      "ultimate": {
+        "mode": "move",
+        "frames": [
+          "ult_0",
+          "sp_fwd_jump_1",
+          "ult_whiff"
+        ]
+      },
+      "ultimate_lock": {
+        "mode": "move",
+        "frames": [
+          "ult_rush",
+          "ult_upper",
+          "ult_upper"
+        ]
+      }
+    },
+    "projectiles": {
+      "sound": {
+        "frames": [
+          "proj_sound_0",
+          "proj_sound_1"
+        ],
+        "rate": 4
+      }
+    },
+    "cutin": {
+      "frame": "cutin"
+    },
+    "fx": {
+      "ultimate_lock": {
+        "frames": [
+          "fx_rush_0",
+          "fx_rush_1"
+        ],
+        "rate": 4,
+        "from": 0,
+        "to": 0,
+        "dx": 36,
+        "dy": 28,
+        "scale": 1
       }
     }
   },

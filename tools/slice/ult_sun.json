@@ -1,0 +1,74 @@
+{
+ "id": "sun_ult",
+ "out": "tmp/ult_out/sun",
+ "scale": 0.32,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "key": {
+  "bg": "auto",
+  "lo": 0.15,
+  "hi": 0.5,
+  "edge": 3
+ },
+ "sheets": [
+  {
+   "file": "tmp/ult_sun_1.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 24,
+   "frames": [
+    "sp_fwd_atk_0",
+    "sp_fwd_atk_1",
+    "sp_fwd_jump_0",
+    "sp_fwd_jump_1",
+    "sp_fwd_jump_2",
+    "sp_up_atk_0",
+    "sp_up_atk_1",
+    {
+     "name": "sp_up_atk_2",
+     "dy": -12
+    },
+    "ult_0",
+    "ult_1",
+    "ult_2"
+   ]
+  },
+  {
+   "file": "tmp/ult_sun_2.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "proj_kame",
+     "scale": 0.23,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_genki_0",
+     "scale": 0.275,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_genki_1",
+     "scale": 0.275,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "cutin",
+     "scale": 0.17,
+     "anchorX": "bbox"
+    }
+   ]
+  }
+ ]
+}

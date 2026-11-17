@@ -8,21 +8,46 @@
     "炮姐"
   ],
   "color": "#c0392b",
-  "hp": 560,
+  "hp": 450,
   "mp": 500,
   "mpStart": 200,
   "mpRegen": 6,
+  "assist": "sp_fwd_atk",
   "ai": {
-    "style": "melee",
-    "range": 70,
-    "specials": []
+    "style": "ranged",
+    "range": 60,
+    "specials": [
+      {
+        "cmd": "sp_fwd_atk",
+        "min": 120,
+        "max": 400,
+        "zr": 10
+      },
+      {
+        "cmd": "sp_down_atk",
+        "min": 0,
+        "max": 45,
+        "zr": 25
+      },
+      {
+        "cmd": "sp_up_atk",
+        "min": 30,
+        "max": 120,
+        "zr": 14
+      }
+    ],
+    "ult": {
+      "range": 400,
+      "zr": 20,
+      "n": 1
+    }
   },
   "walk": {
-    "x": 2,
-    "z": 1.4
+    "x": 2.3,
+    "z": 1.5
   },
   "run": {
-    "x": 4.6,
+    "x": 5.0,
     "z": 0.9
   },
   "jump": {
@@ -265,9 +290,258 @@
           "wait": 8
         }
       ]
+    },
+    "sp_fwd_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "rail",
+            "x": 45,
+            "y": 38
+          }
+        },
+        {
+          "wait": 18
+        }
+      ]
+    },
+    "sp_down_atk": {
+      "cost": 150,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 6,
+          "inv": true
+        },
+        {
+          "wait": 18,
+          "itr": [
+            {
+              "x": -50,
+              "y": 0,
+              "w": 100,
+              "h": 70,
+              "zr": 30,
+              "dmg": 12,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 1.5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 1,
+              "rehit": 6,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 4,
+          "itr": [
+            {
+              "x": -50,
+              "y": 0,
+              "w": 100,
+              "h": 70,
+              "zr": 30,
+              "dmg": 30,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 6,
+              "ky": 5,
+              "stun": 20,
+              "stop": 5,
+              "rehit": 1,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 20
+        }
+      ]
+    },
+    "sp_up_atk": {
+      "cost": 125,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 8
+        },
+        {
+          "wait": 5,
+          "itr": [
+            {
+              "x": 20,
+              "y": 15,
+              "w": 110,
+              "h": 30,
+              "zr": 14,
+              "dmg": 20,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 2,
+              "ky": 0,
+              "stun": 12,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 6,
+          "itr": [
+            {
+              "x": 20,
+              "y": 0,
+              "w": 100,
+              "h": 80,
+              "zr": 14,
+              "dmg": 35,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 1,
+              "ky": 9,
+              "stun": 20,
+              "stop": 6,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 14
+        }
+      ]
+    },
+    "ultimate": {
+      "cost": 0,
+      "cancel": 0,
+      "steer": {
+        "x": 0,
+        "z": 1.0
+      },
+      "ult": {
+        "type": "dodge",
+        "cap": 160,
+        "unblockable": false,
+        "name": "全力電磁砲"
+      },
+      "frames": [
+        {
+          "wait": 30
+        },
+        {
+          "wait": 48,
+          "itr": [
+            {
+              "x": 20,
+              "y": 18,
+              "w": 400,
+              "h": 36,
+              "zr": 16,
+              "dmg": 27,
+              "fall": 20,
+              "bdef": 50,
+              "kx": 1.5,
+              "ky": 0,
+              "stun": 12,
+              "stop": 0,
+              "rehit": 8,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 6,
+          "itr": [
+            {
+              "x": 20,
+              "y": 18,
+              "w": 400,
+              "h": 36,
+              "zr": 16,
+              "dmg": 27,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 6,
+              "ky": 5,
+              "stun": 20,
+              "stop": 0,
+              "rehit": 1,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 30
+        }
+      ]
     }
   },
-  "projectiles": {},
+  "projectiles": {
+    "rail": {
+      "vx": 16,
+      "life": 25,
+      "chase": 0,
+      "bdy": {
+        "x": 12,
+        "y": -5,
+        "w": 30,
+        "h": 10
+      },
+      "itr": {
+        "x": 12,
+        "y": -5,
+        "w": 30,
+        "h": 10,
+        "zr": 10,
+        "dmg": 50,
+        "fall": 40,
+        "bdef": 30,
+        "kx": 3,
+        "ky": 2,
+        "stun": 16,
+        "stop": 4,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "pierce": true
+    }
+  },
+  "info": {
+    "moves": {
+      "sp_fwd_atk": {
+        "name": "彈幣電磁砲",
+        "desc": "彈出硬幣射出穿透的細長光束,射程長;錯開縱深就閃得掉"
+      },
+      "sp_down_atk": {
+        "name": "放電",
+        "desc": "起手無敵,周身電弧連續電擊,最後震開兩側的人;近身解圍用"
+      },
+      "sp_up_atk": {
+        "name": "砂鐵鞭",
+        "desc": "砂鐵鞭橫甩再上撩,第二下把人擊飛,也能打空中"
+      }
+    },
+    "ult": {
+      "name": "全力電磁砲",
+      "desc": "蓄力後發射粗大光束連續電擊,光束期間可用上下鍵慢慢掃縱深;可防、翻滾可閃"
+    }
+  },
   "art": {
     "atlas": "art/magnet/atlas.json",
     "scale": 0.72,
@@ -432,6 +706,102 @@
           "dashatk_1",
           "dashatk_1"
         ]
+      },
+      "sp_fwd_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_atk_0",
+          "sp_fwd_atk_1",
+          "sp_fwd_atk_1"
+        ]
+      },
+      "sp_down_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_down_atk_0",
+          "sp_down_atk_0",
+          "sp_down_atk_0",
+          "idle_1"
+        ]
+      },
+      "sp_up_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_up_atk_0",
+          "sp_up_atk_1",
+          "sp_up_atk_2",
+          "sp_up_atk_2"
+        ]
+      },
+      "ultimate": {
+        "mode": "move",
+        "frames": [
+          "ult_0",
+          "ult_1",
+          "ult_1",
+          "ult_2"
+        ]
+      }
+    },
+    "projectiles": {
+      "rail": {
+        "frames": [
+          "proj_rail"
+        ],
+        "rate": 4
+      }
+    },
+    "cutin": {
+      "frame": "cutin"
+    },
+    "fx": {
+      "sp_down_atk": {
+        "frames": [
+          "fx_shock_0",
+          "fx_shock_1"
+        ],
+        "rate": 3,
+        "from": 1,
+        "to": 2,
+        "dx": 0,
+        "dy": 0,
+        "scale": 1
+      },
+      "sp_up_atk": [
+        {
+          "frames": [
+            "fx_sand_0"
+          ],
+          "rate": 8,
+          "from": 1,
+          "to": 1,
+          "dx": 18,
+          "dy": 34,
+          "scale": 1
+        },
+        {
+          "frames": [
+            "fx_sand_1"
+          ],
+          "rate": 8,
+          "from": 2,
+          "to": 2,
+          "dx": 14,
+          "dy": 0,
+          "scale": 1
+        }
+      ],
+      "ultimate": {
+        "frames": [
+          "fx_rail_ult_0",
+          "fx_rail_ult_1"
+        ],
+        "rate": 3,
+        "from": 1,
+        "to": 2,
+        "dx": 24,
+        "dy": 40,
+        "scale": 1
       }
     }
   }

@@ -22,7 +22,7 @@ for (const id of ids) {
 ok(cmdText('sp_fwd_atk', 'kb') === '防(L)+→+攻(J)', '鍵盤指令顯示');
 ok(cmdText('sp_down_jump', 'kb') === '防(L)+↓(S)+跳(K)', '鍵盤下+跳');
 ok(cmdText('sp_up_atk', 'touch', true) === '防+↑+攻', '簡寫');
-ok(ultKeyText('kb').includes('U') && ultKeyText('touch').includes('大招'), '大招操作文字');
+ok(ultKeyText('kb').includes('U') && ultKeyText('touch').includes('最強'), '最強必殺技操作文字');
 ok(defaultDevice('G1', false) === 'pad' && defaultDevice('P1', true) === 'touch' && defaultDevice('P2', false) === 'p2', '預設裝置');
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

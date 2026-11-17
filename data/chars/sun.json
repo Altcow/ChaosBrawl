@@ -8,22 +8,47 @@
     "如意棒"
   ],
   "color": "#e67e22",
-  "hp": 560,
+  "hp": 480,
   "mp": 500,
   "mpStart": 200,
   "mpRegen": 6,
+  "assist": "sp_fwd_atk",
   "ai": {
     "style": "melee",
-    "range": 70,
-    "specials": []
+    "range": 50,
+    "specials": [
+      {
+        "cmd": "sp_fwd_atk",
+        "min": 100,
+        "max": 340,
+        "zr": 12
+      },
+      {
+        "cmd": "sp_fwd_jump",
+        "min": 60,
+        "max": 220,
+        "zr": 20
+      },
+      {
+        "cmd": "sp_up_atk",
+        "min": 0,
+        "max": 50,
+        "zr": 14
+      }
+    ],
+    "ult": {
+      "range": 360,
+      "zr": 30,
+      "n": 1
+    }
   },
   "walk": {
-    "x": 2,
-    "z": 1.4
+    "x": 2.7,
+    "z": 1.7
   },
   "run": {
-    "x": 4.6,
-    "z": 0.9
+    "x": 6.0,
+    "z": 1.1
   },
   "jump": {
     "vy": 9,
@@ -265,9 +290,301 @@
           "wait": 8
         }
       ]
+    },
+    "sp_fwd_atk": {
+      "cost": 125,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 16
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "kame",
+            "x": 34,
+            "y": 32
+          }
+        },
+        {
+          "wait": 18
+        }
+      ]
+    },
+    "sp_fwd_jump": {
+      "cost": 125,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 6
+        },
+        {
+          "wait": 4,
+          "tp": 220,
+          "inv": true
+        },
+        {
+          "wait": 6
+        },
+        {
+          "wait": 6,
+          "itr": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 56,
+              "h": 50,
+              "zr": 16,
+              "dmg": 50,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 5,
+              "ky": 5,
+              "stun": 20,
+              "stop": 5,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 14
+        }
+      ]
+    },
+    "sp_up_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 4
+        },
+        {
+          "wait": 5,
+          "itr": [
+            {
+              "x": -10,
+              "y": 10,
+              "w": 70,
+              "h": 60,
+              "zr": 16,
+              "dmg": 10,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 0.5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 1,
+              "rehit": 5,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 5,
+          "itr": [
+            {
+              "x": -10,
+              "y": 10,
+              "w": 70,
+              "h": 60,
+              "zr": 16,
+              "dmg": 10,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 0.5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 1,
+              "rehit": 5,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 5,
+          "itr": [
+            {
+              "x": -10,
+              "y": 10,
+              "w": 70,
+              "h": 60,
+              "zr": 16,
+              "dmg": 10,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 0.5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 1,
+              "rehit": 5,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 5,
+          "itr": [
+            {
+              "x": -10,
+              "y": 10,
+              "w": 70,
+              "h": 60,
+              "zr": 16,
+              "dmg": 10,
+              "fall": 20,
+              "bdef": 17,
+              "kx": 0.5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 1,
+              "rehit": 5,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 6,
+          "itr": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 50,
+              "h": 90,
+              "zr": 16,
+              "dmg": 30,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 10,
+              "stun": 20,
+              "stop": 5,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 14
+        }
+      ]
+    },
+    "ultimate": {
+      "cost": 0,
+      "cancel": 0,
+      "ult": {
+        "type": "dodge",
+        "cap": 150,
+        "unblockable": false,
+        "name": "圓氣彈"
+      },
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 50,
+          "live": true
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "genki",
+            "x": 40,
+            "y": 30
+          }
+        },
+        {
+          "wait": 30
+        }
+      ]
     }
   },
-  "projectiles": {},
+  "projectiles": {
+    "kame": {
+      "vx": 10,
+      "life": 36,
+      "chase": 0,
+      "bdy": {
+        "x": -2,
+        "y": -14,
+        "w": 40,
+        "h": 28
+      },
+      "itr": {
+        "x": -2,
+        "y": -14,
+        "w": 40,
+        "h": 28,
+        "zr": 14,
+        "dmg": 55,
+        "fall": 100,
+        "bdef": 50,
+        "kx": 6,
+        "ky": 5,
+        "stun": 20,
+        "stop": 5,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      }
+    },
+    "genki": {
+      "vx": 5,
+      "life": 96,
+      "chase": 0,
+      "bdy": {
+        "x": -28,
+        "y": -28,
+        "w": 56,
+        "h": 56
+      },
+      "itr": {
+        "x": -28,
+        "y": -28,
+        "w": 56,
+        "h": 56,
+        "zr": 30,
+        "dmg": 150,
+        "fall": 100,
+        "bdef": 50,
+        "kx": 7,
+        "ky": 8,
+        "stun": 20,
+        "stop": 5,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "pierce": true
+    }
+  },
+  "info": {
+    "moves": {
+      "sp_fwd_atk": {
+        "name": "龜波氣功",
+        "desc": "蓄力後射出氣功波,命中擊倒"
+      },
+      "sp_fwd_jump": {
+        "name": "瞬間移動",
+        "desc": "瞬移到前方最近敵人背後再用如意棒砸下;前方沒人就直接往前閃"
+      },
+      "sp_up_atk": {
+        "name": "如意棒連打",
+        "desc": "原地連打如意棒,最後上挑擊飛,可打空中"
+      }
+    },
+    "ult": {
+      "name": "圓氣彈",
+      "desc": "舉手聚氣(可被打斷)後投出巨大氣彈,穿透並擊倒;錯開、翻滾、跑開或打斷聚氣都能閃"
+    }
+  },
   "art": {
     "atlas": "art/sun/atlas.json",
     "scale": 0.72,
@@ -432,6 +749,77 @@
           "dashatk_1",
           "dashatk_1"
         ]
+      },
+      "sp_fwd_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_atk_0",
+          "sp_fwd_atk_1",
+          "sp_fwd_atk_1"
+        ]
+      },
+      "sp_fwd_jump": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_jump_0",
+          "sp_fwd_jump_1",
+          "sp_fwd_jump_1",
+          "sp_fwd_jump_2",
+          "sp_fwd_jump_2"
+        ]
+      },
+      "sp_up_atk": {
+        "mode": "move",
+        "frames": [
+          "attack3_0",
+          "sp_up_atk_0",
+          "sp_up_atk_1",
+          "sp_up_atk_0",
+          "sp_up_atk_1",
+          "sp_up_atk_2",
+          "sp_up_atk_2"
+        ]
+      },
+      "ultimate": {
+        "mode": "move",
+        "frames": [
+          "ult_0",
+          "ult_0",
+          "ult_1",
+          "ult_2"
+        ]
+      }
+    },
+    "projectiles": {
+      "kame": {
+        "frames": [
+          "proj_kame"
+        ],
+        "rate": 4
+      },
+      "genki": {
+        "frames": [
+          "proj_genki_0",
+          "proj_genki_1"
+        ],
+        "rate": 4
+      }
+    },
+    "cutin": {
+      "frame": "cutin"
+    },
+    "fx": {
+      "ultimate": {
+        "frames": [
+          "proj_genki_0",
+          "proj_genki_1"
+        ],
+        "rate": 4,
+        "from": 1,
+        "to": 1,
+        "dx": 0,
+        "dy": 68,
+        "scale": 1
       }
     }
   }

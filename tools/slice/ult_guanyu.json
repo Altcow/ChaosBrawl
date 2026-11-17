@@ -1,0 +1,86 @@
+{
+ "id": "guanyu_ult",
+ "out": "tmp/ult_out/guanyu",
+ "scale": 0.32,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "key": {
+  "bg": "auto",
+  "lo": 0.15,
+  "hi": 0.5,
+  "edge": 3
+ },
+ "sheets": [
+  {
+   "file": "tmp/ult_guanyu_1.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": -12,
+   "frames": [
+    "sp_fwd_atk_0",
+    "sp_fwd_jump_0",
+    "sp_fwd_jump_1",
+    "sp_down_atk_0",
+    "ult_0",
+    "ult_2",
+    {
+     "name": "sp_fwd_atk_1",
+     "wide": true
+    },
+    {
+     "name": "ult_1",
+     "wide": true
+    }
+   ],
+   "scale": 0.35
+  },
+  {
+   "file": "tmp/ult_guanyu_2.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "fx_flash",
+     "scale": 0.31,
+     "anchorX": "right",
+     "anchorY": "mid",
+     "wide": true
+    },
+    {
+     "name": "fx_crescent",
+     "scale": 0.205,
+     "anchorX": "left",
+     "anchorY": "mid"
+    },
+    {
+     "name": "proj_cup",
+     "scale": 0.11,
+     "anchorX": "bbox"
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_guanyu_3.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "cutin",
+     "scale": 0.13,
+     "anchorX": "bbox"
+    }
+   ]
+  }
+ ]
+}

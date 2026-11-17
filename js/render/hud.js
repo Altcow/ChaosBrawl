@@ -19,14 +19,14 @@ export function setHudHint(ids, touch) {
   hint = { ids, touch: !!touch };
 }
 
-// 爆氣條(0~100 定點數 ×256):金色;滿了閃爍;條旁標示「大招」
+// 爆氣條(0~100 定點數 ×256):金色;滿了閃爍;條旁標示「爆氣」
 function rageBar(ctx, x, y, w, h, rage, fs, ly) {
   const full = rage >= 100 * 256;
   const flash = full && (Date.now() >> 7) & 1;
   bar(ctx, x, y, w, h, rage / (100 * 256), flash ? '#fff6b0' : '#ffc400');
   ctx.fillStyle = full ? (flash ? '#fff6b0' : '#ffc400') : '#c8b060';
   ctx.font = (full ? 'bold ' : '') + fs + 'px ' + FONT;
-  ctx.fillText('大招', x + w + 3, ly);
+  ctx.fillText('爆氣', x + w + 3, ly);
 }
 
 // 爆氣滿了:畫面上方閃爍提示(只給本機玩家)
@@ -38,7 +38,7 @@ function drawUltHint(ctx, w) {
     if (f && !f.dead && !f.ult && f.rage >= 100 * 256 && w.defs[f.charId].hasUlt) ready = true;
   }
   if (!ready) return;
-  const msg = hint.touch ? '大招可用!點右側「大招」鈕 ▶' : '大招可用!按 防+攻+跳(鍵盤 U / 手把 Y)';
+  const msg = hint.touch ? '最強必殺技可用!點右側「最強」鈕 ▶' : '最強必殺技可用!按 防+攻+跳(鍵盤 U / 手把 Y)';
   ctx.font = 'bold 15px ' + FONT;
   const tw = ctx.measureText(msg).width + 24;
   ctx.globalAlpha = (Date.now() >> 8) & 1 ? 1 : 0.55;

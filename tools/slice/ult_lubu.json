@@ -1,0 +1,95 @@
+{
+ "id": "lubu_ult",
+ "out": "tmp/ult_out/lubu",
+ "scale": 0.32,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "key": {
+  "bg": "auto",
+  "lo": 0.15,
+  "hi": 0.5,
+  "edge": 3
+ },
+ "sheets": [
+  {
+   "file": "tmp/ult_lubu_1.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": -12,
+   "frames": [
+    "sp_fwd_atk_0",
+    "sp_fwd_atk_1",
+    "sp_fwd_atk_2",
+    "sp_up_atk_0",
+    "sp_up_atk_1",
+    "ult_0",
+    "ult_spin_0",
+    "ult_spin_1",
+    "ult_2"
+   ]
+  },
+  {
+   "file": "tmp/ult_lubu_2.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "ride_0",
+     "anchorX": "bbox",
+     "wide": true
+    },
+    {
+     "name": "ride_1",
+     "anchorX": "bbox",
+     "wide": true
+    },
+    {
+     "name": "cutin",
+     "scale": 0.19,
+     "anchorX": "bbox"
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_lubu_3.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "fx_whirl_0",
+     "scale": 0.26,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "fx_whirl_1",
+     "scale": 0.26,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "fx_thrusts",
+     "scale": 0.19,
+     "anchorX": "left",
+     "anchorY": "mid"
+    },
+    {
+     "name": "proj_arrow",
+     "scale": 0.13,
+     "anchorX": "bbox"
+    }
+   ]
+  }
+ ]
+}

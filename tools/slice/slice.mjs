@@ -194,9 +194,11 @@ function componentBoxes(img, amin, mergeGap, minArea) {
     }
     b.x1++;
     b.y1++;
+    b.ids = [id];
     boxes.push(b);
   }
   const list = boxes.filter((b) => b.area >= minArea);
+  list.lab = lab; // 標籤圖:切格時用來遮掉落在方框內、但屬於相鄰物件的像素
   // 近距離碎塊合併(例:角色 + 分離的道具)
   let merged = true;
   while (merged) {
@@ -206,7 +208,7 @@ function componentBoxes(img, amin, mergeGap, minArea) {
         const a = list[i];
         const b = list[j];
         if (a.x0 - mergeGap < b.x1 && b.x0 - mergeGap < a.x1 && a.y0 - mergeGap < b.y1 && b.y0 - mergeGap < a.y1) {
-          list[i] = { x0: Math.min(a.x0, b.x0), y0: Math.min(a.y0, b.y0), x1: Math.max(a.x1, b.x1), y1: Math.max(a.y1, b.y1), area: a.area + b.area };
+          list[i] = { x0: Math.min(a.x0, b.x0), y0: Math.min(a.y0, b.y0), x1: Math.max(a.x1, b.x1), y1: Math.max(a.y1, b.y1), area: a.area + b.area, ids: a.ids.concat(b.ids) };
           list.splice(j, 1);
           merged = true;
           break outer;
@@ -353,10 +355,15 @@ export function sliceSheets(config, readImage) {
     const scale = (sheet.scale || C.scale) === 'auto' ? C.cell.h / chh : sheet.scale || C.scale;
     const layout = sheet.layout || C.layout;
     let boxes;
+    let compLab = null;
+    let owner = null;
     if (layout === 'components') {
       const comps = componentBoxes(img, C.alphaMin, sheet.mergeGap || C.mergeGap, sheet.minArea || C.minArea);
       if (comps.length !== wanted) throw new Error(lab + ':偵測到 ' + comps.length + ' 個連通區域,設定要 ' + wanted + ' 格(調整 mergeGap/minArea,或請 GPT 重畫)');
       boxes = sortRowMajor(comps, sheet.rowTol);
+      compLab = comps.lab;
+      owner = new Map();
+      for (const c of comps) for (const id of c.ids) owner.set(id, c);
     } else {
       boxes = [];
       for (let i = 0; i < entries.length; i++) {
@@ -384,7 +391,23 @@ export function sliceSheets(config, readImage) {
       const fs = e.scale || scale; // 單格縮放(例如特寫比角色大),沒設就用 sheet 的
       const ow = Math.max(1, Math.round((b.x1 - b.x0) * fs));
       const oh = Math.max(1, Math.round((b.y1 - b.y0) * fs));
-      const spr = resample(img, b, ow, oh);
+      let spr;
+      if (compLab) {
+        // 方框內屬於「別的物件」的像素(相鄰畫格的武器尖端 / 特效探進來)先遮掉,避免出現在這一格
+        const bw = b.x1 - b.x0;
+        const bh = b.y1 - b.y0;
+        const sub = { w: bw, h: bh, data: new Uint8Array(bw * bh * 4) };
+        for (let yy = 0; yy < bh; yy++) {
+          for (let xx = 0; xx < bw; xx++) {
+            const p = (b.y0 + yy) * img.w + b.x0 + xx;
+            const o = (yy * bw + xx) * 4;
+            sub.data.set(img.data.subarray(p * 4, p * 4 + 4), o);
+            const id = compLab[p];
+            if (id && owner.has(id) && owner.get(id) !== b) sub.data[o + 3] = 0;
+          }
+        }
+        spr = resample(sub, { x0: 0, y0: 0, x1: bw, y1: bh }, ow, oh);
+      } else spr = resample(img, b, ow, oh);
       const rx = ow / (b.x1 - b.x0);
       const ry = oh / (b.y1 - b.y0);
       let ax;
@@ -401,7 +424,11 @@ export function sliceSheets(config, readImage) {
       const am = e.anchorX || sheet.anchorX || C.anchorX || (layout === 'grid' ? 'cell' : 'bbox');
       if (am === 'cell' && layout === 'grid') ax = ((b.cell.x0 + b.cell.x1) / 2 - b.x0) * rx;
       else if (am === 'feet') ax = (feetX(img, b, sheet.footBand || C.footBand || 0.08) - b.x0) * rx;
+      else if (am === 'left') ax = 0;
+      else if (am === 'right') ax = ow;
       else ax = ow / 2;
+      if (e.anchorY === 'mid') ay = oh / 2; // 特效:垂直置中 / 頂端(預設為底邊 = 腳底)
+      else if (e.anchorY === 'top') ay = 0;
       ax += e.dx || 0;
       ay -= e.dy || 0;
       const wide = !!e.wide;
