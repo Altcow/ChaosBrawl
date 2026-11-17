@@ -102,6 +102,41 @@ export function setupHome(root, { chars, charIds, onStart, onPractice, onOnline,
   }
 
   // ---- 頭像列 ----
+  // 戰鬥角色圖(atlas 的 idle_0),非同步載入;失敗或無 art 保留彩色圓圈
+  const picCache = new Map();
+  function loadPic(id) {
+    if (picCache.has(id)) return picCache.get(id);
+    const art = chars[id].art;
+    const p = (async () => {
+      if (!art || !art.atlas) return null;
+      const aUrl = new URL('data/' + art.atlas, document.baseURI).href;
+      const atlas = await (await fetch(aUrl)).json();
+      const fr = atlas.frames && atlas.frames.idle_0;
+      if (!fr) return null;
+      const img = new Image();
+      await new Promise((ok, no) => {
+        img.onload = ok;
+        img.onerror = no;
+        img.src = new URL(atlas.image || 'atlas.png', aUrl).href;
+      });
+      return { img, fr, k: (art.scale || 0.72) * 0.8 };
+    })().catch(() => null);
+    picCache.set(id, p);
+    return p;
+  }
+  function drawPic(pic) {
+    const c = document.createElement('canvas');
+    c.className = 'pic';
+    c.width = 64;
+    c.height = 64;
+    const g = c.getContext('2d');
+    g.imageSmoothingEnabled = true;
+    g.imageSmoothingQuality = 'high';
+    const { img, fr, k } = pic;
+    // 腳底對齊畫布底、水平以錨點置中;各角色同一倍率
+    g.drawImage(img, fr.x, fr.y, fr.w, fr.h, 32 - fr.ax * k, 62 - fr.ay * k, fr.w * k, fr.h * k);
+    return c;
+  }
   function renderAvatars() {
     const el = $('#avatars');
     el.innerHTML = '';
@@ -115,6 +150,7 @@ export function setupHome(root, { chars, charIds, onStart, onPractice, onOnline,
       const name = document.createElement('span');
       name.textContent = id === 'random' ? '隨機' : short(id);
       b.append(face, name);
+      if (id !== 'random') loadPic(id).then((pic) => { if (pic && face.parentNode) face.replaceWith(drawPic(pic)); });
       b.onclick = () => {
         prefs.char = id;
         savePrefs(prefs);

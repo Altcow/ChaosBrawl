@@ -150,6 +150,7 @@ body.debug .dev { display: inline-block; }
 #avatars { display: flex; gap: 8px; justify-content: center; margin: 6px 0 10px; }
 .avatar { width: 88px; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 4px !important; }
 .avatar i { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 26px; font-weight: bold; color: #14161c; }
+.avatar canvas.pic { width: 64px; height: 64px; flex: none; }
 .avatar span { font-size: 14px; }
 .avatar.on { border: 3px solid #8d8 !important; background: #2b3a30 !important; }
 .avatar.sm { width: 48px; height: 48px; border-radius: 50%; }
@@ -196,6 +197,7 @@ body.debug .dev { display: inline-block; }
   #menu h1 { font-size: 20px; }
   .avatar { height: 88px; }
   .avatar i { width: 44px; height: 44px; font-size: 22px; }
+  .avatar canvas.pic { width: 52px; height: 52px; }
   #btn-start { height: 60px; margin-bottom: 8px; }
   #avatars { margin: 4px 0 8px; }
   .field { margin: 5px 0; }
