@@ -1,0 +1,100 @@
+{
+ "id": "longjuan",
+ "out": "../../data/art/longjuan",
+ "scale": 0.3,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "key": {
+  "bg": "auto",
+  "lo": 0.15,
+  "hi": 0.5,
+  "edge": 3
+ },
+ "sheets": [
+  {
+   "file": "tmp/longjuan_1.png",
+   "cols": 4,
+   "rows": 3,
+   "despeckle": 40,
+   "frames": [
+    "idle_0",
+    "idle_1",
+    "walk_0",
+    "walk_1",
+    "walk_2",
+    "walk_3",
+    "run_0",
+    "run_1",
+    "run_2",
+    "run_3",
+    "runstop_0",
+    "squat_0"
+   ]
+  },
+  {
+   "file": "tmp/longjuan_2.png",
+   "cols": 4,
+   "rows": 3,
+   "despeckle": 40,
+   "frames": [
+    "jump_up",
+    "jump_down",
+    "dash_0",
+    "defend_0",
+    "hurt_light",
+    "hurt_heavy",
+    "attack1_0",
+    "attack1_1",
+    "attack2_0",
+    "attack2_1",
+    "attack3_0",
+    "attack3_1"
+   ]
+  },
+  {
+   "file": "tmp/longjuan_3.png",
+   "cols": 4,
+   "rows": 3,
+   "despeckle": 40,
+   "frames": [
+    "runatk_0",
+    "runatk_1",
+    "jumpatk_0",
+    "jumpatk_1",
+    "dashatk_0",
+    "dashatk_1",
+    "roll_0",
+    "roll_1",
+    "roll_2",
+    "fall_up",
+    "fall_down",
+    "lying_0"
+   ]
+  },
+  {
+   "file": "tmp/longjuan_4.png",
+   "cols": 4,
+   "rows": 2,
+   "despeckle": 40,
+   "frames": [
+    "getup_0",
+    "getup_1",
+    "stun_0",
+    "stun_1",
+    null,
+    null,
+    null,
+    null
+   ]
+  }
+ ]
+}

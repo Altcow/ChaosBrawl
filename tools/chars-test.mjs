@@ -67,7 +67,12 @@ const fakeItr = (o) => Object.assign({ dmg: 10, fall: 20, bdef: 10, kx: 1, ky: 0
 
 // ---- 1. 資料 ----
 {
-  check('index.json:僅 fanfan / areh / guanyu / lubu / magnet / sun(cilin / huhu / liushui / erhao 已作廢,檔案保留)', JSON.stringify(ids) === JSON.stringify(['fanfan', 'areh', 'guanyu', 'lubu', 'magnet', 'sun']), ids.join(','));
+  check('index.json:fanfan / areh / guanyu / lubu / magnet / sun + 新 6 位(piggy qiyu xiaozhi kenan longjuan manman),共 12 人(cilin / huhu / liushui / erhao 已作廢,檔案保留)', JSON.stringify(ids) === JSON.stringify(['fanfan', 'areh', 'guanyu', 'lubu', 'magnet', 'sun', 'piggy', 'qiyu', 'xiaozhi', 'kenan', 'longjuan', 'manman']), ids.join(','));
+  const NEW6 = { piggy: [490, 2.6, 1.6, 5.8, 1.0], qiyu: [520, 2.0, 1.3, 4.8, 0.9], xiaozhi: [470, 2.5, 1.5, 5.5, 1.0], kenan: [450, 2.5, 1.6, 5.6, 1.0], longjuan: [430, 2.4, 1.5, 5.0, 0.9], manman: [530, 2.1, 1.3, 4.8, 0.9] };
+  for (const [id, v] of Object.entries(NEW6)) {
+    const j = chars[id];
+    check(id + ' 新角色基本資料(HP / 走 / 跑符合設計文件 1-3 節;暫無必殺)', j && j.hp === v[0] && j.walk.x === v[1] && j.walk.z === v[2] && j.run.x === v[3] && j.run.z === v[4] && !Object.keys(j.moves).some((m) => /^sp_|^ultimate/.test(m)), j && j.name);
+  }
   for (const id of WAVE1) {
     const j = chars[id];
     const w = mk([P(id, 400, 100)]);

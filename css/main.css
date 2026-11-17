@@ -147,15 +147,15 @@ body.debug .dev { display: inline-block; }
 #menu .grow { flex: 1; }
 #menu small, #net-note { color: #99a; font-size: 12px; }
 
-#avatars { display: flex; gap: 8px; justify-content: center; margin: 6px 0 10px; }
-.avatar { width: 88px; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 4px !important; }
+#avatars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 6px 0 10px; }
+.avatar { width: 100%; min-width: 0; height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 4px !important; }
 .avatar i { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 26px; font-weight: bold; color: #14161c; }
 .avatar canvas.pic { width: 64px; height: 64px; flex: none; }
 .avatar span { font-size: 14px; }
 .avatar.on { border: 3px solid #8d8 !important; background: #2b3a30 !important; }
 .avatar.sm { width: 48px; height: 48px; border-radius: 50%; }
 .avatar.sm i { width: 34px; height: 34px; font-size: 18px; }
-#lb-avatars { display: flex; gap: 6px; }
+#lb-avatars { display: flex; flex-wrap: wrap; gap: 6px; }
 
 #btn-start { display: block; width: min(420px, 100%); height: 64px; margin: 0 auto 10px; font-size: 22px; font-weight: bold; background: #3a7 !important; color: #08140c !important; border: 0 !important; border-radius: 12px !important; }
 #sub-row { display: flex; gap: 8px; }
@@ -195,13 +195,25 @@ body.debug .dev { display: inline-block; }
 @media (max-height: 420px) {
   #menu .screen { padding: 4px 12px; }
   #menu h1 { font-size: 20px; }
-  .avatar { height: 88px; }
-  .avatar i { width: 44px; height: 44px; font-size: 22px; }
-  .avatar canvas.pic { width: 52px; height: 52px; }
+  .avatar { height: 74px; gap: 2px; }
+  .avatar i { width: 40px; height: 40px; font-size: 20px; }
+  .avatar canvas.pic { width: 46px; height: 46px; }
+  .avatar span { font-size: 12px; }
+  #avatars { gap: 4px; }
   #btn-start { height: 60px; margin-bottom: 8px; }
   #avatars { margin: 4px 0 8px; }
   .field { margin: 5px 0; }
 }
+
+@media (max-height: 340px) {
+  .avatar { height: 60px; padding: 2px !important; }
+  .avatar i { width: 32px; height: 32px; font-size: 16px; }
+  .avatar canvas.pic { width: 38px; height: 38px; }
+  .avatar span { font-size: 11px; }
+  #avatars { margin: 2px 0 6px; }
+  #btn-start { height: 48px; margin-bottom: 6px; }
+}
+#home { overflow-y: auto !important; }
 
 #rotate {
   position: fixed; inset: 0; z-index: 30; background: #14161c;
