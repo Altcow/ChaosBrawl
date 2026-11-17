@@ -14,9 +14,9 @@ import { setHudHint } from './render/hud.js';
 // 練習場景:木樁 / 簡易對手
 const SCENARIOS = [['post'], ['post', 'post', 'post'], ['post', 'puncher'], ['puncher']];
 const SEED = 20261113;
-// 鏡頭縮放:基準 1.0(人物約 75 px 高),為了框住本機玩家可再縮小、不放大超過基準。
+// 鏡頭縮放:基準 1.5(人物約 110 px 高),為了框住本機玩家可再縮小、不放大超過基準。
 // 需要 render/renderer.js 讀取 zoomMax / zoomMin(見回報);沒支援時退回 renderer 內建的 0.6~1.0。
-const CAM = { base: 1.0, min: 0.5 };
+const CAM = { base: 1.5, min: 0.75 };
 
 const $ = (id) => document.getElementById(id);
 const qs = new URLSearchParams(location.search);
