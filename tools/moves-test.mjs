@@ -13,6 +13,7 @@ for (const id of ids) {
   const j = JSON.parse(readFileSync(new URL('../data/chars/' + id + '.json', import.meta.url), 'utf8'));
   const sp = Object.keys(j.moves).filter((m) => /^sp_/.test(m));
   const list = listMoves(j);
+  if (!sp.length && !j.moves.ultimate) { ok(list.length === 0 && !j.info, id + ' 尚無必殺 / 大招(僅基礎招式)'); continue; }
   ok(list.length >= 3 && list.length <= 4, id + ' 必殺數 3~4(' + list.length + ')');
   ok(sp.every((c) => list.some((m) => m.cmd === c && m.name && m.desc)), id + ' 每個 sp_ 招式都有名稱與說明');
   ok(list.every((m) => j.moves[m.cmd] && m.cost === j.moves[m.cmd].cost), id + ' 顯示的 MP 消耗與招式資料一致');

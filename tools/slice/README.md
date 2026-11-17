@@ -49,4 +49,4 @@
 
 ## 來源圖是 webp 時
 
-工具只吃 PNG。先用 Pillow 轉到 `tools/slice/tmp/`(可隨時刪):`Image.open(f).convert('RGB').save(...)`;設定檔 `guanyu.json` 即引用該資料夾。已存在的角色設定:`areh.json`、`guanyu.json`(不含必殺 / 大招 / 射彈)。
+工具只吃 PNG。先用 Pillow 轉到 `tools/slice/tmp/`(可隨時刪):`Image.open(f).convert('RGB').save(...)`;設定檔 `guanyu.json` 即引用該資料夾。已存在的角色設定:`areh.json`、`guanyu.json`、`magnet.json`、`sun.json`(不含必殺 / 大招 / 射彈)。磁鈴 / 小孫第 4 張只有第 1 排有角色,角色腳底超出 3 等分的第 1 排高度,所以第 4 張設為 `rows:2`(後 4 格 null);scale 用 0.32 讓身高與關羽接近(來源格內人物較大)。

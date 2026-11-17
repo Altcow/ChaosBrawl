@@ -17,6 +17,8 @@ const ids = JSON.parse(readFileSync(join(root, 'data/chars/index.json'), 'utf8')
 const WAVE1 = ['areh', 'guanyu', 'lubu', 'cilin', 'huhu', 'liushui', 'erhao'];
 const chars = {};
 for (const id of ids) chars[id] = load(id);
+const DORMANT = ['cilin', 'huhu', 'liushui', 'erhao']; // 已從 index 拿掉、檔案保留以便還原;仍載入以維持原有覆蓋
+for (const id of DORMANT) chars[id] = load(id);
 for (const id of ['ada', 'grandma', 'librarian', 'cat']) chars[id] = JSON.parse(readFileSync(join(root, 'tools/fixtures/chars/' + id + '.json'), 'utf8')); // 舊 4 人僅供測試
 chars.dummy = Object.assign(JSON.parse(JSON.stringify(chars.ada)), { id: 'dummy', hp: 5000 });
 const stage = JSON.parse(readFileSync(join(root, 'data/stages/market.json'), 'utf8'));
@@ -65,7 +67,7 @@ const fakeItr = (o) => Object.assign({ dmg: 10, fall: 20, bdef: 10, kx: 1, ky: 0
 
 // ---- 1. 資料 ----
 {
-  check('index.json:fanfan 加 7 新角色,共 8 人(舊 4 人已移除)', JSON.stringify(ids) === JSON.stringify(['fanfan', ...WAVE1]), ids.join(','));
+  check('index.json:僅 fanfan / areh / guanyu / lubu / magnet / sun(cilin / huhu / liushui / erhao 已作廢,檔案保留)', JSON.stringify(ids) === JSON.stringify(['fanfan', 'areh', 'guanyu', 'lubu', 'magnet', 'sun']), ids.join(','));
   for (const id of WAVE1) {
     const j = chars[id];
     const w = mk([P(id, 400, 100)]);
