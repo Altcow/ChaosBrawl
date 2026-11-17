@@ -73,7 +73,7 @@ const fakeItr = (o) => Object.assign({ dmg: 10, fall: 20, bdef: 10, kx: 1, ky: 0
     const w = mk([P(id, 400, 100)]);
     const def = w.defs[id];
     check(id + ' 資料:nicknames 8 個、color、有大招、HP 在 420~600', j.nicknames.length === 8 && /^#[0-9a-f]{6}$/i.test(j.color) && def.hasUlt && j.hp >= 420 && j.hp <= 600, j.name + ' hp=' + j.hp);
-    check(id + ' 資料:無 art 欄位(色塊佔位;areh / guanyu 已接通用動作圖例外)、ai.style / specials / ult 皆有', (!j.art || id === 'areh' || id === 'guanyu') && j.ai.style && j.ai.specials.length >= 2 && j.ai.ult, '');
+    check(id + ' 資料:無 art 欄位(色塊佔位;areh / guanyu / lubu 已接通用動作圖例外)、ai.style / specials / ult 皆有', (!j.art || id === 'areh' || id === 'guanyu' || id === 'lubu') && j.ai.style && j.ai.specials.length >= 2 && j.ai.ult, '');
   }
   const heavy = ['lubu', 'erhao', 'liushui'].every((id) => chars[id].walk.x <= 2.0);
   check('護欄 4:重組走速 ≤ 2.0', heavy);
