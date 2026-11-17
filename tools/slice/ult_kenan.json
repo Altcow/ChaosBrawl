@@ -1,0 +1,93 @@
+{
+ "id": "kenan_ult",
+ "out": "tmp/ult_out/kenan",
+ "scale": 0.3,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "key": {
+  "bg": "auto",
+  "lo": 0.15,
+  "hi": 0.5,
+  "edge": 3
+ },
+ "sheets": [
+  {
+   "file": "tmp/ult_kenan_1.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 3,
+   "frames": [
+    "sp_fwd_atk_0",
+    "sp_fwd_atk_1",
+    "sp_fwd_jump_0",
+    "sp_fwd_jump_1",
+    "sp_down_atk_0",
+    "ult_0",
+    "ult_1",
+    "ult_2"
+   ]
+  },
+  {
+   "file": "tmp/ult_kenan_2.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "proj_ball_0",
+     "scale": 0.115,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_ball_1",
+     "scale": 0.115,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_dart",
+     "scale": 0.133,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "fx_belt",
+     "scale": 0.5,
+     "anchorX": "left",
+     "anchorY": "mid",
+     "wide": true
+    },
+    {
+     "name": "proj_bigball_0",
+     "scale": 0.24,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_bigball_1",
+     "scale": 0.24,
+     "anchorX": "bbox"
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_kenan_3.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "cutin",
+     "scale": 0.2,
+     "anchorX": "bbox"
+    }
+   ]
+  }
+ ]
+}

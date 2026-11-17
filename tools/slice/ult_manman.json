@@ -1,0 +1,100 @@
+{
+ "id": "manman_ult",
+ "out": "tmp/ult_out/manman",
+ "scale": 0.32,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "key": {
+  "bg": "auto",
+  "lo": 0.15,
+  "hi": 0.5,
+  "edge": 3
+ },
+ "sheets": [
+  {
+   "file": "tmp/ult_manman_1.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 12,
+   "frames": [
+    "sp_fwd_atk_0",
+    "sp_fwd_atk_1",
+    "sp_fwd_jump_0",
+    "sp_fwd_jump_1",
+    "sp_fwd_jump_2",
+    "sp_down_atk_0",
+    "ult_0",
+    "ult_1",
+    "ult_2",
+    "ult_3",
+    "ult_4"
+   ]
+  },
+  {
+   "file": "tmp/ult_manman_2a.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": 12,
+   "frames": [
+    {
+     "name": "proj_shell_0",
+     "scale": 0.15,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_shell_1",
+     "scale": 0.15,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "fx_quake",
+     "scale": 0.3,
+     "anchorX": "bbox",
+     "wide": true
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_manman_2b.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": 60,
+   "frames": [
+    {
+     "name": "fx_sparkle_0",
+     "scale": 0.4,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "fx_sparkle_1",
+     "scale": 0.4,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_manman_3.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "cutin",
+     "scale": 0.2,
+     "anchorX": "bbox"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,102 @@
+{
+ "id": "piggy_ult",
+ "out": "tmp/ult_out/piggy",
+ "scale": 0.32,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "key": {
+  "bg": "auto",
+  "lo": 0.15,
+  "hi": 0.5,
+  "edge": 3
+ },
+ "sheets": [
+  {
+   "file": "tmp/ult_piggy_1.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 12,
+   "frames": [
+    "sp_fwd_atk_0",
+    "sp_fwd_atk_1",
+    "sp_fwd_atk_2",
+    "sp_fwd_atk_3",
+    "sp_fwd_jump_0",
+    {
+     "name": "sp_fwd_jump_1",
+     "anchorX": "bbox"
+    },
+    "sp_up_atk_0",
+    "sp_up_atk_1",
+    "ult_0",
+    "ult_1",
+    "ult_2",
+    "ult_3"
+   ]
+  },
+  {
+   "file": "tmp/ult_piggy_2.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": 8,
+   "frames": [
+    {
+     "name": "fx_chop_0",
+     "scale": 0.35,
+     "wide": true,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "fx_chop_1",
+     "scale": 0.35,
+     "wide": true,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "fx_boar_0",
+     "scale": 0.34,
+     "wide": true,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "fx_boar_1",
+     "scale": 0.34,
+     "wide": true,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "fx_spin",
+     "scale": 0.33,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_piggy_3.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "cutin",
+     "scale": 0.2,
+     "anchorX": "bbox"
+    }
+   ]
+  }
+ ]
+}

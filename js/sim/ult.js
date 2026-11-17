@@ -25,6 +25,7 @@ export function normalizeFighter(f) {
   if (f.ultGuard === undefined) f.ultGuard = 0;
   if (f.ultGuardBy === undefined) f.ultGuardBy = 0;
   if (f.held === undefined) f.held = -1;
+  if (f.ctlT === undefined) f.ctlT = 0;
   if (f.mkx === undefined) f.mkx = 0;
   if (f.mkz === undefined) f.mkz = 0;
   if (f.buf === undefined) f.buf = '';

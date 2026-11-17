@@ -12,10 +12,35 @@
   "mp": 500,
   "mpStart": 200,
   "mpRegen": 6,
+  "assist": "sp_fwd_atk",
   "ai": {
-    "style": "melee",
+    "style": "ranged",
     "range": 70,
-    "specials": []
+    "specials": [
+      {
+        "cmd": "sp_fwd_jump",
+        "min": 0,
+        "max": 110,
+        "zr": 16
+      },
+      {
+        "cmd": "sp_down_atk",
+        "min": 110,
+        "max": 170,
+        "zr": 30
+      },
+      {
+        "cmd": "sp_fwd_atk",
+        "min": 170,
+        "max": 340,
+        "zr": 14
+      }
+    ],
+    "ult": {
+      "range": 600,
+      "zr": 30,
+      "n": 1
+    }
   },
   "walk": {
     "x": 2.5,
@@ -265,9 +290,328 @@
           "wait": 8
         }
       ]
+    },
+    "sp_fwd_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 8
+        },
+        {
+          "wait": 4
+        },
+        {
+          "wait": 8
+        },
+        {
+          "wait": 6,
+          "spawn": {
+            "proj": "bolt",
+            "x": 80,
+            "y": 32
+          }
+        },
+        {
+          "wait": 16
+        }
+      ]
+    },
+    "sp_fwd_jump": {
+      "cost": 125,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 8
+        },
+        {
+          "wait": 4
+        },
+        {
+          "wait": 6
+        },
+        {
+          "wait": 6,
+          "itr": [
+            {
+              "x": 30,
+              "y": 15,
+              "w": 160,
+              "h": 30,
+              "zr": 16,
+              "dmg": 6,
+              "fall": 5,
+              "bdef": 10,
+              "kx": 5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 0,
+              "rehit": 4,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 6,
+          "itr": [
+            {
+              "x": 30,
+              "y": 15,
+              "w": 160,
+              "h": 30,
+              "zr": 16,
+              "dmg": 6,
+              "fall": 5,
+              "bdef": 10,
+              "kx": 5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 0,
+              "rehit": 4,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 6,
+          "itr": [
+            {
+              "x": 30,
+              "y": 15,
+              "w": 160,
+              "h": 30,
+              "zr": 16,
+              "dmg": 6,
+              "fall": 5,
+              "bdef": 10,
+              "kx": 5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 0,
+              "rehit": 4,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 6,
+          "itr": [
+            {
+              "x": 30,
+              "y": 15,
+              "w": 160,
+              "h": 30,
+              "zr": 16,
+              "dmg": 6,
+              "fall": 5,
+              "bdef": 10,
+              "kx": 5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 0,
+              "rehit": 4,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 1,
+          "itr": [
+            {
+              "x": 30,
+              "y": 15,
+              "w": 160,
+              "h": 30,
+              "zr": 16,
+              "dmg": 24,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 9,
+              "ky": 6,
+              "stun": 20,
+              "stop": 4,
+              "rehit": 1,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 5
+        },
+        {
+          "wait": 16
+        }
+      ]
+    },
+    "sp_down_atk": {
+      "cost": 125,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 8
+        },
+        {
+          "wait": 4
+        },
+        {
+          "wait": 10
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "trap",
+            "x": 80,
+            "y": 14
+          }
+        },
+        {
+          "wait": 14
+        }
+      ]
+    },
+    "ultimate": {
+      "cost": 0,
+      "cancel": 0,
+      "ult": {
+        "type": "dodge",
+        "cap": 150,
+        "unblockable": false,
+        "name": "爆炎大俯衝"
+      },
+      "frames": [
+        {
+          "wait": 14
+        },
+        {
+          "wait": 20
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "dragon",
+            "x": 40,
+            "y": 36
+          }
+        },
+        {
+          "wait": 30
+        }
+      ]
     }
   },
-  "projectiles": {},
+  "projectiles": {
+    "bolt": {
+      "vx": 12,
+      "life": 30,
+      "chase": 0,
+      "bdy": {
+        "x": -16,
+        "y": -10,
+        "w": 32,
+        "h": 20
+      },
+      "itr": {
+        "x": -16,
+        "y": -10,
+        "w": 32,
+        "h": 20,
+        "zr": 14,
+        "dmg": 40,
+        "fall": 40,
+        "bdef": 20,
+        "kx": 4,
+        "ky": 0,
+        "stun": 30,
+        "stop": 4,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      }
+    },
+    "trap": {
+      "vx": 0,
+      "life": 300,
+      "chase": 0,
+      "bdy": {
+        "x": -15,
+        "y": -10,
+        "w": 30,
+        "h": 20
+      },
+      "itr": {
+        "x": -15,
+        "y": -10,
+        "w": 30,
+        "h": 20,
+        "zr": 14,
+        "dmg": 20,
+        "fall": 0,
+        "bdef": 0,
+        "kx": 0,
+        "ky": 0,
+        "stun": 60,
+        "stop": 4,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "limit": 1
+    },
+    "dragon": {
+      "vx": 12,
+      "life": 140,
+      "chase": 0,
+      "bdy": {
+        "x": -55,
+        "y": -35,
+        "w": 110,
+        "h": 70
+      },
+      "itr": {
+        "x": -55,
+        "y": -35,
+        "w": 110,
+        "h": 70,
+        "zr": 36,
+        "dmg": 150,
+        "fall": 100,
+        "bdef": 50,
+        "kx": 8,
+        "ky": 9,
+        "stun": 20,
+        "stop": 5,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "pierce": true
+    }
+  },
+  "info": {
+    "moves": {
+      "sp_fwd_atk": {
+        "name": "劈哩啪啦",
+        "desc": "丟球放出雷丸鼠,放電射出閃電;命中長硬直,來得及補一招"
+      },
+      "sp_fwd_jump": {
+        "name": "消防水柱",
+        "desc": "丟球放出水塔龜,噴水柱把近身的人一路推開,最後一下擊倒;近身解圍"
+      },
+      "sp_down_atk": {
+        "name": "藤蔓絆腳",
+        "desc": "丟球放出花背蛙,在前方地上種出藤蔓陷阱;第一個踩到的人被纏住不能動,可繞開或跳過"
+      }
+    },
+    "ult": {
+      "name": "爆炎大俯衝",
+      "desc": "丟球召喚炎爪龍橫越全畫面俯衝,穿透並擊倒;可防、錯開縱深、翻滾、跳起躲開;龍飛出後不會因為小志被打而消失"
+    }
+  },
   "art": {
     "atlas": "art/xiaozhi/atlas.json",
     "scale": 0.72,
@@ -432,6 +776,195 @@
           "dashatk_1",
           "dashatk_1"
         ]
+      },
+      "sp_fwd_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_throw_0",
+          "sp_throw_1",
+          "sp_cmd",
+          "sp_cmd",
+          "sp_cmd"
+        ]
+      },
+      "sp_fwd_jump": {
+        "mode": "move",
+        "frames": [
+          "sp_throw_0",
+          "sp_throw_1",
+          "sp_cmd",
+          "sp_cmd",
+          "sp_cmd",
+          "sp_cmd",
+          "sp_cmd",
+          "sp_cmd",
+          "sp_cmd",
+          "sp_cmd"
+        ]
+      },
+      "sp_down_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_throw_0",
+          "sp_throw_1",
+          "sp_cmd",
+          "sp_cmd",
+          "sp_cmd"
+        ]
+      },
+      "ultimate": {
+        "mode": "move",
+        "frames": [
+          "ult_0",
+          "ult_1",
+          "ult_1",
+          "sp_cmd"
+        ]
+      }
+    },
+    "projectiles": {
+      "bolt": {
+        "frames": [
+          "proj_bolt"
+        ],
+        "rate": 4
+      },
+      "trap": {
+        "frames": [
+          "proj_trap_0",
+          "proj_trap_1"
+        ],
+        "rate": 16
+      },
+      "dragon": {
+        "frames": [
+          "proj_dragon_0",
+          "proj_dragon_1"
+        ],
+        "rate": 6
+      }
+    },
+    "cutin": {
+      "frame": "cutin"
+    },
+    "fx": {
+      "sp_fwd_atk": [
+        {
+          "frames": [
+            "fx_pop"
+          ],
+          "rate": 6,
+          "from": 1,
+          "to": 1,
+          "dx": 52,
+          "dy": 28,
+          "scale": 1
+        },
+        {
+          "frames": [
+            "pet_mouse_0"
+          ],
+          "rate": 6,
+          "from": 2,
+          "to": 2,
+          "dx": 56,
+          "dy": 0,
+          "scale": 1.15
+        },
+        {
+          "frames": [
+            "pet_mouse_1"
+          ],
+          "rate": 6,
+          "from": 3,
+          "to": 3,
+          "dx": 56,
+          "dy": 0,
+          "scale": 1.15
+        }
+      ],
+      "sp_fwd_jump": [
+        {
+          "frames": [
+            "fx_pop"
+          ],
+          "rate": 6,
+          "from": 1,
+          "to": 1,
+          "dx": 52,
+          "dy": 28,
+          "scale": 1
+        },
+        {
+          "frames": [
+            "pet_turtle_0"
+          ],
+          "rate": 6,
+          "from": 2,
+          "to": 2,
+          "dx": 52,
+          "dy": 0,
+          "scale": 1.15
+        },
+        {
+          "frames": [
+            "pet_turtle_1"
+          ],
+          "rate": 6,
+          "from": 3,
+          "to": 8,
+          "dx": 52,
+          "dy": 0,
+          "scale": 1.15
+        },
+        {
+          "frames": [
+            "fx_jet_0",
+            "fx_jet_1"
+          ],
+          "rate": 4,
+          "from": 3,
+          "to": 8,
+          "dx": 84,
+          "dy": 36,
+          "scale": 1,
+          "sx": 2.0
+        }
+      ],
+      "sp_down_atk": [
+        {
+          "frames": [
+            "fx_pop"
+          ],
+          "rate": 6,
+          "from": 1,
+          "to": 1,
+          "dx": 52,
+          "dy": 28,
+          "scale": 1
+        },
+        {
+          "frames": [
+            "pet_frog_0"
+          ],
+          "rate": 6,
+          "from": 2,
+          "to": 3,
+          "dx": 52,
+          "dy": 0,
+          "scale": 1.15
+        }
+      ],
+      "ultimate": {
+        "frames": [
+          "fx_pop"
+        ],
+        "rate": 6,
+        "from": 1,
+        "to": 1,
+        "dx": 56,
+        "dy": 34,
+        "scale": 1
       }
     }
   }

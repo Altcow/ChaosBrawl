@@ -64,3 +64,13 @@
 slice.mjs 新增:`anchorX: "left" | "right"`(特效以左 / 右端對齊,例如光束從手掌發出)、`anchorY: "mid" | "top"`(預設底邊)、components 版面切格時會遮掉落在方框內、但屬於相鄰物件的像素(相鄰格的武器尖端不會漏進來);mergeGap 可為負數(`-12`:bbox 只有輕微重疊的相鄰物件不合併)。
 
 遊戲端 `art.fx.<招式名>` 可為物件或陣列(同一招多組特效),欄位 `frames, rate, from, to(最後一格,含), dx, dy(往上位移 px), scale, under`;只動畫面,不影響模擬。檢查:`node tools/art-test.mjs`。
+
+## 新 6 角色必殺技畫格(2026-11-17)
+
+小豬豬 / 騎玉 / 小志 / 柯南 / 籠卷 / 漫漫龜,各 3 張(`給GPT/回收/必殺技_<角色>_第 1~3 張.webp`:動作 / 特效 + 射彈 / 特寫)。流程同上,基底圖集改用「加必殺技前」的 `data/art/<id>/atlas.*`(git 舊版本,或事先備份到 `tools/slice/tmp/base_new6/<id>/`):
+
+    python tools/slice/ult_prep.py                         # 另外把柯南第 1 張皮帶扣的洋紅寶石改成鋼藍色、把漫漫龜第 2 張拆成 2a(龜殼 + 地震波)/ 2b(星星)
+    node tools/slice/slice.mjs tools/slice/ult_<id>.json   # id = piggy qiyu xiaozhi kenan longjuan manman
+    node tools/slice/merge-atlas.mjs tools/slice/tmp/base_new6/<id> tools/slice/tmp/ult_out/<id> data/art/<id>
+
+注意:components 版面合併距離依張而異(騎玉第 2 張拳影 40、漫漫龜星星 60、小志第 2 張 -3 = 相鄰物件外框重疊 2 px 但不能併);`mergeGap` 設 0 會被當成預設 24,要「幾乎不合併」請用 1~4 或負數。特效圖大小依「畫面像素 = 圖集像素 × art.scale(0.72)」換算,遊戲端再用 `art.fx` 的 `scale` / `sx`(只橫向拉長)/ `art.projectiles.<名>.scale` 微調。

@@ -80,7 +80,8 @@ export class Renderer {
     ctx.fillStyle = '#4a4538';
     ctx.fillRect(0, horizon, LW, LH - horizon);
 
-    ctx.setTransform(this.k * zoom, 0, 0, this.k * zoom, 0, this.k * ty);
+    const sh = this.fx.shakeOff();
+    ctx.setTransform(this.k * zoom, 0, 0, this.k * zoom, this.k * sh.x, this.k * (ty + sh.y));
     this._world(ctx, w, camX, vw);
 
     const order = w.fighters.map((f, i) => i).filter((i) => w.fighters[i].state !== S.DEAD).sort((a, b) => w.fighters[a].z - w.fighters[b].z);
@@ -103,7 +104,11 @@ export class Renderer {
       const f = w.fighters[i];
       const p = pos(f, i);
       const sx = p.x - camX;
-      const sy = FLOOR_Y + p.z - p.y;
+      let sy = FLOOR_Y + p.z - p.y;
+      if (f.held >= 0 && w.fighters[f.held] && w.fighters[f.held].move) {
+        const hm = w.defs[w.fighters[f.held].charId].moves[w.fighters[f.held].move];
+        if (hm && hm.holdDy) sy -= hm.holdDy; // 被鎖定者畫面抬高(E1,例如念力擒拋把人舉起來)
+      }
       ctx.globalAlpha = f.inv > 0 && (f.inv & 4) ? 0.4 : 1;
       drawMoveFx(ctx, f, w.defs[f.charId], sx, sy, f.face, true);
       drawFighter(ctx, f, w.defs[f.charId], sx, sy, f.face, f.hitstop > 0 && f.sinceHit < 6);

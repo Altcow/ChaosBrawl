@@ -12,10 +12,35 @@
   "mp": 500,
   "mpStart": 200,
   "mpRegen": 6,
+  "assist": "sp_fwd_atk",
   "ai": {
-    "style": "melee",
+    "style": "ranged",
     "range": 70,
-    "specials": []
+    "specials": [
+      {
+        "cmd": "sp_up_atk",
+        "min": 0,
+        "max": 80,
+        "zr": 18
+      },
+      {
+        "cmd": "sp_fwd_jump",
+        "min": 80,
+        "max": 150,
+        "zr": 16
+      },
+      {
+        "cmd": "sp_fwd_atk",
+        "min": 150,
+        "max": 340,
+        "zr": 14
+      }
+    ],
+    "ult": {
+      "range": 400,
+      "zr": 36,
+      "n": 1
+    }
   },
   "walk": {
     "x": 2.4,
@@ -265,9 +290,310 @@
           "wait": 8
         }
       ]
+    },
+    "sp_fwd_atk": {
+      "cost": 75,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 8
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "wind",
+            "x": 34,
+            "y": 30
+          }
+        },
+        {
+          "wait": 14
+        }
+      ]
+    },
+    "sp_fwd_jump": {
+      "cost": 150,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 12
+        },
+        {
+          "wait": 4,
+          "itr": [
+            {
+              "x": 20,
+              "y": 0,
+              "w": 140,
+              "h": 60,
+              "zr": 16,
+              "dmg": 20,
+              "fall": 0,
+              "bdef": 0,
+              "kx": 0,
+              "ky": 0,
+              "stun": 10,
+              "stop": 0,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "grab",
+              "lock": "psy_lock"
+            }
+          ]
+        },
+        {
+          "wait": 26
+        }
+      ]
+    },
+    "psy_lock": {
+      "cost": 0,
+      "cancel": 0,
+      "lock": true,
+      "holdDy": 18,
+      "frames": [
+        {
+          "wait": 24,
+          "itr": [
+            {
+              "x": 6,
+              "y": 0,
+              "w": 60,
+              "h": 60,
+              "zr": 20,
+              "dmg": 0,
+              "fall": 0,
+              "bdef": 0,
+              "kx": 0,
+              "ky": 0,
+              "stun": 10,
+              "stop": 0,
+              "rehit": 5,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 1,
+          "spawn": {
+            "proj": "throw",
+            "x": 0,
+            "y": 30
+          },
+          "itr": [
+            {
+              "x": 6,
+              "y": 0,
+              "w": 60,
+              "h": 60,
+              "zr": 20,
+              "dmg": 15,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 12,
+              "ky": 9,
+              "stun": 20,
+              "stop": 4,
+              "rehit": 1,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 5
+        },
+        {
+          "wait": 10
+        }
+      ]
+    },
+    "sp_up_atk": {
+      "cost": 125,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "tornado",
+            "x": 45,
+            "y": 45
+          }
+        },
+        {
+          "wait": 14
+        }
+      ]
+    },
+    "ultimate": {
+      "cost": 0,
+      "cancel": 0,
+      "ult": {
+        "type": "dodge",
+        "cap": 150,
+        "unblockable": false,
+        "name": "翡翠大龍捲"
+      },
+      "frames": [
+        {
+          "wait": 20
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "tornado_big",
+            "x": 60,
+            "y": 65
+          }
+        },
+        {
+          "wait": 30
+        }
+      ]
     }
   },
-  "projectiles": {},
+  "projectiles": {
+    "wind": {
+      "vx": 9,
+      "life": 40,
+      "chase": 0,
+      "bdy": {
+        "x": -18,
+        "y": -20,
+        "w": 36,
+        "h": 40
+      },
+      "itr": {
+        "x": -18,
+        "y": -20,
+        "w": 36,
+        "h": 40,
+        "zr": 14,
+        "dmg": 35,
+        "fall": 40,
+        "bdef": 20,
+        "kx": 9,
+        "ky": 0,
+        "stun": 16,
+        "stop": 3,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "pierce": true
+    },
+    "throw": {
+      "vx": 12,
+      "life": 30,
+      "chase": 0,
+      "bdy": {
+        "x": -50,
+        "y": -30,
+        "w": 100,
+        "h": 60
+      },
+      "itr": {
+        "x": -50,
+        "y": -30,
+        "w": 100,
+        "h": 60,
+        "zr": 20,
+        "dmg": 30,
+        "fall": 100,
+        "bdef": 50,
+        "kx": 12,
+        "ky": 9,
+        "stun": 20,
+        "stop": 3,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "pierce": true
+    },
+    "tornado": {
+      "vx": 0.5,
+      "life": 60,
+      "chase": 0,
+      "bdy": {
+        "x": -30,
+        "y": -45,
+        "w": 60,
+        "h": 90
+      },
+      "itr": {
+        "x": -30,
+        "y": -45,
+        "w": 60,
+        "h": 90,
+        "zr": 18,
+        "dmg": 12,
+        "fall": 100,
+        "bdef": 20,
+        "kx": 0,
+        "ky": 5,
+        "stun": 20,
+        "stop": 0,
+        "rehit": 12,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "pierce": true
+    },
+    "tornado_big": {
+      "vx": 3,
+      "life": 150,
+      "chase": 0,
+      "bdy": {
+        "x": -45,
+        "y": -65,
+        "w": 90,
+        "h": 130
+      },
+      "itr": {
+        "x": -45,
+        "y": -65,
+        "w": 90,
+        "h": 130,
+        "zr": 40,
+        "dmg": 30,
+        "fall": 100,
+        "bdef": 50,
+        "kx": 0,
+        "ky": 6,
+        "stun": 20,
+        "stop": 0,
+        "rehit": 10,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "pierce": true
+    }
+  },
+  "info": {
+    "moves": {
+      "sp_fwd_atk": {
+        "name": "翠綠旋風刃",
+        "desc": "揮手射出穿透的風刃,一路把人推開"
+      },
+      "sp_fwd_jump": {
+        "name": "念力擒拋",
+        "desc": "念力抓住前方一人(不可防)舉起再甩飛,被丟出的人撞到路上別人會一起受傷;揮空破綻大"
+      },
+      "sp_up_atk": {
+        "name": "迷你龍捲",
+        "desc": "在前方生出緩慢前進的小龍捲,把人捲上天連續受傷;對空、近身解圍都行"
+      }
+    },
+    "ult": {
+      "name": "翡翠大龍捲",
+      "desc": "雙手高舉後送出巨大龍捲慢慢推進,穿透、捲上天連續受傷;可防、翻滾、錯開縱深,跑步能跑贏它"
+    }
+  },
   "art": {
     "atlas": "art/longjuan/atlas.json",
     "scale": 0.72,
@@ -432,6 +758,94 @@
           "dashatk_1",
           "dashatk_1"
         ]
+      },
+      "sp_fwd_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_atk_0",
+          "sp_fwd_atk_1",
+          "sp_fwd_atk_1"
+        ]
+      },
+      "sp_fwd_jump": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_jump_0",
+          "sp_fwd_jump_0",
+          "sp_fwd_jump_2"
+        ]
+      },
+      "psy_lock": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_jump_1",
+          "sp_fwd_jump_2",
+          "sp_fwd_jump_2",
+          "sp_fwd_jump_2"
+        ]
+      },
+      "sp_up_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_up_atk_0",
+          "sp_up_atk_0",
+          "sp_up_atk_0"
+        ]
+      },
+      "ultimate": {
+        "mode": "move",
+        "frames": [
+          "ult_0",
+          "ult_1",
+          "ult_2"
+        ]
+      }
+    },
+    "projectiles": {
+      "wind": {
+        "frames": [
+          "proj_wind_0",
+          "proj_wind_1"
+        ],
+        "rate": 4
+      },
+      "throw": {
+        "frames": [
+          "proj_throw"
+        ],
+        "rate": 4
+      },
+      "tornado": {
+        "frames": [
+          "proj_tornado_0",
+          "proj_tornado_1"
+        ],
+        "rate": 6
+      },
+      "tornado_big": {
+        "frames": [
+          "proj_tornado_0",
+          "proj_tornado_1"
+        ],
+        "rate": 6,
+        "scale": 1.45
+      }
+    },
+    "cutin": {
+      "frame": "cutin"
+    },
+    "fx": {
+      "psy_lock": {
+        "frames": [
+          "fx_psy_0",
+          "fx_psy_1"
+        ],
+        "rate": 4,
+        "from": 0,
+        "to": 0,
+        "dx": 36,
+        "dy": 50,
+        "scale": 1
       }
     }
   }

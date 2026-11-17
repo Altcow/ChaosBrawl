@@ -1,0 +1,128 @@
+{
+ "id": "xiaozhi_ult",
+ "out": "tmp/ult_out/xiaozhi",
+ "scale": 0.3,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "key": {
+  "bg": "auto",
+  "lo": 0.15,
+  "hi": 0.5,
+  "edge": 3
+ },
+ "sheets": [
+  {
+   "file": "tmp/ult_xiaozhi_1.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 8,
+   "frames": [
+    "sp_throw_0",
+    "sp_throw_1",
+    "sp_cmd",
+    "ult_0",
+    "ult_1",
+    {
+     "name": "cutin",
+     "scale": 0.3,
+     "anchorX": "bbox"
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_xiaozhi_2.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": -3,
+   "frames": [
+    {
+     "name": "pet_mouse_0",
+     "scale": 0.25,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "pet_mouse_1",
+     "scale": 0.25,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_bolt",
+     "scale": 0.12,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "pet_turtle_0",
+     "scale": 0.25,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "pet_turtle_1",
+     "scale": 0.25,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "fx_jet_0",
+     "scale": 0.2,
+     "anchorX": "left",
+     "anchorY": "mid",
+     "wide": true
+    },
+    {
+     "name": "fx_jet_1",
+     "scale": 0.152,
+     "anchorX": "left",
+     "anchorY": "mid",
+     "wide": true
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_xiaozhi_3.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": 8,
+   "frames": [
+    {
+     "name": "pet_frog_0",
+     "scale": 0.25,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_trap_0",
+     "scale": 0.2,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_trap_1",
+     "scale": 0.2,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "fx_pop",
+     "scale": 0.17,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "proj_dragon_0",
+     "scale": 0.26,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_dragon_1",
+     "scale": 0.26,
+     "anchorX": "bbox"
+    }
+   ]
+  }
+ ]
+}

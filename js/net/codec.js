@@ -69,7 +69,7 @@ class Reader {
 }
 
 const F_INTS = ['id', 'team', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'face', 'state', 'st', 'nextState', 'takeoffVx',
-  'hp', 'gray', 'mp', 'rage', 'ult', 'ultSeq', 'ultGuard', 'ultGuardBy', 'held', 'mkx', 'mkz', 'bufT', 'aftT', 'fall', 'bdef', 'sinceHit', 'hitstop', 'rollCd', 'getupDir', 'stunT', 'airHits', 'inv', 'silence',
+  'hp', 'gray', 'mp', 'rage', 'ult', 'ultSeq', 'ultGuard', 'ultGuardBy', 'held', 'mkx', 'mkz', 'bufT', 'aftT', 'fall', 'bdef', 'sinceHit', 'hitstop', 'rollCd', 'getupDir', 'stunT', 'airHits', 'inv', 'silence', 'ctlT',
   'deadTick', 'kills', 'lastAtk', 'lastAtkTick', 'mf', 'mt', 'mtot', 'mseq', 'hf', 'prev', 'pend', 'tapDir', 'tapT'];
 const P_INTS = ['id', 'owner', 'x', 'y', 'z', 'face', 'vx', 'vz', 'life'];
 

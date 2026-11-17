@@ -208,7 +208,7 @@ export function drawProjectileArt(ctx, charId, kind, tick, sx, sy, face) {
   const name = a.frames[Math.floor(tick / (a.rate || 4)) % a.frames.length];
   const fr = e.atlas.frames && e.atlas.frames[name];
   if (!fr) return false;
-  const k = e.art.scale || 1 / (e.atlas.pxPerUnit || 2);
+  const k = (e.art.scale || 1 / (e.atlas.pxPerUnit || 2)) * (a.scale || 1); // a.scale:射彈圖放大倍率(E2,例如大龍捲沿用小龍捲圖)
   ctx.save();
   ctx.translate(sx, sy);
   if (face < 0) ctx.scale(-1, 1);
@@ -248,7 +248,7 @@ export function drawCutinArt(ctx, charId, cx, cy, scale, flip) {
 }
 
 // 招式特效掛圖:art.fx.<招式名> = 物件或物件陣列(同一招可掛多組),每組 { frames, rate, from(邏輯格起算)、to(最後一格,含;沒設就到招式結束)、
-//   dx(朝向前為正)、dy(往上位移 px,刀光 / 光束 / 頭頂光球用)、scale、under(畫在角色底下) }
+//   dx(朝向前為正)、dy(往上位移 px,刀光 / 光束 / 頭頂光球用)、scale、sx(只橫向拉長倍率)、under(畫在角色底下) }
 // 只讀圖集;沒有設定 / 圖集未載入 / 幀名不在圖集就什麼都不畫(退回現狀)。純畫面,不影響模擬與連線同步
 export function drawMoveFx(ctx, f, def, sx, sy, face, under) {
   if (!f.move || (f.hf < 0 && !(f.hitstop > 0))) return; // 命中停頓那幾 tick hf 會被清成 -1,特效照畫(不然一打中特效就閃掉)
@@ -263,12 +263,13 @@ export function drawMoveFx(ctx, f, def, sx, sy, face, under) {
     const fr = e.atlas.frames && e.atlas.frames[name];
     if (!fr) continue;
     const k = (e.art.scale || 1 / (e.atlas.pxPerUnit || 2)) * (a.scale || 1);
+    const kx = k * (a.sx || 1); // sx:只橫向拉長(貼地長特效,例如衝擊波 / 水柱 / 地震波)
     ctx.save();
     ctx.translate(sx + face * (a.dx || 0), sy - (a.dy || 0));
     if (face < 0) ctx.scale(-1, 1);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(e.img, fr.x, fr.y, fr.w, fr.h, -fr.ax * k, -fr.ay * k, fr.w * k, fr.h * k);
+    ctx.drawImage(e.img, fr.x, fr.y, fr.w, fr.h, -fr.ax * kx, -fr.ay * k, fr.w * kx, fr.h * k);
     ctx.restore();
   }
 }

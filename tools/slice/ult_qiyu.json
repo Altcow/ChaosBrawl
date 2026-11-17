@@ -1,0 +1,89 @@
+{
+ "id": "qiyu_ult",
+ "out": "tmp/ult_out/qiyu",
+ "scale": 0.32,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "key": {
+  "bg": "auto",
+  "lo": 0.15,
+  "hi": 0.5,
+  "edge": 3
+ },
+ "sheets": [
+  {
+   "file": "tmp/ult_qiyu_1.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 12,
+   "frames": [
+    "sp_fwd_atk_0",
+    "sp_fwd_atk_1",
+    "sp_fwd_atk_2",
+    "sp_fwd_jump_0",
+    "sp_fwd_jump_1",
+    "sp_up_atk_0",
+    "sp_up_atk_1",
+    "ult_0",
+    "ult_1",
+    "ult_2"
+   ]
+  },
+  {
+   "file": "tmp/ult_qiyu_2.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": 40,
+   "frames": [
+    {
+     "name": "fx_fists_0",
+     "scale": 0.24,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "fx_fists_1",
+     "scale": 0.24,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "fx_punch_0",
+     "scale": 0.53,
+     "anchorX": "left",
+     "anchorY": "mid",
+     "wide": true
+    },
+    {
+     "name": "fx_punch_1",
+     "scale": 0.53,
+     "anchorX": "left",
+     "anchorY": "mid",
+     "wide": true
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_qiyu_3.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "cutin",
+     "scale": 0.2,
+     "anchorX": "bbox"
+    }
+   ]
+  }
+ ]
+}

@@ -4,7 +4,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { setArtIO, drawFighter, drawMoveFx, pickFrame } from '../js/render/sprites.js';
+import { setArtIO, drawFighter, drawMoveFx, drawProjectileArt, pickFrame } from '../js/render/sprites.js';
 import { compileChar } from '../js/sim/fighter.js';
 import { createWorld, stepWorld } from '../js/sim/world.js';
 import { commandMacro, ULT_MACRO } from '../js/sim/command.js';
@@ -146,6 +146,24 @@ const imgs = (c) => c.filter((x) => x[0] === 'drawImage').length;
   }
   c = await fxCalls('fanfan', 'sp_up_atk', 2);
   ok(imgs(c) === 1, '舊格式:沒設 to 時結束格仍畫');
+}
+// E2:射彈圖 scale(籠卷大龍捲沿用小龍捲圖放大)、fx sx(只橫向拉長)
+{
+  await fxCalls('longjuan', 'ultimate', 0); // 觸發載入
+  const dw = (ctx) => ctx.calls.find((x) => x[0] === 'drawImage');
+  const projW = (kind) => {
+    const ctx = mkCtx();
+    ok(drawProjectileArt(ctx, 'longjuan', kind, 0, 100, 100, 1), '射彈圖 ' + kind + ' 畫得出來');
+    return dw(ctx);
+  };
+  const small = projW('tornado');
+  const big = projW('tornado_big');
+  ok(small && big && Math.abs(big[8] / small[8] - 1.45) < 0.01 && Math.abs(big[9] / small[9] - 1.45) < 0.01, 'E2:大龍捲射彈圖 = 小龍捲圖 × 1.45(寬高同比)');
+  await fxCalls('qiyu', 'ultimate', 1); // 觸發載入
+  const ctx1 = mkCtx();
+  drawMoveFx(ctx1, fighter('qiyu', 'ultimate', 1), defOf('qiyu'), 100, 100, 1, true); // 衝擊波畫在角色底下(under)
+  const d1 = dw(ctx1);
+  ok(d1 && d1[8] > d1[9] * 6, 'fx sx:騎玉衝擊波橫向拉長(寬 / 高 > 6,實際約 ' + (d1 ? Math.round(d1[8]) + '×' + Math.round(d1[9]) : '?') + ' px)');
 }
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');

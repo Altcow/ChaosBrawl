@@ -1,0 +1,100 @@
+{
+ "id": "longjuan_ult",
+ "out": "tmp/ult_out/longjuan",
+ "scale": 0.3,
+ "anchorX": "feet",
+ "cell": {
+  "w": 128,
+  "h": 128
+ },
+ "wideCell": {
+  "w": 256,
+  "h": 128
+ },
+ "pxPerUnit": 1,
+ "footOffset": 8,
+ "key": {
+  "bg": "auto",
+  "lo": 0.15,
+  "hi": 0.5,
+  "edge": 3
+ },
+ "sheets": [
+  {
+   "file": "tmp/ult_longjuan_1.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 12,
+   "frames": [
+    "sp_fwd_atk_0",
+    "sp_fwd_atk_1",
+    "sp_fwd_jump_0",
+    "sp_fwd_jump_1",
+    "sp_fwd_jump_2",
+    "sp_up_atk_0",
+    "ult_0",
+    "ult_1",
+    "ult_2"
+   ]
+  },
+  {
+   "file": "tmp/ult_longjuan_2.png",
+   "layout": "components",
+   "despeckle": 0,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "proj_wind_0",
+     "scale": 0.215,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_wind_1",
+     "scale": 0.215,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "fx_psy_0",
+     "scale": 0.35,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "fx_psy_1",
+     "scale": 0.35,
+     "anchorX": "bbox",
+     "anchorY": "mid"
+    },
+    {
+     "name": "proj_throw",
+     "scale": 0.2,
+     "anchorX": "bbox",
+     "wide": true
+    },
+    {
+     "name": "proj_tornado_0",
+     "scale": 0.41,
+     "anchorX": "bbox"
+    },
+    {
+     "name": "proj_tornado_1",
+     "scale": 0.41,
+     "anchorX": "bbox"
+    }
+   ]
+  },
+  {
+   "file": "tmp/ult_longjuan_3.png",
+   "layout": "components",
+   "despeckle": 40,
+   "mergeGap": 24,
+   "frames": [
+    {
+     "name": "cutin",
+     "scale": 0.2,
+     "anchorX": "bbox"
+    }
+   ]
+  }
+ ]
+}

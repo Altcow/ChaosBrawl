@@ -12,10 +12,35 @@
   "mp": 500,
   "mpStart": 200,
   "mpRegen": 6,
+  "assist": "sp_fwd_atk",
   "ai": {
     "style": "melee",
     "range": 70,
-    "specials": []
+    "specials": [
+      {
+        "cmd": "sp_up_atk",
+        "min": 0,
+        "max": 30,
+        "zr": 14
+      },
+      {
+        "cmd": "sp_fwd_atk",
+        "min": 30,
+        "max": 60,
+        "zr": 16
+      },
+      {
+        "cmd": "sp_fwd_jump",
+        "min": 60,
+        "max": 100,
+        "zr": 30
+      }
+    ],
+    "ult": {
+      "range": 900,
+      "zr": 30,
+      "n": 2
+    }
   },
   "walk": {
     "x": 2.0,
@@ -265,9 +290,252 @@
           "wait": 8
         }
       ]
+    },
+    "sp_fwd_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 6
+        },
+        {
+          "wait": 9,
+          "itr": [
+            {
+              "x": 0,
+              "y": 10,
+              "w": 60,
+              "h": 40,
+              "zr": 16,
+              "dmg": 6,
+              "fall": 8,
+              "bdef": 17,
+              "kx": 0.5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 0,
+              "rehit": 3,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 9,
+          "itr": [
+            {
+              "x": 0,
+              "y": 10,
+              "w": 60,
+              "h": 40,
+              "zr": 16,
+              "dmg": 6,
+              "fall": 8,
+              "bdef": 17,
+              "kx": 0.5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 0,
+              "rehit": 3,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 9,
+          "itr": [
+            {
+              "x": 0,
+              "y": 10,
+              "w": 60,
+              "h": 40,
+              "zr": 16,
+              "dmg": 6,
+              "fall": 8,
+              "bdef": 17,
+              "kx": 0.5,
+              "ky": 0,
+              "stun": 10,
+              "stop": 0,
+              "rehit": 3,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 1,
+          "itr": [
+            {
+              "x": 0,
+              "y": 10,
+              "w": 60,
+              "h": 40,
+              "zr": 16,
+              "dmg": 30,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 8,
+              "ky": 5,
+              "stun": 20,
+              "stop": 5,
+              "rehit": 1,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 5
+        },
+        {
+          "wait": 16
+        }
+      ]
+    },
+    "sp_fwd_jump": {
+      "cost": 125,
+      "cancel": 0,
+      "steer": {
+        "x": 2.5,
+        "z": 4
+      },
+      "frames": [
+        {
+          "wait": 8,
+          "inv": true
+        },
+        {
+          "wait": 8,
+          "inv": true
+        },
+        {
+          "wait": 5,
+          "still": true,
+          "itr": [
+            {
+              "x": 0,
+              "y": 10,
+              "w": 50,
+              "h": 40,
+              "zr": 16,
+              "dmg": 45,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 6,
+              "ky": 5,
+              "stun": 20,
+              "stop": 5,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 20,
+          "still": true
+        }
+      ]
+    },
+    "sp_up_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 6
+        },
+        {
+          "wait": 6,
+          "itr": [
+            {
+              "x": 0,
+              "y": 0,
+              "w": 40,
+              "h": 90,
+              "zr": 14,
+              "dmg": 55,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 2,
+              "ky": 11,
+              "stun": 20,
+              "stop": 5,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 18
+        }
+      ]
+    },
+    "ultimate": {
+      "cost": 0,
+      "cancel": 0,
+      "ult": {
+        "type": "dodge",
+        "cap": 160,
+        "unblockable": false,
+        "name": "玩真的一拳"
+      },
+      "frames": [
+        {
+          "wait": 30
+        },
+        {
+          "wait": 6,
+          "shake": 24,
+          "itr": [
+            {
+              "x": 10,
+              "y": 0,
+              "w": 1000,
+              "h": 100,
+              "zr": 40,
+              "dmg": 160,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 16,
+              "ky": 10,
+              "stun": 20,
+              "stop": 5,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 48
+        }
+      ]
     }
   },
   "projectiles": {},
+  "info": {
+    "moves": {
+      "sp_fwd_atk": {
+        "name": "隨便連打",
+        "desc": "一臉無聊地連打,最後一拳擊倒"
+      },
+      "sp_fwd_jump": {
+        "name": "體育課反覆橫跳",
+        "desc": "前半段無敵,可用方向鍵橫跳閃開對方招式,再補一拳擊倒;閃避兼反擊"
+      },
+      "sp_up_atk": {
+        "name": "順手上鉤拳",
+        "desc": "順手一記上鉤拳,擊飛對空的人"
+      }
+    },
+    "ult": {
+      "name": "玩真的一拳",
+      "desc": "蓄力(無敵)後認真出拳,前方超過一個畫面寬都打得到,傷害極高且擊飛很遠;縱深只有一小條,錯開上下位置、繞到背後或翻滾可閃;出拳後破綻很長"
+    }
+  },
   "art": {
     "atlas": "art/qiyu/atlas.json",
     "scale": 0.72,
@@ -432,6 +700,74 @@
           "dashatk_1",
           "dashatk_1"
         ]
+      },
+      "sp_fwd_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_atk_0",
+          "sp_fwd_atk_1",
+          "sp_fwd_atk_0",
+          "sp_fwd_atk_1",
+          "sp_fwd_atk_2",
+          "sp_fwd_atk_2",
+          "sp_fwd_atk_2"
+        ]
+      },
+      "sp_fwd_jump": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_jump_0",
+          "sp_fwd_jump_1",
+          "sp_fwd_atk_2",
+          "sp_fwd_atk_2"
+        ]
+      },
+      "sp_up_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_up_atk_0",
+          "sp_up_atk_1",
+          "sp_up_atk_1"
+        ]
+      },
+      "ultimate": {
+        "mode": "move",
+        "frames": [
+          "ult_0",
+          "ult_1",
+          "ult_2"
+        ]
+      }
+    },
+    "cutin": {
+      "frame": "cutin"
+    },
+    "fx": {
+      "sp_fwd_atk": {
+        "frames": [
+          "fx_fists_0",
+          "fx_fists_1"
+        ],
+        "rate": 3,
+        "from": 1,
+        "to": 3,
+        "dx": 48,
+        "dy": 36,
+        "scale": 1
+      },
+      "ultimate": {
+        "frames": [
+          "fx_punch_0",
+          "fx_punch_1"
+        ],
+        "rate": 3,
+        "from": 1,
+        "to": 1,
+        "dx": 22,
+        "dy": 46,
+        "scale": 0.8,
+        "sx": 2.5,
+        "under": true
       }
     }
   }

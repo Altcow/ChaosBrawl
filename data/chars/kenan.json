@@ -12,10 +12,35 @@
   "mp": 500,
   "mpStart": 200,
   "mpRegen": 6,
+  "assist": "sp_fwd_atk",
   "ai": {
-    "style": "melee",
+    "style": "ranged",
     "range": 70,
-    "specials": []
+    "specials": [
+      {
+        "cmd": "sp_fwd_jump",
+        "min": 80,
+        "max": 150,
+        "zr": 24
+      },
+      {
+        "cmd": "sp_down_atk",
+        "min": 150,
+        "max": 230,
+        "zr": 8
+      },
+      {
+        "cmd": "sp_fwd_atk",
+        "min": 230,
+        "max": 380,
+        "zr": 12
+      }
+    ],
+    "ult": {
+      "range": 700,
+      "zr": 28,
+      "n": 1
+    }
   },
   "walk": {
     "x": 2.5,
@@ -265,9 +290,208 @@
           "wait": 8
         }
       ]
+    },
+    "sp_fwd_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "ball",
+            "x": 30,
+            "y": 12
+          }
+        },
+        {
+          "wait": 16
+        }
+      ]
+    },
+    "sp_fwd_jump": {
+      "cost": 125,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 8
+        },
+        {
+          "wait": 18,
+          "pull": {
+            "range": 220,
+            "zr": 24,
+            "to": 30,
+            "speed": 12
+          }
+        },
+        {
+          "wait": 10
+        }
+      ]
+    },
+    "sp_down_atk": {
+      "cost": 125,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "dart",
+            "x": 30,
+            "y": 36
+          }
+        },
+        {
+          "wait": 18
+        }
+      ]
+    },
+    "ultimate": {
+      "cost": 0,
+      "cancel": 0,
+      "ult": {
+        "type": "dodge",
+        "cap": 140,
+        "unblockable": false,
+        "name": "破案大射門"
+      },
+      "frames": [
+        {
+          "wait": 8
+        },
+        {
+          "wait": 8
+        },
+        {
+          "wait": 8
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "bigball",
+            "x": 55,
+            "y": 35
+          }
+        },
+        {
+          "wait": 30
+        }
+      ]
     }
   },
-  "projectiles": {},
+  "projectiles": {
+    "ball": {
+      "vx": 11,
+      "life": 36,
+      "chase": 0,
+      "bdy": {
+        "x": -12,
+        "y": -12,
+        "w": 24,
+        "h": 24
+      },
+      "itr": {
+        "x": -12,
+        "y": -12,
+        "w": 24,
+        "h": 24,
+        "zr": 12,
+        "dmg": 50,
+        "fall": 100,
+        "bdef": 50,
+        "kx": 6,
+        "ky": 6,
+        "stun": 20,
+        "stop": 4,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      }
+    },
+    "dart": {
+      "vx": 14,
+      "life": 22,
+      "chase": 0,
+      "bdy": {
+        "x": -8,
+        "y": -4,
+        "w": 16,
+        "h": 8
+      },
+      "itr": {
+        "x": -8,
+        "y": -4,
+        "w": 16,
+        "h": 8,
+        "zr": 8,
+        "dmg": 10,
+        "fall": 0,
+        "bdef": 10,
+        "kx": 0,
+        "ky": 0,
+        "stun": 75,
+        "stop": 4,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      }
+    },
+    "bigball": {
+      "vx": 10,
+      "life": 160,
+      "chase": 0,
+      "bdy": {
+        "x": -32,
+        "y": -32,
+        "w": 64,
+        "h": 64
+      },
+      "itr": {
+        "x": -32,
+        "y": -32,
+        "w": 64,
+        "h": 64,
+        "zr": 32,
+        "dmg": 140,
+        "fall": 100,
+        "bdef": 50,
+        "kx": 9,
+        "ky": 10,
+        "stun": 20,
+        "stop": 5,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "pierce": true
+    }
+  },
+  "info": {
+    "moves": {
+      "sp_fwd_atk": {
+        "name": "強力射門",
+        "desc": "用鞋子踢出足球,命中擊倒"
+      },
+      "sp_fwd_jump": {
+        "name": "伸縮皮帶",
+        "desc": "甩出皮帶,把前方範圍內的敵人全部拉到身前;不傷害、不能防,翻滾中拉不動;拉完可接普攻或射門"
+      },
+      "sp_down_atk": {
+        "name": "麻痺飛針",
+        "desc": "用手錶射出細針,命中者長時間不能動;很細,錯開縱深就能躲,正面防禦可擋"
+      }
+    },
+    "ult": {
+      "name": "破案大射門",
+      "desc": "按腰帶把足球膨脹成巨球再踢出,橫越全畫面穿透並擊倒;可防、錯開縱深、翻滾躲開"
+    }
+  },
   "art": {
     "atlas": "art/kenan/atlas.json",
     "scale": 0.72,
@@ -432,7 +656,118 @@
           "dashatk_1",
           "dashatk_1"
         ]
+      },
+      "sp_fwd_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_atk_0",
+          "sp_fwd_atk_1",
+          "sp_fwd_atk_1"
+        ]
+      },
+      "sp_fwd_jump": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_jump_0",
+          "sp_fwd_jump_1",
+          "sp_fwd_jump_1"
+        ]
+      },
+      "sp_down_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_down_atk_0",
+          "sp_down_atk_0",
+          "sp_down_atk_0"
+        ]
+      },
+      "ultimate": {
+        "mode": "move",
+        "frames": [
+          "ult_0",
+          "ult_0",
+          "ult_0",
+          "ult_1",
+          "ult_2"
+        ]
       }
+    },
+    "projectiles": {
+      "ball": {
+        "frames": [
+          "proj_ball_0",
+          "proj_ball_1"
+        ],
+        "rate": 4
+      },
+      "dart": {
+        "frames": [
+          "proj_dart"
+        ],
+        "rate": 4
+      },
+      "bigball": {
+        "frames": [
+          "proj_bigball_0",
+          "proj_bigball_1"
+        ],
+        "rate": 5
+      }
+    },
+    "cutin": {
+      "frame": "cutin"
+    },
+    "fx": {
+      "sp_fwd_jump": {
+        "frames": [
+          "fx_belt"
+        ],
+        "rate": 6,
+        "from": 0,
+        "to": 1,
+        "dx": 14,
+        "dy": 24,
+        "scale": 0.8,
+        "sx": 1.5
+      },
+      "ultimate": [
+        {
+          "frames": [
+            "proj_bigball_0",
+            "proj_bigball_1"
+          ],
+          "rate": 4,
+          "from": 0,
+          "to": 0,
+          "dx": 52,
+          "dy": 12,
+          "scale": 0.35
+        },
+        {
+          "frames": [
+            "proj_bigball_0",
+            "proj_bigball_1"
+          ],
+          "rate": 4,
+          "from": 1,
+          "to": 1,
+          "dx": 52,
+          "dy": 23,
+          "scale": 0.65
+        },
+        {
+          "frames": [
+            "proj_bigball_0",
+            "proj_bigball_1"
+          ],
+          "rate": 4,
+          "from": 2,
+          "to": 2,
+          "dx": 52,
+          "dy": 35,
+          "scale": 1.0
+        }
+      ]
     }
   }
 }

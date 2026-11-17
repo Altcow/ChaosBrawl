@@ -17,6 +17,8 @@ const DOUBLE_TAP = 12; // 連按同向兩次的 tick 上限
 const HEAL_DELAY = 180; // 灰血 3 秒後開始回復
 const GRAY_RATIO = 3; // 傷害的 30% 變灰血(×3/10)
 const KILL_CREDIT = 300; // 擊殺歸屬:最後 5 s 內造成傷害的人
+const LONG_STUN = 40; // 控制遞減(護欄 6):硬直 >= 40 tick(或鎖定 / 擒抓)算「長控制」
+const CTL_WINDOW = 180; // 同一目標 3 s 內再吃一次長硬直,硬直減半
 
 // JSON 招式資料 → 執行用資料(速度轉定點數、預算總 tick)
 export function compileChar(j) {
@@ -40,7 +42,8 @@ export function compileChar(j) {
       // counter:true = 觸發名為 counter 的招式;字串 = 觸發該名稱的招式
       counter: f.counter === true ? 'counter' : f.counter || '',
       inv: !!f.inv, armor: !!f.armor, turn: !!f.turn, live: !!f.live, reflect: !!f.reflect,
-      mark: !!f.mark, recall: !!f.recall, buff: f.buff || '',
+      mark: !!f.mark, recall: !!f.recall, buff: f.buff || '', shake: f.shake || 0, // shake:招式格開始時發畫面震動事件(純畫面,E3)
+      still: !!f.still, // still:這一格不吃 steer(方向鍵操控只在沒標 still 的格有效:起手 / 收招的破綻不能邊走邊收)
       heal: f.heal ? Math.floor((f.heal * FX) / f.wait) : 0, // 每 tick 回復量(先灰血再 HP)
       mpTick: f.mpSec ? Math.round((f.mpSec * FX) / 60) : 0,
       pull: f.pull ? { range: f.pull.range || 0, zr: f.pull.zr || 0, to: f.pull.to || 0, speed: toFx(f.pull.speed || 0), zspeed: toFx(f.pull.zspeed || 0), all: !!f.pull.all, front: !!f.pull.front } : null
@@ -50,6 +53,7 @@ export function compileChar(j) {
       launch: m.launch ? { vx: toFx(m.launch.vx), vy: toFx(m.launch.vy) } : null,
       steer: m.steer ? { x: toFx(m.steer.x), z: toFx(m.steer.z || 0) } : null, // 招式中可用方向鍵移動(px / tick)
       lock: !!m.lock, // 鎖定演出招式(被 itr.lock 指到時,對手被釘在身前)
+      holdDy: m.holdDy || 0, // 鎖定演出招式:被鎖定者畫面往上抬 N px(純畫面,E1)
       total: frames.reduce((s, f) => s + f.wait, 0), boom: false, first: 0, ult: null
     };
     if (m.ult) {
@@ -89,7 +93,7 @@ export function createFighter(w, spec, id) {
     x: toFx(spec.x), y: 0, z: toFx(spec.z), vx: 0, vy: 0, vz: 0, face: spec.face || 1,
     state: S.IDLE, st: 0, nextState: S.JUMP, takeoffVx: 0,
     hp: def.hp, gray: 0, mp: def.mpStart, fall: 0, bdef: 0, sinceHit: 999,
-    hitstop: 0, rollCd: 0, getupDir: 0, stunT: 0, airHits: 0, inv: 0, silence: 0,
+    hitstop: 0, rollCd: 0, getupDir: 0, stunT: 0, airHits: 0, inv: 0, silence: 0, ctlT: 0,
     held: -1, mkx: 0, mkz: 0, buf: '', bufT: 0, aftT: 0,
     rage: 0, ult: 0, ultSeq: 0, ultDmg: {}, ultGuard: 0, ultGuardBy: 0,
     dead: false, deadTick: 0, kills: 0, lastAtk: -1, lastAtkTick: -999,
@@ -270,13 +274,14 @@ function stepMove(f, def, w, air) {
     if (fr.tp) teleport(f, w, fr.tp, fr.tpAny);
     if (fr.buff) startBuff(f, def, fr.buff);
     if (fr.spawn) for (const sp of fr.spawn) spawnProjectile(w, f, def, sp);
+    if (fr.shake) w.events.push({ t: 'shake', x: f.x, y: f.y, z: f.z, n: fr.shake });
   }
   if (fr.heal) healStep(f, def, fr.heal);
   if (fr.mpTick) f.mp = Math.min(def.mp, f.mp + fr.mpTick);
   if (fr.pull) applyPull(w, f, fr.pull);
   if (!air) {
     f.vx = f.face * fr.mvx;
-    if (m.steer) {
+    if (m.steer && !fr.still) {
       const h = f.hist.length ? f.hist[f.hist.length - 1] : 0;
       f.vx = ((h & BIT.RIGHT ? 1 : 0) - (h & BIT.LEFT ? 1 : 0)) * m.steer.x;
       f.vz = ((h & BIT.DOWN ? 1 : 0) - (h & BIT.UP ? 1 : 0)) * m.steer.z;
@@ -504,7 +509,13 @@ export function takeHit(w, d, attX, itr, owner, isProj) {
   } else {
     d.state = S.HURT;
     d.st = 0;
-    d.stunT = itr.stun;
+    let stun = itr.stun;
+    if (stun >= LONG_STUN || itr.lock) {
+      // 控制遞減(E4):3 s 內第二次(含)長硬直減半;擒抓(lock)不減,但會刷新計時
+      if (!itr.lock && d.ctlT > 0 && w.tick + 1 - d.ctlT < CTL_WINDOW) stun = Math.floor(stun / 2);
+      d.ctlT = w.tick + 1;
+    }
+    d.stunT = stun;
   }
   return 'hit';
 }
@@ -715,6 +726,7 @@ export function respawnFighter(f, def, x, z) {
   f.hitstop = 0;
   f.silence = 0;
   f.sinceHit = 999;
+  f.ctlT = 0;
   f.rage = Math.floor(f.rage / 2); // 時間賽復活保留 50% 爆氣
   f.ult = 0;
   f.ultGuard = 0;

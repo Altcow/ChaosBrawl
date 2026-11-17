@@ -71,7 +71,7 @@ const fakeItr = (o) => Object.assign({ dmg: 10, fall: 20, bdef: 10, kx: 1, ky: 0
   const NEW6 = { piggy: [490, 2.6, 1.6, 5.8, 1.0], qiyu: [520, 2.0, 1.3, 4.8, 0.9], xiaozhi: [470, 2.5, 1.5, 5.5, 1.0], kenan: [450, 2.5, 1.6, 5.6, 1.0], longjuan: [430, 2.4, 1.5, 5.0, 0.9], manman: [530, 2.1, 1.3, 4.8, 0.9] };
   for (const [id, v] of Object.entries(NEW6)) {
     const j = chars[id];
-    check(id + ' 新角色基本資料(HP / 走 / 跑符合設計文件 1-3 節;暫無必殺)', j && j.hp === v[0] && j.walk.x === v[1] && j.walk.z === v[2] && j.run.x === v[3] && j.run.z === v[4] && !Object.keys(j.moves).some((m) => /^sp_|^ultimate/.test(m)), j && j.name);
+    check(id + ' 新角色基本資料(HP / 走 / 跑符合設計文件 1-3 節;3 招必殺 + 最強必殺技)', j && j.hp === v[0] && j.walk.x === v[1] && j.walk.z === v[2] && j.run.x === v[3] && j.run.z === v[4] && Object.keys(j.moves).filter((m) => /^sp_/.test(m)).length === 3 && !!j.moves.ultimate, j && j.name);
   }
   for (const id of WAVE1) {
     const j = chars[id];
@@ -529,7 +529,8 @@ const fakeItr = (o) => Object.assign({ dmg: 10, fall: 20, bdef: 10, kx: 1, ky: 0
 }
 
 // ---- 14. 每角色每招可出手 ----
-for (const id of WAVE1) {
+const NEW6 = ['piggy', 'qiyu', 'xiaozhi', 'kenan', 'longjuan', 'manman'];
+for (const id of WAVE1.concat(NEW6)) {
   const j = chars[id];
   const cmds = Object.keys(j.moves).filter((m) => /^sp_/.test(m));
   const touched = [];
@@ -691,6 +692,251 @@ for (const id of WAVE1) {
     out.push(a + ' vs ' + b + ' ' + aw + '-' + bw + ' [矩陣預期 ' + (exp === 'win' ? a + ' 剋 ' + b : a + ' 被 ' + b + ' 剋') + ';實測 ' + (as === exp ? '符合' : as === 'even' ? '持平' : '相反') + ']');
   }
   for (const l of out) console.log('INFO 互剋 ' + l);
+}
+
+// ---- 18. 新 6 角色必殺技(docs/必殺技設計_新6角色.md)+ E1~E4 ----
+{
+  for (const id of NEW6) {
+    const j = chars[id];
+    const sp = Object.keys(j.moves).filter((m) => /^sp_/.test(m));
+    check(id + ' 資料:3 招必殺 + 最強、info / ai.specials / ai.ult / assist 齊全', sp.length === 3 && j.info.ult && j.ai.specials.length === 3 && j.ai.ult && j.assist && sp.every((c) => j.info.moves[c] && j.ai.specials.some((a) => a.cmd === c)), sp.join(','));
+  }
+  const casting = (id, others, cmd) => {
+    const w = mk([P(id, 400, 100), ...others]);
+    w.fighters[0].mp = 500 * FX;
+    cast(w, cmd);
+    return w;
+  };
+  const RIGHT = () => [BIT.RIGHT, 0, 0, 0, 0, 0, 0, 0];
+  // 小豬豬
+  {
+    const w = casting('piggy', [D(440, 100), D(360, 100, { team: 5 })], 'sp_fwd_atk');
+    run(w, 120, nil);
+    check('雙刀亂剁:前後都打(前方 80、身後 50,最後交叉斬只打前方)', lost(w, 1) === 80 && lost(w, 2) === 50, lost(w, 1) + '/' + lost(w, 2));
+    const w2 = casting('piggy', [D(450, 100), D(550, 100, { team: 5 }), D(650, 100, { team: 6 })], 'sp_fwd_jump');
+    run(w2, 120, nil);
+    check('豬突猛進:路上 3 人各中 50 一次', [1, 2, 3].every((i) => lost(w2, i) === 50), [1, 2, 3].map((i) => lost(w2, i)).join(','));
+    const w3 = casting('piggy', [D(430, 100)], 'sp_up_atk');
+    run(w3, 120, nil);
+    check('旋風豬上天:空中旋轉總傷害約 61(40~70)', lost(w3, 1) >= 40 && lost(w3, 1) <= 70, lost(w3, 1));
+    const wu = mk([P('piggy', 400, 100), D(440, 100)]);
+    full(wu.fighters[0]);
+    ult(wu);
+    const x0 = wu.fighters[0].x;
+    run(wu, 130, RIGHT);
+    check('山大王大暴走:方向鍵可操控(往右 > 300 px)、單目標 ≤ 160', (wu.fighters[0].x - x0) / FX > 300 && lost(wu, 1) <= 160 && lost(wu, 1) > 0, 'dx=' + (((wu.fighters[0].x - x0) / FX) | 0) + ' lost=' + lost(wu, 1));
+    const wi = mk([P('piggy', 400, 100), D(1000, 100)]);
+    full(wi.fighters[0]);
+    ult(wi);
+    run(wi, 45, nil);
+    takeHit(wi, wi.fighters[0], wi.fighters[0].x + 30 * FX, fakeItr({ fall: 20 }), 1, true);
+    check('山大王大暴走:沒有霸體,被射彈打中就中斷', wi.fighters[0].move === null);
+  }
+  // 騎玉
+  {
+    const w = casting('qiyu', [D(440, 100)], 'sp_fwd_atk');
+    run(w, 120, nil);
+    check('隨便連打:9 連拳 + 直拳 = 84', lost(w, 1) === 84, lost(w, 1));
+    const w2 = mk([P('qiyu', 400, 100), D(1300, 100), D(1000, 160, { team: 5 }), D(1000, 100, { team: 6 })]);
+    full(w2.fighters[0]);
+    ult(w2);
+    let shake = 0;
+    for (let t = 0; t < 120; t++) {
+      stepWorld(w2, nil());
+      shake += w2.events.filter((e) => e.t === 'shake').length;
+    }
+    check('玩真的一拳:前方 900 px 外也打得到 160、縱深錯開 60 閃得掉、E3 發出畫面震動事件', lost(w2, 1) === 160 && lost(w2, 2) === 0 && lost(w2, 3) === 160 && shake === 1, lost(w2, 1) + '/' + lost(w2, 2) + '/' + lost(w2, 3) + ' shake=' + shake);
+    const w3 = mk([P('qiyu', 400, 100), D(440, 100)]);
+    w3.fighters[0].mp = 500 * FX;
+    cast(w3, 'sp_fwd_jump');
+    let invT = 0;
+    for (let t = 0; t < 40; t++) {
+      stepWorld(w3, nil());
+      if (isInvuln(w3.fighters[0], w3.defs.qiyu)) invT++;
+    }
+    check('體育課反覆橫跳:前 16 tick 無敵', invT >= 12 && invT <= 17, invT);
+  }
+  // 小志
+  {
+    const w = casting('xiaozhi', [D(600, 100)], 'sp_fwd_atk');
+    run(w, 100, nil);
+    check('劈哩啪啦:閃電 40、硬直 30(長於一般)', lost(w, 1) === 40 && w.fighters[1].stunT === 30, lost(w, 1) + ' stun=' + w.fighters[1].stunT);
+    const w2 = casting('xiaozhi', [D(450, 100)], 'sp_fwd_jump');
+    run(w2, 140, nil);
+    check('消防水柱:共 60(連續推擠 + 最後擊倒)', lost(w2, 1) === 60, lost(w2, 1));
+    const w3 = casting('xiaozhi', [D(480, 100)], 'sp_down_atk');
+    let hurt = 0;
+    for (let t = 0; t < 150; t++) {
+      stepWorld(w3, nil());
+      if (w3.fighters[1].state === S.HURT) hurt++;
+    }
+    check('藤蔓絆腳:纏住約 60 tick、20 傷害、陷阱踩中後消失', hurt >= 58 && hurt <= 66 && lost(w3, 1) === 20 && w3.projectiles.length === 0, 'hurt=' + hurt);
+    const w4 = mk([P('xiaozhi', 400, 100), D(900, 100), D(1100, 100, { team: 5 })]);
+    full(w4.fighters[0]);
+    ult(w4);
+    run(w4, 220, nil);
+    check('爆炎大俯衝:龍橫越畫面穿透,兩人各 150', lost(w4, 1) === 150 && lost(w4, 2) === 150, lost(w4, 1) + '/' + lost(w4, 2));
+    const w5 = mk([P('xiaozhi', 400, 100), D(900, 100)]);
+    full(w5.fighters[0]);
+    ult(w5);
+    run(w5, 70, nil);
+    const f5 = w5.fighters[0];
+    f5.hitstop = 0;
+    const had = w5.projectiles.length === 1;
+    takeHit(w5, f5, f5.x + 30 * FX, fakeItr({ fall: 100 }), 1, false);
+    stepWorld(w5, nil());
+    check('爆炎大俯衝:龍飛出後小志被打倒,龍仍在', had && w5.projectiles.some((p) => p.kind === 'dragon'));
+  }
+  // 柯南
+  {
+    const w = casting('kenan', [D(700, 100)], 'sp_fwd_atk');
+    run(w, 80, nil);
+    check('強力射門:足球 50 擊倒', lost(w, 1) === 50, lost(w, 1));
+    const w2 = casting('kenan', [D(550, 100), D(500, 160, { team: 5 }), D(380, 100, { team: 6 })], 'sp_fwd_jump');
+    run(w2, 40, nil);
+    check('伸縮皮帶:前方 220 px 內拉到身前 30 px、不傷害;縱深外與身後的人不受影響', Math.abs((w2.fighters[1].x - w2.fighters[0].x) / FX - 30) <= 1 && lost(w2, 1) === 0 && w2.fighters[2].x === 500 * FX && w2.fighters[3].x === 380 * FX);
+    const w3 = casting('kenan', [D(600, 100), D(600, 130, { team: 5 })], 'sp_down_atk');
+    let hurt = 0;
+    for (let t = 0; t < 160; t++) {
+      stepWorld(w3, nil());
+      if (w3.fighters[1].state === S.HURT) hurt++;
+    }
+    check('麻痺飛針:命中 10、麻痺約 75 tick;縱深錯開 30 閃得掉(zr 8)', lost(w3, 1) === 10 && hurt >= 73 && hurt <= 82 && lost(w3, 2) === 0, 'hurt=' + hurt);
+    const w4 = mk([P('kenan', 400, 100), D(800, 100), D(1100, 100, { team: 5 })]);
+    full(w4.fighters[0]);
+    ult(w4);
+    run(w4, 220, nil);
+    check('破案大射門:巨球穿透,兩人各 140', lost(w4, 1) === 140 && lost(w4, 2) === 140, lost(w4, 1) + '/' + lost(w4, 2));
+  }
+  // 籠卷
+  {
+    const w = casting('longjuan', [D(700, 100), D(900, 100, { team: 5 })], 'sp_fwd_atk');
+    run(w, 100, nil);
+    check('翠綠旋風刃:360 px 內命中 35、更遠不中', lost(w, 1) === 35 && lost(w, 2) === 0, lost(w, 1));
+    const w2 = casting('longjuan', [D(470, 100), D(700, 100, { team: 5 })], 'sp_fwd_jump');
+    let held = 0;
+    for (let t = 0; t < 150; t++) {
+      stepWorld(w2, nil());
+      if (w2.fighters[1].held === 0) held++;
+    }
+    check('念力擒拋:抓到 → 釘住約 24 tick;被抓者共 65(20 + 15 + 30);丟出路上的人 30', held >= 22 && held <= 28 && lost(w2, 1) === 65 && lost(w2, 2) === 30, 'held=' + held + ' ' + lost(w2, 1) + '/' + lost(w2, 2));
+    const w3 = casting('longjuan', [D(1000, 100)], 'sp_fwd_jump');
+    let n = 0;
+    for (let t = 0; t < 100; t++) {
+      stepWorld(w3, nil());
+      if (w3.fighters[0].move) n++;
+    }
+    check('念力擒拋:揮空約 42 tick 破綻、不鎖定', n >= 38 && n <= 46 && w3.fighters[1].held === -1, n);
+    const w3b = casting('longjuan', [D(470, 100)], 'sp_fwd_jump');
+    w3b.fighters[1].state = S.DEFEND;
+    w3b.fighters[1].face = -1;
+    let sawHeld = false;
+    for (let t = 0; t < 30; t++) {
+      stepWorld(w3b, nil());
+      if (w3b.fighters[1].held === 0) sawHeld = true;
+    }
+    check('念力擒拋:不可防(防禦姿勢也被抓)', sawHeld && lost(w3b, 1) >= 20, lost(w3b, 1));
+    const w4 = casting('longjuan', [D(470, 100)], 'sp_up_atk');
+    run(w4, 150, nil);
+    check('迷你龍捲:捲上天連續 4 下共 48', lost(w4, 1) === 48, lost(w4, 1));
+    const w5 = mk([P('longjuan', 400, 100), D(560, 100)]);
+    full(w5.fighters[0]);
+    ult(w5);
+    run(w5, 300, nil);
+    check('翡翠大龍捲:連續受傷、單目標 ≤ 150', lost(w5, 1) >= 90 && lost(w5, 1) <= 150, lost(w5, 1));
+    check('E1:念力擒拋鎖定招式帶 holdDy(被抓者畫面抬高),其他角色的鎖定招式沒有', w5.defs.longjuan.moves.psy_lock.holdDy > 0 && w5.defs.longjuan.moves.psy_lock.lock && !w5.defs.areh.moves.ultimate_lock.holdDy);
+  }
+  // 漫漫龜
+  {
+    const w = casting('manman', [D(600, 100)], 'sp_fwd_atk');
+    let out = 0;
+    for (let t = 0; t < 220; t++) {
+      stepWorld(w, nil());
+      if (w.projectiles.length) out = t;
+    }
+    check('龜殼滑球:去程 + 回程各打一次(共 70),滑回來後消失', lost(w, 1) === 70 && out > 60 && out < 160 && w.projectiles.length === 0, lost(w, 1) + ' out=' + out);
+    const w2 = casting('manman', [D(500, 100), D(700, 100, { team: 5 })], 'sp_fwd_jump');
+    const m2 = w2.fighters[0];
+    let invT = 0;
+    for (let t = 0; t < 120; t++) {
+      stepWorld(w2, RIGHT());
+      if (isInvuln(m2, w2.defs.manman) && m2.move) invT++;
+    }
+    check('星星糖無敵衝:48 tick 無敵、方向鍵可操控、撞到的人各 35', invT >= 46 && invT <= 56 && lost(w2, 1) === 35 && lost(w2, 2) === 35, 'inv=' + invT + ' ' + lost(w2, 1) + '/' + lost(w2, 2));
+    const wq = casting('manman', [D(900, 100)], 'sp_fwd_jump');
+    const xq = wq.fighters[0].x;
+    run(wq, 8, RIGHT);
+    check('steer 招式:標 still 的吃糖格不吃方向鍵(吃糖期間按住方向鍵不位移)', wq.fighters[0].x === xq);
+    const w3 = casting('manman', [D(430, 100)], 'sp_down_atk');
+    run(w3, 10, nil);
+    const f3 = w3.fighters[0];
+    const r = takeHit(w3, f3, f3.x + 30 * FX, fakeItr({ fall: 20 }), 1, false);
+    run(w3, 60, nil);
+    check('縮頭烏龜:近戰碰到 → 殼旋轉反擊 45', r === 'counter' && lost(w3, 1) === 45, r + ' ' + lost(w3, 1));
+    check('縮頭烏龜:架式格 reflect(射彈原路彈回)', w3.defs.manman.moves.sp_down_atk.frames[0].reflect);
+    const w4 = mk([P('manman', 400, 100), D(600, 100), D(900, 100, { team: 5 }), D(700, 100, { team: 6 })]);
+    w4.fighters[2].y = 40 * FX;
+    full(w4.fighters[0]);
+    ult(w4);
+    run(w4, 200, nil);
+    check('星光殼大地震:全場地面敵人各 70;腳離地 40 px(跳起)的人碰不到', lost(w4, 1) === 70 && lost(w4, 2) === 0 && lost(w4, 3) === 70, lost(w4, 1) + '/' + lost(w4, 2) + '/' + lost(w4, 3));
+  }
+  // E4 控制遞減
+  {
+    const w = mk([P('kenan', 400, 100), D(700, 100)]);
+    const d = w.fighters[1];
+    const itr = (o) => fakeItr(Object.assign({ fall: 0, stun: 60, dmg: 1 }, o));
+    takeHit(w, d, 600 * FX, itr(), 0, true);
+    const first = d.stunT;
+    d.state = S.IDLE;
+    d.hitstop = 0;
+    run(w, 30, nil);
+    takeHit(w, d, 600 * FX, itr(), 0, true);
+    const second = d.stunT;
+    d.state = S.IDLE;
+    d.hitstop = 0;
+    run(w, 200, nil);
+    takeHit(w, d, 600 * FX, itr(), 0, true);
+    const third = d.stunT;
+    d.state = S.IDLE;
+    d.hitstop = 0;
+    takeHit(w, d, 600 * FX, itr({ stun: 20 }), 0, true);
+    const short = d.stunT;
+    check('E4 控制遞減:長硬直 60 → 3 s 內第二次減半 30 → 超過 3 s 恢復 60;短硬直(20)不受影響', first === 60 && second === 30 && third === 60 && short === 20, first + '/' + second + '/' + third + '/' + short);
+    const w2 = mk([P('kenan', 400, 100), D(700, 100)]);
+    const d2 = w2.fighters[1];
+    takeHit(w2, d2, 600 * FX, fakeItr({ fall: 0, stun: 10, kind: 'grab', lock: 'x' }), 0, false);
+    d2.state = S.IDLE;
+    d2.hitstop = 0;
+    takeHit(w2, d2, 600 * FX, itr(), 0, true);
+    check('E4:擒抓(lock)刷新計時,之後 3 s 內的長硬直減半', d2.stunT === 30, d2.stunT);
+    const snap = serializeWorld(w2);
+    const w3 = mk([P('kenan', 400, 100), D(700, 100)]);
+    restoreWorld(w3, snap);
+    check('E4:ctlT 進快照 / 還原', w3.fighters[1].ctlT === w2.fighters[1].ctlT && w3.fighters[1].ctlT > 0);
+  }
+  // 8 人新角色混戰 3 分鐘:雜湊一致、電腦出過必殺
+  {
+    const lay = layoutSpawns(8, stage);
+    const list = ['piggy', 'qiyu', 'xiaozhi', 'kenan', 'longjuan', 'manman', 'fanfan', 'sun'];
+    const mkm = () => createWorld({ chars, seed: 33, stage, mode: 'timed', ult: true, spawns: list.map((c, i) => ({ charId: c, kind: 'ai', lvl: 2 + (i % 2), x: lay[i].x, z: lay[i].z, face: lay[i].face })) });
+    const used = {};
+    const go = (w) => {
+      const hs = [];
+      for (let t = 0; t < 10800; t++) {
+        stepWorld(w, []);
+        for (const f of w.fighters) if (f.move && /^sp_|^ultimate/.test(f.move)) used[f.charId + ':' + f.move] = 1;
+        if (t % 120 === 119) hs.push(hashWorld(w));
+      }
+      return hs;
+    };
+    const h1 = go(mkm());
+    const h2 = go(mkm());
+    const names = Object.keys(used);
+    const need = (c) => Object.keys(chars[c].moves).filter((m) => /^sp_|^ultimate$/.test(m)).filter((m) => !used[c + ':' + m]);
+    const miss = NEW6.filter((c) => need(c).length).map((c) => c + '(' + need(c).join('/') + ')');
+    check('新 6 角色 8 人電腦混戰 3 分鐘:雜湊一致、每位電腦 4 招(3 必殺 + 最強)都用過', JSON.stringify(h1) === JSON.stringify(h2) && miss.length === 0, 'unused=' + miss.join(',') + ' used=' + names.length);
+  }
 }
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');

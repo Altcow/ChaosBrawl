@@ -12,10 +12,35 @@
   "mp": 500,
   "mpStart": 200,
   "mpRegen": 6,
+  "assist": "sp_fwd_atk",
   "ai": {
     "style": "melee",
     "range": 70,
-    "specials": []
+    "specials": [
+      {
+        "cmd": "sp_down_atk",
+        "min": 0,
+        "max": 60,
+        "zr": 18
+      },
+      {
+        "cmd": "sp_fwd_jump",
+        "min": 60,
+        "max": 140,
+        "zr": 20
+      },
+      {
+        "cmd": "sp_fwd_atk",
+        "min": 140,
+        "max": 340,
+        "zr": 14
+      }
+    ],
+    "ult": {
+      "range": 2000,
+      "zr": 240,
+      "n": 2
+    }
   },
   "walk": {
     "x": 2.1,
@@ -265,9 +290,338 @@
           "wait": 8
         }
       ]
+    },
+    "sp_fwd_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 2,
+          "spawn": {
+            "proj": "shell",
+            "x": 30,
+            "y": 11
+          }
+        },
+        {
+          "wait": 14
+        }
+      ]
+    },
+    "sp_fwd_jump": {
+      "cost": 175,
+      "cancel": 0,
+      "steer": {
+        "x": 6,
+        "z": 2
+      },
+      "frames": [
+        {
+          "wait": 12,
+          "still": true
+        },
+        {
+          "wait": 8,
+          "inv": true,
+          "itr": [
+            {
+              "x": -10,
+              "y": 0,
+              "w": 50,
+              "h": 55,
+              "zr": 18,
+              "dmg": 35,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 7,
+              "ky": 7,
+              "stun": 20,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8,
+          "inv": true,
+          "itr": [
+            {
+              "x": -10,
+              "y": 0,
+              "w": 50,
+              "h": 55,
+              "zr": 18,
+              "dmg": 35,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 7,
+              "ky": 7,
+              "stun": 20,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8,
+          "inv": true,
+          "itr": [
+            {
+              "x": -10,
+              "y": 0,
+              "w": 50,
+              "h": 55,
+              "zr": 18,
+              "dmg": 35,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 7,
+              "ky": 7,
+              "stun": 20,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8,
+          "inv": true,
+          "itr": [
+            {
+              "x": -10,
+              "y": 0,
+              "w": 50,
+              "h": 55,
+              "zr": 18,
+              "dmg": 35,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 7,
+              "ky": 7,
+              "stun": 20,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8,
+          "inv": true,
+          "itr": [
+            {
+              "x": -10,
+              "y": 0,
+              "w": 50,
+              "h": 55,
+              "zr": 18,
+              "dmg": 35,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 7,
+              "ky": 7,
+              "stun": 20,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 8,
+          "inv": true,
+          "itr": [
+            {
+              "x": -10,
+              "y": 0,
+              "w": 50,
+              "h": 55,
+              "zr": 18,
+              "dmg": 35,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 7,
+              "ky": 7,
+              "stun": 20,
+              "stop": 3,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 24,
+          "still": true
+        }
+      ]
+    },
+    "sp_down_atk": {
+      "cost": 100,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 40,
+          "counter": "shell_counter",
+          "reflect": true
+        },
+        {
+          "wait": 20
+        }
+      ]
+    },
+    "shell_counter": {
+      "cost": 0,
+      "cancel": 0,
+      "frames": [
+        {
+          "wait": 2
+        },
+        {
+          "wait": 20,
+          "mvx": 6,
+          "itr": [
+            {
+              "x": -10,
+              "y": 0,
+              "w": 60,
+              "h": 50,
+              "zr": 20,
+              "dmg": 45,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 6,
+              "ky": 5,
+              "stun": 20,
+              "stop": 5,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 14
+        }
+      ]
+    },
+    "ultimate": {
+      "cost": 0,
+      "cancel": 0,
+      "ult": {
+        "type": "area",
+        "cap": 100,
+        "unblockable": true,
+        "name": "星光殼大地震"
+      },
+      "frames": [
+        {
+          "wait": 10
+        },
+        {
+          "wait": 10
+        },
+        {
+          "wait": 10
+        },
+        {
+          "wait": 20
+        },
+        {
+          "wait": 4,
+          "shake": 40,
+          "itr": [
+            {
+              "x": -1000,
+              "y": 0,
+              "w": 2000,
+              "h": 20,
+              "zr": 240,
+              "dmg": 70,
+              "fall": 100,
+              "bdef": 50,
+              "kx": 0,
+              "ky": 6,
+              "stun": 20,
+              "stop": 5,
+              "rehit": 0,
+              "gain": 0,
+              "kind": "hit"
+            }
+          ]
+        },
+        {
+          "wait": 14
+        },
+        {
+          "wait": 26
+        }
+      ]
     }
   },
-  "projectiles": {},
+  "projectiles": {
+    "shell": {
+      "vx": 8,
+      "life": 45,
+      "chase": 0,
+      "bdy": {
+        "x": -15,
+        "y": -11,
+        "w": 30,
+        "h": 22
+      },
+      "itr": {
+        "x": -15,
+        "y": -11,
+        "w": 30,
+        "h": 22,
+        "zr": 14,
+        "dmg": 35,
+        "fall": 60,
+        "bdef": 30,
+        "kx": 5,
+        "ky": 3,
+        "stun": 20,
+        "stop": 4,
+        "rehit": 0,
+        "gain": 0,
+        "kind": "hit"
+      },
+      "boomerang": true,
+      "backVx": 8
+    }
+  },
+  "info": {
+    "moves": {
+      "sp_fwd_atk": {
+        "name": "龜殼滑球",
+        "desc": "拔下龜殼貼地滑出去撞人,碰到場邊或飛遠會滑回來再撞一次;殼沒回來前不能再丟"
+      },
+      "sp_fwd_jump": {
+        "name": "星星糖無敵衝",
+        "desc": "吃下星星糖(這段會被打斷)後無敵衝刺,可用方向鍵操控,撞到的人各撞飛一次;衝完很喘"
+      },
+      "sp_down_atk": {
+        "name": "縮頭烏龜",
+        "desc": "縮進殼裡擺架式:被近戰碰到自動殼旋轉反擊,被射彈打到原路彈回;擋不住投技與零傷害控制"
+      }
+    },
+    "ult": {
+      "name": "星光殼大地震",
+      "desc": "變成金色星光殼旋轉(無敵,全場看得到預告)後跳起砸地,全場地面上的敵人都跌倒受傷、不可防;看到預告抓時機跳起、翻滾或已倒地都能躲過"
+    }
+  },
   "art": {
     "atlas": "art/manman/atlas.json",
     "scale": 0.72,
@@ -432,7 +786,95 @@
           "dashatk_1",
           "dashatk_1"
         ]
+      },
+      "sp_fwd_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_atk_0",
+          "sp_fwd_atk_1",
+          "sp_fwd_atk_1"
+        ]
+      },
+      "sp_fwd_jump": {
+        "mode": "move",
+        "frames": [
+          "sp_fwd_jump_0",
+          "sp_fwd_jump_1",
+          "sp_fwd_jump_2",
+          "sp_fwd_jump_1",
+          "sp_fwd_jump_2",
+          "sp_fwd_jump_1",
+          "sp_fwd_jump_2",
+          "sp_fwd_jump_0"
+        ]
+      },
+      "sp_down_atk": {
+        "mode": "move",
+        "frames": [
+          "sp_down_atk_0",
+          "sp_down_atk_0"
+        ]
+      },
+      "shell_counter": {
+        "mode": "move",
+        "frames": [
+          "runatk_0",
+          "runatk_1",
+          "runatk_1"
+        ]
+      },
+      "ultimate": {
+        "mode": "move",
+        "frames": [
+          "ult_0",
+          "ult_1",
+          "ult_2",
+          "ult_3",
+          "ult_3",
+          "ult_4",
+          "ult_4"
+        ]
       }
+    },
+    "projectiles": {
+      "shell": {
+        "frames": [
+          "proj_shell_0",
+          "proj_shell_1"
+        ],
+        "rate": 5
+      }
+    },
+    "cutin": {
+      "frame": "cutin"
+    },
+    "fx": {
+      "ultimate": [
+        {
+          "frames": [
+            "fx_sparkle_0",
+            "fx_sparkle_1"
+          ],
+          "rate": 4,
+          "from": 1,
+          "to": 4,
+          "dx": 0,
+          "dy": 30,
+          "scale": 1
+        },
+        {
+          "frames": [
+            "fx_quake"
+          ],
+          "rate": 6,
+          "from": 4,
+          "to": 5,
+          "dx": 0,
+          "dy": 8,
+          "scale": 1,
+          "sx": 5.0
+        }
+      ]
     }
   }
 }

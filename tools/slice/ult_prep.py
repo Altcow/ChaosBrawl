@@ -7,7 +7,8 @@ from PIL import Image
 ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(ROOT, '..', '..', '給GPT', '回收')
 TMP = os.path.join(ROOT, 'tmp')
-IDS = {'小孫': 'sun', '磁鈴': 'magnet', '阿熱': 'areh', '關羽': 'guanyu', '呂布': 'lubu'}
+IDS = {'小孫': 'sun', '磁鈴': 'magnet', '阿熱': 'areh', '關羽': 'guanyu', '呂布': 'lubu',
+       '小豬豬': 'piggy', '騎玉': 'qiyu', '小志': 'xiaozhi', '柯南': 'kenan', '籠卷': 'longjuan', '漫漫龜': 'manman'}
 MAG = (255, 0, 255)
 
 
@@ -41,6 +42,24 @@ for ch, cid in IDS.items():
         if cid == 'magnet' and n == 1:
             # 第 8 格(全力發射)手掌前烘進去的光束:手掌右側整塊擦掉,手臂電弧留著
             erase(im, (812, 845, 965, 935), lambda r, g, b: False)
+        if cid == 'kenan' and n == 1:
+            # 第 3 格皮帶扣中央的洋紅色寶石:改成鋼藍色,否則去背時會被當背景挖成洞
+            px = im.load()
+            for y in range(384, 409):
+                for x in range(943, 969):
+                    r, g, b = px[x, y][:3]
+                    if min(r, b) - g > 60:
+                        px[x, y] = (110 + g // 4, 150 + g // 4, 195)
+        if cid == 'manman' and n == 2:
+            # 星光(散開的小星星)與龜殼 / 地面震波要用不同的合併距離,拆成兩張圖(2a 龜殼 + 震波、2b 星星)
+            a, b = im.copy(), im.copy()
+            erase(a, (740, 150, 1448, 540), lambda r, g, b: False)
+            keep = Image.new('RGB', im.size, MAG)
+            keep.paste(im.crop((740, 150, 1448, 540)), (740, 150))
+            b = keep
+            for tag, img in (('2a', a), ('2b', b)):
+                img.save(os.path.join(TMP, 'ult_manman_%s.png' % tag))
+                print('->', 'ult_manman_%s.png' % tag, img.size)
         out = os.path.join(TMP, 'ult_%s_%d.png' % (cid, n))
         os.makedirs(TMP, exist_ok=True)
         im.save(out)
