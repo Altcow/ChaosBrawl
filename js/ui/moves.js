@@ -103,7 +103,7 @@ export function setupMoves(root, { chars, charIds, onToggle }) {
       const top = h('div', 'mv-top');
       top.append(h('b', null, m.name), h('span', 'mv-cost', 'MP ' + m.cost));
       row.append(top);
-      row.append(h('div', 'mv-cmd', dev === 'touch' ? '點「必殺技」鈕選此招(指令 ' + cmdText(m.cmd, dev, true) + ')' : cmdText(m.cmd, dev)));
+      row.append(h('div', 'mv-cmd', dev === 'touch' ? '點畫面上這招的按鈕(指令 ' + cmdText(m.cmd, dev, true) + ')' : cmdText(m.cmd, dev)));
       row.append(h('div', 'mv-desc', m.desc));
       list.append(row);
     }

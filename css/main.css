@@ -48,7 +48,17 @@ html, body {
 #touch .b-ult.ready { background: rgba(255,196,0,.55); border-color: #fff6b0; color: #000; animation: ultPulse .5s ease-in-out infinite alternate; }
 @keyframes ultPulse { from { box-shadow: 0 0 4px 1px rgba(255,196,0,.6); } to { box-shadow: 0 0 16px 6px rgba(255,246,176,.95); } }
 
-/* ---- 必殺展開面板 / 大招提示(觸控) ---- */
+/* ---- 必殺直接鈕 / 大招提示(觸控) ---- */
+#touch .sp-bar { position: absolute; right: 90px; bottom: 112px; display: flex; flex-direction: row-reverse; gap: 5px; z-index: 4; pointer-events: none; }
+#touch .sp-btn {
+  width: 56px; height: 58px; border-radius: 12px; border: 2px solid rgba(255,255,255,.6); pointer-events: auto; touch-action: none;
+  background: rgba(30,34,46,.78); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+}
+#touch .sp-btn b { font-size: 12px; line-height: 1.15; font-weight: bold; }
+#touch .sp-btn span { font-size: 10px; color: #cdd; line-height: 1.2; }
+#touch .sp-btn.down { background: rgba(255,255,255,.45); }
+#touch .sp-btn.off { opacity: .35; filter: grayscale(1); }
+
 #touch .sp-mask { position: absolute; inset: 0; pointer-events: auto; touch-action: none; display: none; z-index: 5; }
 #touch .sp-mask.show { display: block; }
 #touch .sp-panel {

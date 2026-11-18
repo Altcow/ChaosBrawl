@@ -7,6 +7,7 @@ import { ULT_MACRO } from '../sim/command.js';
 // 大招鈕:爆氣滿(100)才亮起,點一下排入 ULT_MACRO;爆氣來源:主程式呼叫 setRage(0~1),沒呼叫時讀 window.__cb.world
 const STICK_R = 56;
 const DEAD = 0.25;
+const RUN_R = 0.8; // 搖桿推到 80% 以上(左右)= 自動跑
 const RAGE_FULL = 100 * 256; // 爆氣滿值(sim/ult.js RAGE_MAX = 100 * FX,FX = 256)
 
 export function setupTouch(root, input, onAssist, getSpecials) {
@@ -19,6 +20,7 @@ export function setupTouch(root, input, onAssist, getSpecials) {
 
   const btnBits = { atk: 0, jump: 0, def: 0 };
   let stickBits = 0;
+  let runArmed = true;
   const emit = () => input.setTouch(stickBits | btnBits.atk | btnBits.jump | btnBits.def);
 
   // 搖桿
@@ -53,12 +55,21 @@ export function setupTouch(root, input, onAssist, getSpecials) {
     knob.style.left = ox + dx + 'px';
     knob.style.top = oy + dy + 'px';
     stickBits = mag < STICK_R * DEAD ? 0 : dirBits(Math.atan2(dy, dx));
+    // 推到最外圈且偏左右 → 送出「連點兩下」的輸入讓角色跑起來;收回內圈再重新武裝
+    const horiz = stickBits & (BIT.LEFT | BIT.RIGHT);
+    if (mag >= STICK_R * RUN_R && horiz && runArmed) {
+      runArmed = false;
+      input.queueRun('P1');
+    } else if (mag < STICK_R * 0.6) {
+      runArmed = true;
+    }
     emit();
   });
   const endStick = (e) => {
     if (e.pointerId !== sid) return;
     sid = null;
     stickBits = 0;
+    runArmed = true;
     hint.style.display = '';
     base.style.display = 'none';
     knob.style.display = 'none';
@@ -72,68 +83,48 @@ export function setupTouch(root, input, onAssist, getSpecials) {
   addButton('atk', '攻', 'b-atk', BIT.ATK);
   addButton('jump', '跳', 'b-jump', BIT.JUMP);
   addButton('def', '防', 'b-def', BIT.DEF);
-  const sp = el('div', 'btn b-sp');
-  sp.textContent = '必殺技';
-  root.append(sp);
-  const spMask = el('div', 'sp-mask');
-  const spPanel = el('div', 'sp-panel');
-  root.append(spMask, spPanel);
-  let spChips = [];
-  const spOpen = () => spPanel.classList.contains('show');
-  const spClose = () => {
-    spPanel.classList.remove('show');
-    spMask.classList.remove('show');
-    sp.classList.remove('down');
-  };
+  // 必殺技:每招一顆直接按鈕(一點就放,不用先展開面板);MP 不足的灰色
+  const spBar = el('div', 'sp-bar');
+  root.append(spBar);
+  let spBtns = [];
+  let spSig = '';
   const spPaint = () => {
     const d = getSpecials && getSpecials();
-    if (!d || d.items.length !== spChips.length) return;
-    spChips.forEach((c, i) => c.classList.toggle('off', d.mp < d.items[i].cost * 256));
+    if (!d || d.items.length !== spBtns.length) return;
+    spBtns.forEach((c, i) => c.classList.toggle('off', d.mp < d.items[i].cost * 256));
   };
   const spBuild = () => {
     const d = getSpecials && getSpecials();
-    spPanel.innerHTML = '';
-    spChips = [];
-    if (!d || !d.items.length) return false;
-    spPanel.style.gridTemplateColumns = d.items.length > 1 ? '1fr 1fr' : '1fr';
+    const sig = d ? d.items.map((it) => it.cmd + it.name).join('|') : '';
+    if (sig === spSig) return;
+    spSig = sig;
+    spBar.innerHTML = '';
+    spBtns = [];
+    if (!d || !d.items.length) return;
     d.items.forEach((it) => {
-      const c = el('div', 'sp-chip');
+      const c = el('div', 'sp-btn');
       const a = el('b', '');
       a.textContent = it.name;
       const b = el('span', '');
-      b.textContent = it.short + '  MP' + it.cost;
+      b.textContent = 'MP' + it.cost;
       c.append(a, b);
       c.addEventListener('pointerdown', (e) => {
         e.preventDefault();
         e.stopPropagation();
         if (c.classList.contains('off')) return;
-        spClose();
+        c.classList.add('down');
         if (onAssist) onAssist(it.cmd);
       });
-      spPanel.append(c);
-      spChips.push(c);
+      const up = () => c.classList.remove('down');
+      c.addEventListener('pointerup', up);
+      c.addEventListener('pointercancel', up);
+      c.addEventListener('pointerleave', up);
+      spBar.append(c);
+      spBtns.push(c);
     });
     spPaint();
-    return true;
   };
-  sp.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    if (spOpen()) {
-      spClose();
-      return;
-    }
-    if (!spBuild()) {
-      if (onAssist) onAssist();
-      return;
-    }
-    sp.classList.add('down');
-    spPanel.classList.add('show');
-    spMask.classList.add('show');
-  });
-  spMask.addEventListener('pointerdown', (e) => {
-    e.preventDefault();
-    spClose();
-  });
+  const spClose = () => {};
 
   // 大招鈕:rageRatio = null(未知,視為可按)/ 0~1
   const ult = el('div', 'btn b-ult');
@@ -166,7 +157,8 @@ export function setupTouch(root, input, onAssist, getSpecials) {
   let raf = 0;
   const poll = () => {
     raf = requestAnimationFrame(poll);
-    if (spOpen()) spPaint();
+    spBuild();
+    spPaint();
     if (Date.now() - manualAt < 500) return;
     const w = window.__cb && window.__cb.world;
     let r = null;
@@ -210,6 +202,8 @@ export function setupTouch(root, input, onAssist, getSpecials) {
   return {
     show() {
       root.classList.add('show');
+      spSig = '';
+      spBuild();
       if (!raf) raf = requestAnimationFrame(poll);
     },
     hide() {

@@ -15,6 +15,7 @@ export class Input {
     this.keys = { P1: 0, P2: 0 };
     this.touch = 0;
     this.macros = {};
+    this.runq = {};
     this.padY = {};
   }
   attach() {
@@ -49,11 +50,20 @@ export class Input {
   queueMacro(src, bytes) {
     this.macros[src] = bytes.slice();
   }
+  // 觸控自動跑:把左右方向在接下來幾個 tick 內「放開、按下、放開、按下」,等於連點兩下(引擎判讀為跑)
+  queueRun(src) {
+    const q = [];
+    for (let i = 0; i < 3; i++) q.push(1);
+    for (let i = 0; i < 3; i++) q.push(0);
+    for (let i = 0; i < 3; i++) q.push(1);
+    this.runq[src] = q;
+  }
   clear() {
     this.keys.P1 = 0;
     this.keys.P2 = 0;
     this.touch = 0;
     this.macros = {};
+    this.runq = {};
   }
   _pad(n) {
     const list = navigator.getGamepads ? navigator.getGamepads() : [];
@@ -92,6 +102,8 @@ export class Input {
     if (src === 'P1') b = this.keys.P1 | this.touch;
     else if (src === 'P2') b = this.keys.P2;
     else if (src && src[0] === 'G') b = this._pad(parseInt(src.slice(1), 10) - 1);
+    const rq = this.runq[src];
+    if (rq && rq.length && rq.shift()) b &= ~(BIT.LEFT | BIT.RIGHT);
     const m = this.macros[src];
     if (m && m.length) b |= m.shift();
     return b;
