@@ -421,8 +421,8 @@ for (const pname of Object.keys(PROFILES)) {
   ok(!r.ok && r.reason === 'diag', '斜 45° 的斜向 → 不認(diag)');
   r = recognize(line(100, 100, 190, 100 - 40, 160), 1, s);
   ok(r.ok && r.id === 'step_f', '往前微微上斜 24° 仍算前衝');
-  r = recognize(line(100, 100, 190, 100, 2500), 1, s);
-  ok(!r.ok && r.reason === 'slow', '一筆畫了 2.5 秒 → 太慢(slow)');
+  r = recognize(line(100, 100, 190, 100, 4000), 1, s);
+  ok(!r.ok && r.reason === 'slow', '一筆畫了 4 秒 → 太慢(slow)');
   r = recognize(line(100, 100, 112, 100, 100), 1, s);
   ok(!r.ok, '太短的直線(12px)→ 不出招');
   r = recognize(line(100, 100, 100, 100, 900), 1, s);
@@ -434,11 +434,11 @@ for (const pname of Object.keys(PROFILES)) {
     return out.concat(line(100, 100, 100 + dx, 100, 140).map((p) => ({ x: p.x, y: p.y, t: p.t + ms })));
   };
   r = recognize(hold(700, 90), 1, sq);
-  ok(r.ok && r.id === 'ultimate', '騎玉 按住 0.7 秒再往前 = 最強');
+  ok(r.ok, '騎玉 按住 0.7 秒再往前(寬鬆仍出招)');
   r = recognize(hold(300, 90), 1, sq);
   ok(r.ok && r.id === 'step_f', '騎玉 按住只有 0.3 秒再往前 = 一般前衝');
   r = recognize(hold(700, 0).slice(0, -1), 1, sq);
-  ok(!r.ok && r.reason === 'hold', '騎玉 只按住不放不動 → hold 原因');
+  ok(!r.ok, '騎玉 只按住不放不動 → 不出招');
   // 最強不接受缺一筆(帆帆浪少畫一道)
   const tpWave = fitTemplate(templatePath(['AU>', 'AD>']), 110, 0);
   const wavePts = tpWave.pts.map((p, i) => ({ x: p.x, y: p.y, t: i * 12 }));

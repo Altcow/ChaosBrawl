@@ -34,8 +34,8 @@ export const PARAMS = {
   arcLenMin: 42, // 半月路徑長下限(文件 50)
   circleLenMin: 55, // 一圈路徑長下限
   chordTol: 40, // 半月弦與水平 / 垂直的容忍角
-  maxMs: 1500, // MP 招 / 月步一筆時限
-  maxMsUlt: 2200, // 最強時限
+  maxMs: 2500, // MP 招 / 月步一筆時限
+  maxMsUlt: 3500, // 最強時限
   maxPoints: 420 // 重新取樣後最多點數(超過視為亂畫)
 };
 
@@ -503,21 +503,18 @@ export function recognize(points, face, set, P) {
     res.reason = tk.bad === 'hold' && !hasHold ? 'tap' : tk.bad;
     return res;
   }
-  // 有任何一筆無法分類(太短 / 斜向 / 弧度不夠…)就整筆不算,避免把殘缺的手勢當成別招
-  if (tk.bad) {
-    res.reason = tk.bad;
-    res.nearest = near();
+  // 寬鬆模式:斜向 / 弧度不夠的筆畫都不再整筆作廢,直接拿辨識到的筆畫找最接近的招(放錯招也沒關係)
+  let hit = set.find((g) => same(g.seq, tk.tokens));
+  if (!hit && tk.tokens.every((t) => t === 'H')) {
+    res.reason = 'hold';
     return res;
   }
-  let hit = set.find((g) => same(g.seq, tk.tokens));
   if (!hit) {
-    // 寬鬆:非最強,編輯距離最小且 <= 1,並且唯一
-    const cand = set.filter((g) => !g.strict).map((g) => ({ g, d: editDistance(tk.tokens, g.seq) })).sort((a, b) => a.d - b.d);
-    if (cand.length && cand[0].d <= 1 && (cand.length < 2 || cand[1].d >= cand[0].d + 1)) {
-      // 寬鬆命中時,最強仍不能是更近的答案(避免漏畫一筆的最強變成小招)
-      const ultD = Math.min(...set.filter((g) => g.strict).map((g) => editDistance(tk.tokens, g.seq)), 99);
-      if (ultD > cand[0].d) hit = cand[0].g;
-    }
+    const cand = set.map((g) => ({ g, d: editDistance(tk.tokens, g.seq) })).sort((a, b) => a.d - b.d || (a.g.strict ? 1 : 0) - (b.g.strict ? 1 : 0));
+    const pick = cand.find((c) => !c.g.strict) || null;
+    const ult = cand.find((c) => c.g.strict);
+    if (ult && ult.d <= 1 && (!pick || ult.d < pick.d)) hit = ult.g;
+    else if (pick) hit = pick.g;
   }
   if (!hit) {
     res.reason = tk.bad || 'unknown';
