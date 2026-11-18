@@ -439,6 +439,13 @@ async function boot() {
   tip = setupTip($('tip'), { isTouch: () => hasTouch });
   $('btn-moves').addEventListener('click', () => openMoves());
   $('btn-help-tip').addEventListener('click', () => tip.show(true));
+  $('btn-clear-cache')?.addEventListener('click', async () => {
+    try {
+      if (navigator.serviceWorker) for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister();
+      if (window.caches) for (const k of await caches.keys()) await caches.delete(k);
+    } catch (e) { console.warn(e); }
+    location.reload();
+  });
   $('btn-guide-help')?.addEventListener('click', () => guide && gd && guide.open(home.getPrefChar() === 'random' ? null : home.getPrefChar()));
   room = setupRoom($('menu'), { chars, stage, charIds: ids, getChar: () => home.getChar(), onSession: startOnline });
   $('btn-net-back').onclick = () => home.showScreen('home');
