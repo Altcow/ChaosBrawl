@@ -120,7 +120,9 @@ function pathGet(o, p) {
 
 // 由狀態與 tick 選幀名;找不到回 null
 export function pickFrame(art, f, def) {
-  const anim = (f.move && art.moves && art.moves[f.move]) || (art.states && art.states[STATE_NAMES[f.state].toLowerCase()]);
+  let anim = (f.move && art.moves && art.moves[f.move]) || (art.states && art.states[STATE_NAMES[f.state].toLowerCase()]);
+  // 月步沒有專屬美術:前衝 / 上下閃用 dash 幀,後滑用 runstop(煞車姿勢),沒有就退到 dash
+  if (!anim && f.state === S.STEP && art.states) anim = (f.stepK === 2 && art.states.runstop) || art.states.dash || art.states.runstop;
   if (!anim || !anim.frames || !anim.frames.length) return null;
   const fr = anim.frames;
   const n = fr.length;
