@@ -22,18 +22,18 @@ export const PARAMS = {
   minStroke: 24, // 直線至少多長(含半個轉角)
   lineTol: 35, // 直線方向與四向的容忍角(超過 55 度為斜向 → 不認)
   diagTol: 55,
-  arcMin: 115, // 半月累積轉角下限(文件 130;弧尾常被擬合分給接下來的轉角,量到會偏小)
+  arcMin: 70, // 半月累積轉角下限(文件 130;弧尾常被擬合分給接下來的轉角,量到會偏小)
   arcMax: 270, // 半月上限(之上 = 圈)
   circleMax: 520, // 一圈上限(之上 = 兩圈)
   circle2Max: 930,
   c8Min: 260, // 8 字每個圈至少
   cornerMaxA: 215, // 轉彎累積角度超過此就不可能是轉角(接近封閉的小圈)
   uChord: 26, // 反折(U 型)的弦長上限;超過才算半月
-  quarterChord: 30, // 小於半圓的轉彎,弦長超過這個才被視為「弧度不夠」,否則是轉角
-  arcChordMin: 28, // 半月弦長下限(文件 32)
-  arcLenMin: 42, // 半月路徑長下限(文件 50)
-  circleLenMin: 55, // 一圈路徑長下限
-  chordTol: 40, // 半月弦與水平 / 垂直的容忍角
+  quarterChord: 20, // 小於半圓的轉彎,弦長超過這個才被視為「弧度不夠」,否則是轉角
+  arcChordMin: 18, // 半月弦長下限(文件 32)
+  arcLenMin: 30, // 半月路徑長下限(文件 50)
+  circleLenMin: 38, // 一圈路徑長下限
+  chordTol: 55, // 半月弦與水平 / 垂直的容忍角
   maxMs: 2500, // MP 招 / 月步一筆時限
   maxMsUlt: 3500, // 最強時限
   maxPoints: 420 // 重新取樣後最多點數(超過視為亂畫)
@@ -464,7 +464,14 @@ function arcToken(q, r, p0, p1, P) {
 }
 
 // ---------------------------------------------------------------- 比對
-const SIMILAR = { 'C1|C2': 0.5 };
+const SIMILAR = { 'C1|C2': 0.4 };
+for (const a of ['AU>', 'AU<', 'AD>', 'AD<', 'AF↓', 'AF↑', 'AB↓', 'AB↑']) {
+  SIMILAR[a + '|C1'] = 0.5;
+  for (const b of ['AU>', 'AU<', 'AD>', 'AD<', 'AF↓', 'AF↑', 'AB↓', 'AB↑']) if (a !== b) SIMILAR[a + '|' + b] = 0.5;
+}
+// 弧 ↔ 直線:弦方向一致時算相近
+const ARCLINE = { 'AU>': 'F', 'AD>': 'F', 'AU<': 'B', 'AD<': 'B', 'AF↓': 'D', 'AB↓': 'D', 'AF↑': 'U', 'AB↑': 'U' };
+for (const a in ARCLINE) SIMILAR[a + '|' + ARCLINE[a]] = 0.4;
 function subCost(a, b) {
   if (a === b) return 0;
   return SIMILAR[a + '|' + b] || SIMILAR[b + '|' + a] || 1;
