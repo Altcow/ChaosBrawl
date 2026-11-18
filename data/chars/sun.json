@@ -10,8 +10,8 @@
   "color": "#e67e22",
   "hp": 480,
   "mp": 500,
-  "mpStart": 200,
-  "mpRegen": 6,
+  "mpStart": 300,
+  "mpRegen": 14,
   "assist": "sp_fwd_atk",
   "ai": {
     "style": "melee",
@@ -97,16 +97,17 @@
               "w": 52,
               "h": 20,
               "zr": 12,
-              "dmg": 30,
+              "dmg": 12,
               "fall": 20,
-              "bdef": 17,
+              "bdef": 9,
               "kx": 2,
               "ky": 0,
               "stun": 12,
               "stop": 3,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
@@ -114,7 +115,8 @@
           "wait": 12,
           "mvx": 0
         }
-      ]
+      ],
+      "basic": true
     },
     "attack2": {
       "next": "attack3",
@@ -134,16 +136,17 @@
               "w": 52,
               "h": 20,
               "zr": 12,
-              "dmg": 30,
+              "dmg": 12,
               "fall": 20,
-              "bdef": 17,
+              "bdef": 9,
               "kx": 2,
               "ky": 0,
               "stun": 12,
               "stop": 3,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
@@ -151,7 +154,8 @@
           "wait": 12,
           "mvx": 0
         }
-      ]
+      ],
+      "basic": true
     },
     "attack3": {
       "cancel": 8,
@@ -170,16 +174,17 @@
               "w": 56,
               "h": 24,
               "zr": 12,
-              "dmg": 40,
+              "dmg": 16,
               "fall": 60,
-              "bdef": 35,
+              "bdef": 18,
               "kx": 4,
               "ky": 6,
               "stun": 20,
               "stop": 6,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
@@ -187,7 +192,8 @@
           "wait": 16,
           "mvx": 0
         }
-      ]
+      ],
+      "basic": true
     },
     "runatk": {
       "cancel": 0,
@@ -206,16 +212,17 @@
               "w": 56,
               "h": 24,
               "zr": 12,
-              "dmg": 40,
+              "dmg": 16,
               "fall": 100,
-              "bdef": 35,
+              "bdef": 18,
               "kx": 5,
               "ky": 6,
               "stun": 20,
               "stop": 6,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
@@ -223,7 +230,8 @@
           "wait": 14,
           "mvx": 1
         }
-      ]
+      ],
+      "basic": true
     },
     "jumpatk": {
       "cancel": 0,
@@ -240,23 +248,25 @@
               "w": 48,
               "h": 30,
               "zr": 12,
-              "dmg": 35,
+              "dmg": 14,
               "fall": 60,
-              "bdef": 20,
+              "bdef": 10,
               "kx": 3,
               "ky": 3,
               "stun": 14,
               "stop": 4,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
         {
           "wait": 8
         }
-      ]
+      ],
+      "basic": true
     },
     "dashatk": {
       "cancel": 0,
@@ -273,26 +283,28 @@
               "w": 54,
               "h": 30,
               "zr": 12,
-              "dmg": 40,
+              "dmg": 16,
               "fall": 100,
-              "bdef": 35,
+              "bdef": 18,
               "kx": 5,
               "ky": 5,
               "stun": 20,
               "stop": 6,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
         {
           "wait": 8
         }
-      ]
+      ],
+      "basic": true
     },
     "sp_fwd_atk": {
-      "cost": 125,
+      "cost": 90,
       "cancel": 0,
       "frames": [
         {
@@ -312,7 +324,7 @@
       ]
     },
     "sp_fwd_jump": {
-      "cost": 125,
+      "cost": 90,
       "cancel": 0,
       "frames": [
         {
@@ -335,7 +347,7 @@
               "w": 56,
               "h": 50,
               "zr": 16,
-              "dmg": 50,
+              "dmg": 60,
               "fall": 100,
               "bdef": 50,
               "kx": 5,
@@ -354,7 +366,7 @@
       ]
     },
     "sp_up_atk": {
-      "cost": 100,
+      "cost": 70,
       "cancel": 0,
       "frames": [
         {
@@ -369,7 +381,7 @@
               "w": 70,
               "h": 60,
               "zr": 16,
-              "dmg": 10,
+              "dmg": 12,
               "fall": 20,
               "bdef": 17,
               "kx": 0.5,
@@ -391,7 +403,7 @@
               "w": 70,
               "h": 60,
               "zr": 16,
-              "dmg": 10,
+              "dmg": 12,
               "fall": 20,
               "bdef": 17,
               "kx": 0.5,
@@ -413,7 +425,7 @@
               "w": 70,
               "h": 60,
               "zr": 16,
-              "dmg": 10,
+              "dmg": 12,
               "fall": 20,
               "bdef": 17,
               "kx": 0.5,
@@ -435,7 +447,7 @@
               "w": 70,
               "h": 60,
               "zr": 16,
-              "dmg": 10,
+              "dmg": 12,
               "fall": 20,
               "bdef": 17,
               "kx": 0.5,
@@ -457,7 +469,7 @@
               "w": 50,
               "h": 90,
               "zr": 16,
-              "dmg": 30,
+              "dmg": 36,
               "fall": 100,
               "bdef": 50,
               "kx": 2,
@@ -523,7 +535,7 @@
         "w": 40,
         "h": 28,
         "zr": 14,
-        "dmg": 55,
+        "dmg": 66,
         "fall": 100,
         "bdef": 50,
         "kx": 6,

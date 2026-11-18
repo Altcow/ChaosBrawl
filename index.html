@@ -25,12 +25,14 @@
     <button id="btn-home" type="button">回首頁</button>
   </div>
   <div id="touch"></div>
+  <div id="trainer" class="hide"></div>
+  <div id="tut" class="hide"></div>
 </div>
 
 <div id="menu">
   <!-- 首頁:頭像列、開始、和朋友連線 / 練習場 / 更多設定 -->
   <section id="home" class="screen">
-    <header><h1>ChaosBrawl</h1><span><button id="btn-about" type="button" class="small">關於與致謝</button> <button id="btn-help" type="button" class="small">操作說明</button></span></header>
+    <header><h1>ChaosBrawl</h1><span><button id="btn-about" type="button" class="small">關於與致謝</button> <button id="btn-guide" type="button" class="small">招式手勢書</button> <button id="btn-help" type="button" class="small">操作說明</button></span></header>
     <div id="avatars"></div>
     <button id="btn-start" type="button">開始</button>
     <div id="sub-row">
@@ -53,6 +55,8 @@
       <div class="field"><label>友軍傷害</label><div id="seg-ff" class="seg"></div></div>
     </div>
     <div class="field"><button id="btn-seats" type="button">自訂每個座位 &gt;</button><span id="custom-note"></span></div>
+    <div class="field"><label>手機輔助</label><div id="seg-assist" class="seg"></div><span class="set-note">新手輔助按鈕(每招一顆鈕),只有單機 / 練習場有效,連線一律沒有</span></div>
+    <div class="field"><label>手勢小抄</label><div id="seg-ring" class="seg"></div><span class="set-note">手勢圈外圍的迷你圖示;自動 = 前 5 場顯示</span></div>
   </section>
 
   <!-- 自訂每個座位(第二層) -->
@@ -113,22 +117,24 @@
   <!-- 操作說明 -->
   <section id="help" class="screen hide">
     <header><h2>操作說明</h2><button id="btn-help-done" type="button" class="small">關閉</button></header>
-    <p>鍵盤 P1:WASD 移動、J 攻擊、K 跳、L 防禦。防禦 + 方向 + 攻擊/跳 = 必殺技(吃 MP,→ 是面對的方向;每個角色有哪些招看「招式表」,遊戲中按 H 也能開)。</p>
-    <p>最強必殺技:HUD 上標示「爆氣」的金色細條是爆氣條,滿了會閃爍並出現提示,這時按 U(或 防 + 攻 + 跳 同時按)放最強必殺技。爆氣靠出招命中(傷害每 10 點 +2)與被打(受傷每 10 點 +3、被擊倒 +5)累積。</p>
-    <p>手機:左半邊滑動移動,把搖桿推到最外圈(左或右)會自動跑;右下 攻 / 跳 / 防,上方每招必殺技各一顆按鈕,點一下就放出(MP 不足的灰色)。爆氣滿了「最強」鈕亮起閃爍,點一下放最強必殺技。左下的虛線圈是搖桿位置,手指按下後搖桿會跟著手指。</p>
+    <p>鍵盤 P1:WASD 移動、J 攻擊、L 防禦、K 步 / 技。遊戲沒有跳躍,改用月步:E 前衝、Q 後滑、R / F 縱步上 / 下(也可 K 單按 = 前衝、K + 後 / 上 / 下),靠 HUD 青色「步力條」,不吃 MP。防禦 + 方向 + 攻擊 / K = 必殺技(吃 MP,→ 是面對的方向;每個角色有哪些招看「招式表」,遊戲中按 H 也能開)。</p>
+    <p>最強必殺技:HUD 上標示「爆氣」的金色細條是爆氣條,滿了會閃爍並出現提示,這時按 U(或 防 + 攻 + K 同時按)放最強必殺技。爆氣靠出招命中(傷害每 10 點 +2)與被打(受傷每 10 點 +3、被擊倒 +5)累積。</p>
+    <p>手機:左半邊滑動移動,把搖桿推到最外圈(左或右)會自動跑。右下的大圈是「手勢圈」:用手指一筆畫出手勢,放開才出招(點一下不會有反應)。往右畫 = 前衝、往左畫 = 後滑、往上 / 下畫 = 縱步;每個角色的 3 招必殺與最強必殺技各有專屬手勢,看首頁「招式手勢書」或遊戲中的「招式表」。圈左邊的小「攻」鈕是普攻(傷害低,用來牽制)、再上面是「防」。爆氣滿了手勢圈外框會亮金光。</p>
+    <p><button id="btn-guide-help" type="button" class="small">打開招式手勢書</button></p>
     <p><button id="btn-help-tip" type="button" class="small">再看一次戰鬥操作提示</button></p>
-    <p>2P:按手把任一鍵或小鍵盤 1 即加入(方向鍵移動、小鍵盤 1 攻 / 2 跳 / 3 防、小鍵盤 4 最強必殺技)。</p>
-    <p>手把:X 攻、A 跳、B / RB 防、Y 最強必殺技。</p>
+    <p>2P:按手把任一鍵或小鍵盤 1 即加入(方向鍵移動、小鍵盤 1 攻 / 2 技 / 3 防、4 最強必殺技、6 前衝 / 5 後滑 / 8 9 縱步)。</p>
+    <p>手把:X 攻、A 單按前衝(A + 搖桿往後 / 上 / 下 = 後滑 / 縱步)、B / RB 防、Y 最強必殺技。</p>
     <p>遊戲中:Enter 或「選單」回首頁。</p>
   </section>
 </div>
 
 <div id="rotate"><div><div class="phone"></div>請把手機轉橫</div></div>
 <div id="moves" class="hide">
-  <div class="mv-head"><h2 id="mv-title"></h2><span><button id="mv-dev" type="button"></button> <button id="mv-close" type="button">關閉</button></span></div>
+  <div class="mv-head"><h2 id="mv-title"></h2><span><button id="mv-guide" type="button">手勢書</button> <button id="mv-dev" type="button"></button> <button id="mv-close" type="button">關閉</button></span></div>
   <div id="mv-tabs"></div>
   <div id="mv-body"></div>
 </div>
+<div id="guide" class="hide"></div>
 <div id="tip" class="hide"></div>
 
 <script type="module" src="js/main.js"></script>

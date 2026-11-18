@@ -1,4 +1,4 @@
-import { STATE_NAMES, S } from '../sim/fighter.js';
+import { STATE_NAMES, S, stepPower } from '../sim/fighter.js';
 
 const S_LYING = S.LYING;
 const S_FALL = S.FALL;
@@ -17,6 +17,13 @@ function bar(ctx, x, y, w, h, frac, color, back) {
 let hint = { ids: [], touch: false };
 export function setHudHint(ids, touch) {
   hint = { ids, touch: !!touch };
+}
+
+// 步力條(月步用,0~100):青色細條;引擎沒有 stepP 欄位(舊快照)時略過
+function stepBar(ctx, x, y, w, h, f) {
+  if (typeof f.stepP !== 'number') return;
+  const v = stepPower(f);
+  bar(ctx, x, y, w, h, v / 100, v < 25 ? '#3a8f98' : '#2de0d0');
 }
 
 // 爆氣條(0~100 定點數 ×256):金色;滿了閃爍;條旁標示「爆氣」
@@ -38,7 +45,7 @@ function drawUltHint(ctx, w) {
     if (f && !f.dead && !f.ult && f.rage >= 100 * 256 && w.defs[f.charId].hasUlt) ready = true;
   }
   if (!ready) return;
-  const msg = hint.touch ? '最強必殺技可用!點右側「最強」鈕 ▶' : '最強必殺技可用!按 防+攻+跳(鍵盤 U / 手把 Y)';
+  const msg = hint.touch ? '最強必殺技可用!在右下手勢圈畫最強手勢 ▶' : '最強必殺技可用!按 防+攻+K(鍵盤 U / 手把 Y)';
   ctx.font = 'bold 15px ' + FONT;
   const tw = ctx.measureText(msg).width + 24;
   ctx.globalAlpha = (Date.now() >> 8) & 1 ? 1 : 0.55;
@@ -73,6 +80,7 @@ function drawPracticeHud(ctx, w, stats, debug) {
   ctx.fillText(Math.ceil(f.hp / 256) + ' / ' + (def.hp >> 8), 16, 25);
   bar(ctx, 12, 42, 200, 8, f.mp / def.mp, '#48f');
   if (def.hasUlt) rageBar(ctx, 12, 74, 200, 6, f.rage || 0, 10, 71);
+  stepBar(ctx, 12, 69, 200, 4, f);
   bar(ctx, 12, 54, 200, 5, f.fall / 100, '#f90');
   bar(ctx, 12, 62, 200, 5, f.bdef / 100, '#6cf');
   ctx.fillStyle = '#ccc';
@@ -112,6 +120,7 @@ function drawGridHud(ctx, w, stats, debug) {
     ctx.fillRect(x + 16, y + 2, Math.min(1, f.hp / def.hp) * 100, 8);
     bar(ctx, x + 16, y + 12, 100, 3, f.mp / def.mp, '#48f');
     if (def.hasUlt) rageBar(ctx, x + 16, y + 16, 100, 3, f.rage || 0, 8, y + 14);
+    stepBar(ctx, x + 16, y + 20, 100, 2, f);
     if (w.mode.type === 'timed') {
       ctx.fillStyle = '#fff';
       ctx.font = '10px ' + FONT;

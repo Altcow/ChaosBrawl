@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { createWorld, stepWorld, serializeWorld, restoreWorld, hashWorld } from '../js/sim/world.js';
 import { BIT } from '../js/core/input.js';
-import { S, isInvuln } from '../js/sim/fighter.js';
+import { S, isInvuln, RULES } from '../js/sim/fighter.js';
 import { Rng } from '../js/core/rng.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -137,18 +137,27 @@ const P = (x, z, kind = 'human', extra = {}) => Object.assign({ charId: 'ada', k
 
 // 6. 其他狀態與數值
 {
-  const w = mk([P(400, 100)]);
-  const f = w.fighters[0];
-  let t = 0;
-  stepWorld(w, [BIT.JUMP]); t++;
-  let air = 0;
-  let maxY = 0;
-  for (; t < 80; t++) {
-    stepWorld(w, [0]);
-    if (f.y > 0) air++;
-    maxY = Math.max(maxY, f.y >> 8);
-  }
-  check('跳:滯空約 36 tick、最高約 81 px', air >= 33 && air <= 38 && maxY >= 78 && maxY <= 90, 'air=' + air + ' maxY=' + maxY);
+  // 取消跳躍(預設):單獨按跳(K / A / 觸控)不起跳(K 單按 = 前衝月步);RULES.noJump = false 時舊跳躍仍可用(舊行為比對)
+  const jumpTest = () => {
+    const w = mk([P(400, 100)]);
+    const f = w.fighters[0];
+    let t = 0;
+    stepWorld(w, [BIT.JUMP]); t++;
+    let air = 0;
+    let maxY = 0;
+    for (; t < 80; t++) {
+      stepWorld(w, [0]);
+      if (f.y > 0) air++;
+      maxY = Math.max(maxY, f.y >> 8);
+    }
+    return { air, maxY, f };
+  };
+  const nj = jumpTest();
+  check('取消跳躍:單獨按跳不離地(全程 y = 0),且觸發月步前衝', nj.air === 0 && nj.maxY === 0, 'air=' + nj.air + ' maxY=' + nj.maxY);
+  RULES.noJump = false;
+  const legacy = jumpTest();
+  RULES.noJump = true;
+  check('舊規則(RULES.noJump = false):跳滯空約 36 tick、最高約 81 px', legacy.air >= 33 && legacy.air <= 38 && legacy.maxY >= 78 && legacy.maxY <= 90, 'air=' + legacy.air + ' maxY=' + legacy.maxY);
 }
 {
   const w = mk([P(400, 100)]);

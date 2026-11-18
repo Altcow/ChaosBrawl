@@ -1,5 +1,13 @@
-// 輸入:鍵盤 / 手把 / 觸控 → 7 bit 位元組。來源:P1(鍵盤 WASD + 觸控)、P2(鍵盤方向鍵)、G1~G4(手把)
-export const BIT = { UP: 1, DOWN: 2, LEFT: 4, RIGHT: 8, ATK: 16, JUMP: 32, DEF: 64 };
+// 輸入:鍵盤 / 手把 / 觸控 → 8 bit 位元組。來源:P1(鍵盤 WASD + 觸控)、P2(鍵盤方向鍵)、G1~G4(手把)
+// BIT.STEP = 月步(取消跳躍後的位移)。步的種類編在方向位元(同 STEP_BYTE;sim 以 stepKindOf 解讀):
+//   前衝 = STEP;後滑 = STEP + 左 + 右;縱步上 = STEP + 上 + 下;縱步下 = STEP + 四向全開(依角色面向,前 / 後不需知道面向)
+export const BIT = { UP: 1, DOWN: 2, LEFT: 4, RIGHT: 8, ATK: 16, JUMP: 32, DEF: 64, STEP: 128 };
+export const STEP_BYTE = {
+  fwd: BIT.STEP,
+  back: BIT.STEP | BIT.LEFT | BIT.RIGHT,
+  up: BIT.STEP | BIT.UP | BIT.DOWN,
+  down: BIT.STEP | BIT.UP | BIT.DOWN | BIT.LEFT | BIT.RIGHT
+};
 
 const KEYMAPS = {
   P1: { KeyW: BIT.UP, KeyS: BIT.DOWN, KeyA: BIT.LEFT, KeyD: BIT.RIGHT, KeyJ: BIT.ATK, KeyK: BIT.JUMP, KeyL: BIT.DEF },
@@ -8,6 +16,11 @@ const KEYMAPS = {
 const PAD_DEAD = 0.35;
 const ULT_KEY = 'KeyU'; // P1 鍵盤大招(也可防+攻+跳同時按);手把 Y(button 3)
 const ULT_KEY_P2 = 'Numpad4';
+// 月步鍵(按下瞬間排入一步):P1 E 前衝 / Q 後滑 / R 縱步上 / F 縱步下;P2 數字鍵 6 / 5 / 8 / 9。K / 手把 A(JUMP 位元)單按 = 前衝(加方向鍵:K+上 / 下 = 縱步、K+後 = 後滑)
+const STEP_KEYS = {
+  P1: { KeyE: 'fwd', KeyQ: 'back', KeyR: 'up', KeyF: 'down' },
+  P2: { Numpad6: 'fwd', Numpad5: 'back', Numpad8: 'up', Numpad9: 'down' }
+};
 const ULT_BITS = [BIT.DEF | BIT.ATK | BIT.JUMP, 0]; // 同 sim/ult.js ULT_MACRO(core 不反向 import sim)
 
 export class Input {
@@ -23,6 +36,13 @@ export class Input {
       if (!e.repeat && (e.code === ULT_KEY || e.code === ULT_KEY_P2)) {
         this.queueMacro(e.code === ULT_KEY ? 'P1' : 'P2', ULT_BITS);
         e.preventDefault();
+      }
+      for (const src in STEP_KEYS) {
+        const k = STEP_KEYS[src][e.code];
+        if (k) {
+          if (!e.repeat) this.queueStep(src, k);
+          e.preventDefault();
+        }
       }
       for (const src in KEYMAPS) {
         const b = KEYMAPS[src][e.code];
@@ -49,6 +69,12 @@ export class Input {
   // 排入一串逐 tick 的輸入(觸控必殺輔助鍵用)
   queueMacro(src, bytes) {
     this.macros[src] = bytes.slice();
+  }
+  // 排入一步月步(kind: 'fwd' | 'back' | 'up' | 'down';前 / 後依角色面向,由引擎判讀)。已有巨集進行中則接在後面
+  queueStep(src, kind) {
+    const b = STEP_BYTE[kind];
+    if (!b) return;
+    this.macros[src] = (this.macros[src] || []).concat([b, 0]);
   }
   // 觸控自動跑:把左右方向在接下來幾個 tick 內「放開、按下、放開、按下」,等於連點兩下(引擎判讀為跑)
   queueRun(src) {

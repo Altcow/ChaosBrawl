@@ -39,17 +39,28 @@ html, body {
   color: #fff; font-size: 17px; font-weight: bold;
 }
 #touch .btn.down { background: rgba(255,255,255,.4); }
-#touch .b-atk { width: 84px; height: 84px; right: 18px; bottom: 16px; }
-#touch .b-jump { width: 72px; height: 72px; right: 114px; bottom: 28px; }
-#touch .b-def { width: 64px; height: 64px; right: 196px; bottom: 16px; }
-#touch .b-sp { width: 60px; height: 60px; right: 126px; bottom: 112px; font-size: 14px; }
-#touch .b-ult { width: 62px; height: 62px; right: 18px; bottom: 112px; font-size: 15px; }
+#touch .b-atk { width: 58px; height: 58px; right: 201px; bottom: 21px; font-size: 15px; }
+#touch .b-def { width: 64px; height: 64px; right: 178px; bottom: 148px; }
+#touch .b-ult { width: 62px; height: 62px; right: 18px; bottom: 220px; font-size: 15px; }
 #touch .b-ult.off { opacity: .45; filter: grayscale(1); }
 #touch .b-ult.ready { background: rgba(255,196,0,.55); border-color: #fff6b0; color: #000; animation: ultPulse .5s ease-in-out infinite alternate; }
 @keyframes ultPulse { from { box-shadow: 0 0 4px 1px rgba(255,196,0,.6); } to { box-shadow: 0 0 16px 6px rgba(255,246,176,.95); } }
 
-/* ---- 必殺直接鈕 / 大招提示(觸控) ---- */
-#touch .sp-bar { position: absolute; right: 90px; bottom: 112px; display: flex; flex-direction: row-reverse; gap: 5px; z-index: 4; pointer-events: none; }
+/* ---- 手勢圈(右下,直徑 150、判定 170)---- */
+#touch .g-pad { position: absolute; right: 15px; bottom: 15px; width: 170px; height: 170px; border-radius: 50%; pointer-events: auto; touch-action: none; display: flex; align-items: center; justify-content: center; }
+#touch .g-disc { width: 150px; height: 150px; border-radius: 50%; border: 3px solid rgba(255,255,255,.5); background: radial-gradient(circle, rgba(255,255,255,.04) 0, rgba(255,255,255,.12) 100%); pointer-events: none; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.28); font-size: 15px; letter-spacing: 2px; }
+#touch .g-disc.ready { border-color: #ffe566; animation: padGlow .9s ease-in-out infinite alternate; }
+@keyframes padGlow { from { box-shadow: 0 0 6px 2px rgba(255,200,40,.55), inset 0 0 8px rgba(255,200,40,.25); } to { box-shadow: 0 0 22px 8px rgba(255,236,120,.95), inset 0 0 18px rgba(255,220,80,.5); } }
+#touch .g-ring { position: absolute; right: 0; bottom: 0; width: 200px; height: 200px; pointer-events: none; }
+#touch .g-icon { position: absolute; width: 30px; height: 30px; border-radius: 50%; background: rgba(20,24,34,.75); border: 1px solid rgba(255,255,255,.35); color: #6b7280; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+#touch .g-icon svg { display: block; }
+#touch .g-icon.lit { color: #fff; border-color: rgba(255,255,255,.8); }
+#touch .g-icon.ult { border-color: rgba(255,196,0,.7); }
+#touch .g-icon.ult.lit { color: #ffe566; border-color: #ffe566; box-shadow: 0 0 8px rgba(255,220,80,.8); }
+#touch .g-canvas { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+
+/* ---- 新手輔助按鈕(設定開啟才出現;單機 / 練習場)---- */
+#touch .sp-bar { position: absolute; right: 90px; bottom: 220px; display: flex; flex-direction: row-reverse; gap: 5px; z-index: 4; pointer-events: none; }
 #touch .sp-btn {
   width: 56px; height: 58px; border-radius: 12px; border: 2px solid rgba(255,255,255,.6); pointer-events: auto; touch-action: none;
   background: rgba(30,34,46,.78); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
@@ -58,31 +69,6 @@ html, body {
 #touch .sp-btn span { font-size: 10px; color: #cdd; line-height: 1.2; }
 #touch .sp-btn.down { background: rgba(255,255,255,.45); }
 #touch .sp-btn.off { opacity: .35; filter: grayscale(1); }
-
-#touch .sp-mask { position: absolute; inset: 0; pointer-events: auto; touch-action: none; display: none; z-index: 5; }
-#touch .sp-mask.show { display: block; }
-#touch .sp-panel {
-  position: absolute; right: 18px; bottom: 182px; width: 232px; z-index: 6; display: none;
-  grid-template-columns: 1fr 1fr; gap: 6px; pointer-events: auto;
-}
-#touch .sp-panel.show { display: grid; }
-#touch .sp-chip {
-  min-height: 46px; padding: 4px 6px; border-radius: 10px; border: 2px solid rgba(255,255,255,.55);
-  background: rgba(30,34,46,.92); color: #fff; display: flex; flex-direction: column; justify-content: center;
-  align-items: center; text-align: center; touch-action: none;
-}
-#touch .sp-chip b { font-size: 13px; line-height: 1.2; }
-#touch .sp-chip span { font-size: 10px; color: #cdd; line-height: 1.2; }
-#touch .sp-chip:active { background: rgba(255,255,255,.35); }
-#touch .sp-chip.off { opacity: .35; filter: grayscale(1); }
-#touch .b-sp.down { background: rgba(255,255,255,.4); }
-#touch .ult-tip {
-  position: absolute; right: 8px; bottom: 178px; display: none; pointer-events: none; z-index: 3;
-  padding: 3px 10px; border-radius: 12px; background: rgba(0,0,0,.65); color: #ffd84a; font-size: 13px; font-weight: bold;
-  animation: tipBlink .6s ease-in-out infinite alternate;
-}
-#touch .ult-tip.show { display: block; }
-@keyframes tipBlink { from { opacity: 1; } to { opacity: .45; } }
 
 /* ---- 招式表面板(首頁與遊戲中共用) ---- */
 #moves {
@@ -223,7 +209,7 @@ body.debug .dev { display: inline-block; }
   #avatars { margin: 2px 0 6px; }
   #btn-start { height: 48px; margin-bottom: 6px; }
 }
-#home { overflow-y: auto !important; }
+#home, #help, #more { overflow-y: auto !important; }
 
 #rotate {
   position: fixed; inset: 0; z-index: 30; background: #14161c;
@@ -237,3 +223,75 @@ body.debug .dev { display: inline-block; }
 @media (orientation: portrait) {
   #rotate { display: flex; }
 }
+
+/* ---- 練習場手勢訓練面板 ---- */
+#trainer { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); z-index: 6; width: 330px; max-width: 58%; background: rgba(14,18,26,.82); border: 1px solid #556; border-radius: 10px; padding: 4px 6px 5px; }
+#trainer.hide { display: none; }
+#trainer .tr-row { display: flex; gap: 3px; justify-content: center; }
+#trainer .tr-btn { width: 33px; height: 30px; padding: 0; border-radius: 7px; border: 1px solid #667; background: #222733; color: #aab; display: flex; align-items: center; justify-content: center; }
+#trainer .tr-btn.on { background: #2f6f4a; border-color: #8d8; color: #fff; }
+#trainer .tr-btn.done { box-shadow: inset 0 0 0 2px #ffd23a; }
+#trainer .tr-info { margin-top: 3px; font-size: 12px; line-height: 1.35; color: #cdd; text-align: center; min-height: 16px; }
+#trainer .tr-info b { color: #ffd84a; }
+#trainer .tr-info .star { color: #ffd23a; }
+#trainer .tr-opt { display: flex; gap: 6px; justify-content: center; margin-top: 3px; }
+#trainer .tr-opt button { height: 24px; font-size: 12px; padding: 0 8px; border-radius: 6px; border: 1px solid #667; background: #222733; color: #ccd; }
+
+/* ---- 首次戰鬥互動教學 ---- */
+#tut { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); z-index: 6; width: 340px; max-width: 58%; background: rgba(14,18,26,.9); border: 2px solid #8d8; border-radius: 10px; padding: 6px 10px 6px; text-align: center; }
+#tut.hide { display: none; }
+#tut b { color: #ffd84a; font-size: 14px; }
+#tut div { font-size: 13px; line-height: 1.4; color: #dde; margin: 2px 0 4px; }
+#tut button { height: 26px; font-size: 12px; padding: 0 12px; border-radius: 6px; border: 1px solid #667; background: #222733; color: #ccd; }
+#tut .ok { color: #8d8; font-weight: bold; }
+
+/* ---- 招式手勢書(滿版頁面,只有左上返回)---- */
+#guide { position: fixed; inset: 0; z-index: 25; background: #0a0c10; display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); touch-action: pan-y; }
+#guide.hide { display: none; }
+#guide button { font-family: inherit; }
+#guide .gd-head { display: flex; align-items: center; gap: 10px; padding: 6px 12px 2px; }
+#guide .gd-back { height: 34px; padding: 0 12px; font-size: 14px; border-radius: 8px; border: 1px solid #556; background: #222733; color: #eee; }
+#guide h2 { margin: 0; font-size: 17px; color: #8d8; }
+#guide .gd-sub { margin-left: auto; font-size: 12px; color: #99a; }
+#gd-tabs { display: flex; gap: 4px; padding: 4px 12px; overflow-x: auto; flex: none; touch-action: pan-x; }
+#gd-tabs button { flex: none; height: 28px; font-size: 13px; padding: 2px 10px; border-radius: 8px; border: 1px solid #556; background: #222733; color: #eee; }
+#gd-tabs button.on { background: #3a7; color: #08140c; border-color: #3a7; font-weight: bold; }
+#gd-body { flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; padding: 2px 12px 12px; }
+.gd-steps { font-size: 12px; color: #cdd; background: #1b1f2a; border-radius: 8px; padding: 5px 10px; margin: 4px 0 6px; line-height: 1.5; }
+.gd-steps b { color: #ffd84a; }
+.gd-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.gd-card { background: #1b1f2a; border-radius: 10px; padding: 6px 8px 8px; display: flex; flex-direction: column; gap: 3px; min-width: 0; border: 2px solid transparent; }
+.gd-card.ult { border-color: #6a5a1a; }
+.gd-card.done { border-color: #3a7; }
+.gd-name { display: flex; justify-content: space-between; align-items: baseline; font-size: 14px; font-weight: bold; gap: 4px; }
+.gd-name .gd-cost { font-size: 12px; color: #6cf; font-weight: normal; white-space: nowrap; }
+.gd-card.ult .gd-cost { color: #ffc400; }
+.gd-svg { background: #11141c; border-radius: 8px; display: flex; justify-content: center; padding: 2px 0; }
+.gd-svg svg { width: 100%; max-width: 120px; height: 84px; }
+.gd-sym { font-size: 13px; color: #ffd84a; text-align: center; }
+.gd-fam { font-size: 11px; color: #99a; text-align: center; }
+.gd-desc { font-size: 12px; color: #cdd; line-height: 1.4; }
+.gd-tip { font-size: 12px; color: #8d8; }
+.gd-act { display: flex; align-items: center; gap: 6px; margin-top: auto; }
+.gd-act button { height: 26px; font-size: 12px; padding: 0 10px; border-radius: 6px; border: 1px solid #667; background: #2a6; color: #fff; }
+.gd-act .gd-ok { color: #ffd23a; font-size: 12px; }
+.gd-fams { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px 10px; }
+.gd-fam-card { background: #1b1f2a; border-radius: 8px; padding: 5px 8px; display: flex; gap: 8px; align-items: center; }
+.gd-fam-card .gd-svg { flex: none; width: 74px; }
+.gd-fam-card .gd-svg svg { height: 56px; }
+.gd-fam-card div.t { font-size: 12px; color: #cdd; line-height: 1.4; }
+.gd-fam-card div.t b { color: #ffd84a; font-size: 13px; }
+#guide h3 { margin: 8px 0 3px; font-size: 14px; color: #8d8; }
+#guide ul { margin: 2px 0; padding-left: 18px; font-size: 13px; line-height: 1.5; color: #dde; }
+.gd-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: #cdd; }
+.gd-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; vertical-align: -2px; margin-right: 4px; }
+@media (max-width: 760px) { .gd-grid { grid-template-columns: repeat(2, 1fr); } .gd-fams { grid-template-columns: 1fr; } }
+@media (max-height: 420px) { #guide .gd-head { padding: 3px 12px 0; } #gd-tabs { padding: 3px 12px; } .gd-svg svg { height: 64px; } }
+
+/* ---- 招式表裡的手勢圖 ---- */
+.mv-gest { display: flex; gap: 8px; align-items: center; }
+.mv-gest .gd-svg { flex: none; width: 74px; }
+.mv-gest .gd-svg svg { height: 52px; }
+#moves .mv-head button#mv-guide { background: #2f5a8a; }
+#menu .set-note { color: #99a; font-size: 12px; margin-left: 4px; }
+#menu .avatar .gbtn { font-size: 10px; line-height: 1; padding: 2px 5px; border-radius: 6px; background: #2f5a8a; color: #fff; margin-top: -2px; }

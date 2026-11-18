@@ -1,17 +1,18 @@
 import { BIT } from '../core/input.js';
-import { px } from '../core/fixed.js';
+import { px, FX } from '../core/fixed.js';
 import { S, boomOut } from './fighter.js';
 import { RAGE_MAX, ULT_MACRO } from './ult.js';
-import { commandMacro } from './command.js';
+import { commandMacro, stepMacro } from './command.js';
 
 // 電腦 AI(草案 4-2):只輸出「輸入位元組」,與真人走同一套程式。
 // 反應延遲:AI 只看得到 delay tick 以前的場面快照(不作弊讀對方下一格)。
 // delay = 400/250/150/80 ms ≈ 24/15/9/5 tick;防禦率 10/30/55/75%
+// 普攻降傷後(設計 7-3 e)必殺機率上調、連段續打機率下調;chase / flee / sidestep = 月步(追擊 / 逃跑 / 錯開射彈)機率(設計 4-7)
 export const LEVELS = [
-  { name: '新手', delay: 24, def: 0.1, roll: 0, special: 0.05, zNoise: 30, juggle: false, skipInv: false, atkCd: 40, chain: 0.4, cap: true },
-  { name: '普通', delay: 15, def: 0.3, roll: 0.15, special: 0.3, zNoise: 0, juggle: false, skipInv: true, atkCd: 26, chain: 0.75, cap: true },
-  { name: '困難', delay: 9, def: 0.55, roll: 0.3, special: 0.6, zNoise: 0, juggle: true, skipInv: true, atkCd: 18, chain: 0.9, cap: false },
-  { name: '魔王', delay: 5, def: 0.75, roll: 0.4, special: 0.9, zNoise: 0, juggle: true, skipInv: true, atkCd: 14, chain: 1, cap: false }
+  { name: '新手', delay: 24, def: 0.1, roll: 0, special: 0.25, zNoise: 30, juggle: false, skipInv: false, atkCd: 40, chain: 0.2, cap: true, chase: 0, flee: 0.1, sidestep: 0 },
+  { name: '普通', delay: 15, def: 0.3, roll: 0.15, special: 0.55, zNoise: 0, juggle: false, skipInv: true, atkCd: 26, chain: 0.55, cap: true, chase: 0.2, flee: 0.3, sidestep: 0.15 },
+  { name: '困難', delay: 9, def: 0.55, roll: 0.3, special: 0.8, zNoise: 0, juggle: true, skipInv: true, atkCd: 18, chain: 0.7, cap: false, chase: 0.45, flee: 0.6, sidestep: 0.4 },
+  { name: '魔王', delay: 5, def: 0.75, roll: 0.4, special: 0.95, zNoise: 0, juggle: true, skipInv: true, atkCd: 14, chain: 0.8, cap: false, chase: 0.7, flee: 0.85, sidestep: 0.7 }
 ];
 const CAP_PER_HUMAN = 2; // 同一真人最多被 2 個 AI 同時鎖定(新手、普通)
 
@@ -144,6 +145,17 @@ function thinkAi(w, f) {
     }
   }
 
+  // 月步:每 20 tick 評估一次(ai.stCd);只在可行動時,與玩家同規則(輸出 BIT.STEP 位元組)
+  if (ai.stCd > 0) ai.stCd--;
+  if (canAct && !(ai.stCd > 0)) {
+    const st = stepAi(w, f, L, def, ai, tg, dx, dz, adx, facing);
+    if (st) {
+      ai.script = st;
+      ai.lastIn = ai.script.shift();
+      return ai.lastIn;
+    }
+  }
+
   let out = 0;
   const range = info.range || 44;
   const ranged = info.style === 'ranged';
@@ -193,4 +205,48 @@ function thinkAi(w, f) {
   }
   ai.lastIn = out;
   return out;
+}
+
+// 回傳要排入的輸入序列(含第一格)或 null。全部只用延遲後看到的位置 dx / dz,射彈與演出狀態讀目前世界(與威脅反應同層級)
+function stepAi(w, f, L, def, ai, tg, dx, dz, adx, facing) {
+  const mx = px(f.x);
+  const mz = px(f.z);
+  const zbit = Math.abs(dz) > 12 ? (dz > 0 ? BIT.DOWN : BIT.UP) : 0; // 連踏中順便調縱深追人
+  // 1. 逃跑:有人在放最強的暫停中(其他人)而我在附近,或血量 < 30% 被逼近 → 後滑(連 1~3 段,暫停中預先輸入)
+  const U = w.ult;
+  const showing = U.cur >= 0 && U.cur !== f.id && w.fighters[U.cur] && w.fighters[U.cur].team !== f.team && Math.abs(px(w.fighters[U.cur].x) - mx) < 800;
+  const hurtClose = f.hp < def.hp * 0.3 && adx < 160 && Math.abs(dz) < 40;
+  if ((showing || hurtClose) && f.stepP >= 20 * FX && w.rng.int(100) < L.flee * 100) {
+    ai.stCd = showing ? 120 : 40;
+    const n = Math.min(3, Math.floor(f.stepP / (20 * FX)));
+    const out = [];
+    for (let i = 0; i < n; i++) out.push(...stepMacro('back', f.face), 0, 0, 0, 0, 0, 0, 0, 0);
+    return out;
+  }
+  // 2. 錯開快速射彈:敵方射彈朝我飛來、縱深帶重疊、200 px 內 → 縱步到縱深較寬鬆的一側
+  if (f.stepP >= 15 * FX) {
+    for (const p of w.projectiles) {
+      const o = w.fighters[p.owner];
+      if (!o || o.team === f.team) continue;
+      const pd = w.defs[p.ch].projectiles[p.kind];
+      if (!pd || !pd.itr) continue;
+      const rel = px(p.x) - mx;
+      if (Math.abs(rel) > 200 || rel * p.face > 0 || Math.abs(px(p.z) - mz) > 24 || Math.abs(pd.vx) < 9 * FX) continue; // vx(定點)>= 9 px/tick 才算快
+      ai.stCd = 30;
+      if (w.rng.int(100) < L.sidestep * 100) return stepMacro(mz < w.stage.d / 2 ? 'down' : 'up', f.face);
+      return null;
+    }
+  }
+  // 3. 追擊:目標在 250 px 外、步力 >= 50、面向目標 → 連前衝 2~3 段(順便調縱深)
+  if (adx > 250 && f.stepP >= 50 * FX && facing && w.rng.int(100) < L.chase * 100) {
+    ai.stCd = 40;
+    const n = L.chase >= 0.45 ? 3 : 2;
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      out.push(BIT.STEP | zbit, zbit, zbit, zbit, zbit, zbit, zbit, zbit, zbit, zbit);
+    }
+    return out;
+  }
+  ai.stCd = 20;
+  return null;
 }

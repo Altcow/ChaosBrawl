@@ -1,5 +1,7 @@
 // 首頁與設定:頭像列 + 大「開始」鈕;次要入口(連線 / 練習 / 更多設定);「自訂每個座位」第二層。
 // 設定存 localStorage(記住上次用的);同機 2P / 手把改成「按任一鍵加入」。
+import { getSettings, setSetting } from './settings.js';
+
 const LS = 'chaosbrawl-prefs';
 const DEFAULTS = { char: 'fanfan', mode: 'brawl', total: 8, lvl: 1, teams: 2, ff: 0, custom: null };
 const MODE_NAME = { brawl: '大亂鬥', team: '分隊戰', timed: '時間賽' };
@@ -57,7 +59,7 @@ export function seg(el, options, value, onPick) {
   return mark;
 }
 
-export function setupHome(root, { chars, charIds, onStart, onPractice, onOnline, onMoves }) {
+export function setupHome(root, { chars, charIds, onStart, onPractice, onOnline, onMoves, onGuide }) {
   const $ = (s) => root.querySelector(s);
   const prefs = loadPrefs();
   if (prefs.char !== 'random' && charIds.indexOf(prefs.char) < 0) prefs.char = charIds[0];
@@ -150,6 +152,17 @@ export function setupHome(root, { chars, charIds, onStart, onPractice, onOnline,
       const name = document.createElement('span');
       name.textContent = id === 'random' ? '隨機' : short(id);
       b.append(face, name);
+      if (id !== 'random' && prefs.char === id && onGuide) {
+        // 選角:已選中的角色卡上有「手勢」小鈕,直接開該角色的手勢書
+        const gb = document.createElement('span');
+        gb.className = 'gbtn';
+        gb.textContent = '手勢';
+        gb.onclick = (ev) => {
+          ev.stopPropagation();
+          onGuide(id);
+        };
+        b.append(gb);
+      }
       if (id !== 'random') loadPic(id).then((pic) => { if (pic && face.parentNode) face.replaceWith(drawPic(pic)); });
       b.onclick = () => {
         prefs.char = id;
@@ -181,6 +194,9 @@ export function setupHome(root, { chars, charIds, onStart, onPractice, onOnline,
   seg($('#seg-lvl'), [[0, '新手'], [1, '普通'], [2, '困難']], prefs.lvl, (v) => set('lvl', v));
   seg($('#seg-teams'), [[2, '2'], [3, '3'], [4, '4']], prefs.teams, (v) => set('teams', v));
   seg($('#seg-ff'), [[0, '關'], [1, '部分'], [2, '全開']], prefs.ff, (v) => set('ff', v));
+  // 手機操作設定(存在 settings.js 的本機設定,不跟著房間 / 連線)
+  seg($('#seg-assist'), [[false, '關'], [true, '開']], getSettings().assist, (v) => setSetting('assist', v));
+  seg($('#seg-ring'), [['auto', '自動'], ['on', '開'], ['off', '關']], getSettings().ring, (v) => setSetting('ring', v));
 
   // ---- 自訂每個座位(第二層,沿用原本的 8 列座位表) ----
   const slotsEl = $('#slots');
@@ -222,6 +238,8 @@ export function setupHome(root, { chars, charIds, onStart, onPractice, onOnline,
   $('#btn-practice').onclick = () => onPractice({ mode: 'practice', ff: 0, slots: [{ kind: 'P1', char: pickChar(), team: 0 }] });
   $('#btn-online').onclick = () => onOnline();
   $('#btn-moves-home').onclick = () => onMoves && onMoves();
+  $('#btn-guide').onclick = () => onGuide && onGuide(prefs.char === 'random' ? null : prefs.char);
+  $('#btn-guide-help').onclick = () => onGuide && onGuide(prefs.char === 'random' ? null : prefs.char);
   $('#btn-more').onclick = () => showScreen('more');
   $('#btn-more-done').onclick = () => showScreen('home');
   $('#btn-seats').onclick = () => {

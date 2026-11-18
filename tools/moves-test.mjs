@@ -19,8 +19,21 @@ for (const id of ids) {
   ok(list.every((m) => j.moves[m.cmd] && m.cost === j.moves[m.cmd].cost), id + ' 顯示的 MP 消耗與招式資料一致');
   ok(j.info && j.info.ult && j.info.ult.name === j.moves.ultimate.ult.name && j.info.ult.desc, id + ' 大招名稱與 moves.ultimate.ult.name 一致且有說明');
 }
+// 手機滑動出招設計 第 7 節:普攻 ×0.4、必殺消耗 ×0.7、MP 經濟(詳細平衡與 TTK 模擬見 tools/balance-test.mjs)
+{
+  const itrs = (m) => (m.frames || []).flatMap((f) => (f.itr ? [].concat(f.itr) : []));
+  for (const id of ids) {
+    const j = JSON.parse(readFileSync(new URL('../data/chars/' + id + '.json', import.meta.url), 'utf8'));
+    const m = j.moves;
+    ok(itrs(m.attack1)[0].dmg === 12 && itrs(m.attack2)[0].dmg === 12 && itrs(m.attack3)[0].dmg === 16, id + ' attack1 / 2 傷害 12、attack3 傷害 16(整套 40)');
+    ok(itrs(m.runatk)[0].dmg === 16 && itrs(m.jumpatk)[0].dmg === 14 && itrs(m.dashatk)[0].dmg === 16, id + ' 跑攻 16 / 跳攻 14 / 衝刺攻 16');
+    ok(['attack1', 'attack2', 'attack3', 'runatk', 'jumpatk', 'dashatk'].every((n) => itrs(m[n]).every((i) => i.basic === true && !i.gain) && m[n].basic === true), id + ' 普攻類皆標 basic、命中不回 MP');
+    ok(j.mp === 500 && j.mpStart === 300 && j.mpRegen === 14, id + ' MP 經濟:上限 500、開局 300、回復 14/秒');
+    ok(Object.keys(m).filter((n) => /^sp_/.test(n)).every((n) => [55, 70, 90, 105, 125].includes(m[n].cost)), id + ' 必殺消耗落在 55 / 70 / 90 / 105 / 125');
+  }
+}
 ok(cmdText('sp_fwd_atk', 'kb') === '防(L)+→+攻(J)', '鍵盤指令顯示');
-ok(cmdText('sp_down_jump', 'kb') === '防(L)+↓(S)+跳(K)', '鍵盤下+跳');
+ok(cmdText('sp_down_jump', 'kb') === '防(L)+↓(S)+技(K)', '鍵盤下+跳');
 ok(cmdText('sp_up_atk', 'touch', true) === '防+↑+攻', '簡寫');
 ok(ultKeyText('kb').includes('U') && ultKeyText('touch').includes('最強'), '最強必殺技操作文字');
 ok(defaultDevice('G1', false) === 'pad' && defaultDevice('P1', true) === 'touch' && defaultDevice('P2', false) === 'p2', '預設裝置');

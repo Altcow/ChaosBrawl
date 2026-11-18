@@ -1,16 +1,41 @@
 import { BIT } from '../core/input.js';
 import { FX, toFx, clamp, px } from '../core/fixed.js';
-import { detectCommand } from './command.js';
+import { detectCommand, stepKindOf, jumpStepKind, STEP_FWD, STEP_BACK, STEP_UP, STEP_DOWN } from './command.js';
 import { spawnProjectile } from './projectiles.js';
 import { RAGE_MAX } from './ult.js';
 
+// 規則旗標:noJump = 取消跳躍(預設開,全遊戲)。關掉時 K / 跳位元恢復起跳、跳攻 / 衝刺跳攻可用(僅測試與舊行為比對用)
+export const RULES = { noJump: true };
+
+// 月步規格(tick = 1/60 s;距離 px):su 起步、mv 移動、dx 每 tick 位移(px,往面向為正,後滑自動反向)、sz 每 tick 縱深操控(px)、cost 步力、rec 收招
+export const STEP_SPEC = {
+  [STEP_FWD]: { su: 2, mv: 8, dx: 18.75, dz: 0, sz: 3, cost: 25, rec: 10 },
+  [STEP_BACK]: { su: 2, mv: 10, dx: -11, dz: 0, sz: 3, cost: 20, rec: 8 },
+  [STEP_UP]: { su: 2, mv: 8, dx: 0, dz: -7.5, sz: 0, cost: 15, rec: 8 },
+  [STEP_DOWN]: { su: 2, mv: 8, dx: 0, dz: 7.5, sz: 0, cost: 15, rec: 8 }
+};
+export const STEP_MAX = 100 * FX; // 步力上限(定點數)
+export const STEP_CHAIN = 4; // 連續最多段數
+export const STEP_BREATH = 16; // 連 3 段以上或步力用盡後的收招(破綻)
+const STEP_REGEN_DELAY = 24; // 停用 0.4 s 後開始回復
+const STEP_REGEN = Math.round((30 * FX) / 60); // 每秒 30
+const STEP_WIN = 6; // 連踏窗:段內第 6 tick 起的輸入才算接下一段
+const SREQ_TTL = 6; // 月步請求保留 tick 數(緩衝)
+// 步力(0~100)供 UI 畫步力條
+export const stepPower = (f) => f.stepP / FX;
+
+// 普攻遞減(設計 7-2):同目標 3 s 內第 4~6 下 ×0.5、第 7 下起 ×0.25;普攻命中回 MP 只算前 3 下
+export const BASIC_WINDOW = 180;
+const BASIC_NAMES = { attack1: 1, attack2: 1, attack3: 1, runatk: 1, jumpatk: 1, dashatk: 1 };
+export const isBasicMove = (def, name) => !!(name && (BASIC_NAMES[name] || (def.moves[name] && def.moves[name].basic)));
+
 export const S = {
   IDLE: 0, WALK: 1, RUN: 2, RUNSTOP: 3, SQUAT: 4, JUMP: 5, DASH: 6, ATTACK: 7,
-  DEFEND: 8, ROLL: 9, HURT: 10, FALL: 11, LYING: 12, GETUP: 13, STUN: 14, SPECIAL: 15, DEAD: 16
+  DEFEND: 8, ROLL: 9, HURT: 10, FALL: 11, LYING: 12, GETUP: 13, STUN: 14, SPECIAL: 15, DEAD: 16, STEP: 17
 };
 export const STATE_NAMES = [
   'Idle', 'Walk', 'Run', 'RunStop', 'Squat', 'Jump', 'Dash', 'Attack',
-  'Defend', 'Roll', 'Hurt', 'Fall', 'Lying', 'GetUp', 'Stun', 'Special', 'Dead'
+  'Defend', 'Roll', 'Hurt', 'Fall', 'Lying', 'GetUp', 'Stun', 'Special', 'Dead', 'Step'
 ];
 
 const DOUBLE_TAP = 12; // 連按同向兩次的 tick 上限
@@ -43,6 +68,7 @@ export function compileChar(j) {
       counter: f.counter === true ? 'counter' : f.counter || '',
       inv: !!f.inv, armor: !!f.armor, turn: !!f.turn, live: !!f.live, reflect: !!f.reflect,
       mark: !!f.mark, recall: !!f.recall, buff: f.buff || '', shake: f.shake || 0, // shake:招式格開始時發畫面震動事件(純畫面,E3)
+      wave: f.itr ? f.itr.find((i) => i.wave) || null : null, // wave:由施放者向外擴散的震波判定(見 hit.js),格開始時發 'wave' 事件
       still: !!f.still, // still:這一格不吃 steer(方向鍵操控只在沒標 still 的格有效:起手 / 收招的破綻不能邊走邊收)
       heal: f.heal ? Math.floor((f.heal * FX) / f.wait) : 0, // 每 tick 回復量(先灰血再 HP)
       mpTick: f.mpSec ? Math.round((f.mpSec * FX) / 60) : 0,
@@ -52,6 +78,7 @@ export function compileChar(j) {
       frames, next: m.next || null, cancel: m.cancel || 0, cost: toFx(m.cost || 0),
       launch: m.launch ? { vx: toFx(m.launch.vx), vy: toFx(m.launch.vy) } : null,
       steer: m.steer ? { x: toFx(m.steer.x), z: toFx(m.steer.z || 0) } : null, // 招式中可用方向鍵移動(px / tick)
+      basic: !!m.basic || !!BASIC_NAMES[name], // 普攻旗標:遞減 / 被擋 0 傷害 / 回 MP 規則(未標旗標時以 attack1~3、runatk、jumpatk、dashatk 名稱判定)
       lock: !!m.lock, // 鎖定演出招式(被 itr.lock 指到時,對手被釘在身前)
       holdDy: m.holdDy || 0, // 鎖定演出招式:被鎖定者畫面往上抬 N px(純畫面,E1)
       total: frames.reduce((s, f) => s + f.wait, 0), boom: false, first: 0, ult: null
@@ -100,7 +127,8 @@ export function createFighter(w, spec, id) {
     move: null, mf: 0, mt: 0, mtot: 0, mseq: 0, hf: -1, hm: null,
     prev: 0, pend: 0, hist: [], tapDir: 0, tapT: -99,
     ai: { lvl: spec.lvl || 0, cd: spec.period || 30, period: spec.period || 30, tgt: -1, q: [], script: [], defUntil: 0, reactCd: 0, cdA: 0, zOff: 0, spT: 0, lastIn: 0 },
-    hitLog: {}
+    hitLog: {},
+    stepP: STEP_MAX, stepK: 0, stepN: 0, stepRt: STEP_REGEN_DELAY, stepLk: 0, sreq: 0, sreqT: -999, nHit: 0, nHitT: -999
   };
 }
 
@@ -275,6 +303,7 @@ function stepMove(f, def, w, air) {
     if (fr.buff) startBuff(f, def, fr.buff);
     if (fr.spawn) for (const sp of fr.spawn) spawnProjectile(w, f, def, sp);
     if (fr.shake) w.events.push({ t: 'shake', x: f.x, y: f.y, z: f.z, n: fr.shake });
+    if (fr.wave) w.events.push({ t: 'wave', x: f.x, y: f.y, z: f.z, r: fr.wave.wave.r, n: fr.wave.wave.t, id: f.id });
   }
   if (fr.heal) healStep(f, def, fr.heal);
   if (fr.mpTick) f.mp = Math.min(def.mp, f.mp + fr.mpTick);
@@ -359,6 +388,8 @@ function ultAllowed(f, def) {
       const m = def.moves[f.move];
       return f.mtot <= 4 || m.total - f.mtot <= m.cancel;
     }
+    case S.STEP:
+      return !f.stepLk && f.st >= STEP_WIN; // 月步第 6 tick 起可直接接最強(破綻收招中不行)
     default:
       return false;
   }
@@ -383,12 +414,16 @@ export function ultTrigger(f, def, w) {
 // 演出暫停中:只記錄輸入(與 hitstop 相同),並讓滿條者仍可排隊發動
 export function bufferInput(f, w, inb) {
   const def = w.defs[f.charId];
+  const raw = inb;
+  const prev = f.prev;
   if ((inb & (BIT.LEFT | BIT.RIGHT)) === (BIT.LEFT | BIT.RIGHT)) inb &= ~(BIT.LEFT | BIT.RIGHT);
   if ((inb & (BIT.UP | BIT.DOWN)) === (BIT.UP | BIT.DOWN)) inb &= ~(BIT.UP | BIT.DOWN);
   const pr = (inb & ~f.prev) | f.pend;
   f.prev = inb;
   f.hist.push(inb);
   if (f.hist.length > 16) f.hist.shift();
+  captureStep(f, w, raw, prev);
+  if (f.sreq) f.sreqT = w.tick; // 特寫暫停中:月步請求保持新鮮,暫停結束後仍可用(預先輸入)
   f.hf = -1;
   f.hm = null;
   if (f.state === S.DEAD || f.hitstop > 0) {
@@ -397,6 +432,75 @@ export function bufferInput(f, w, inb) {
   }
   f.pend = pr;
   ultTrigger(f, def, w);
+}
+
+// ---- 月步 ----
+// 登記月步請求:BIT.STEP 剛按下,或(取消跳躍時)JUMP 位元單按且前 15 tick 沒有防 / 沒按攻(有防 = 指令判讀的觸發位)
+function captureStep(f, w, raw, prev) {
+  let k = 0;
+  if (raw & BIT.STEP && !(prev & BIT.STEP)) k = stepKindOf(raw);
+  else if (RULES.noJump && raw & BIT.JUMP && !(prev & BIT.JUMP) && !(raw & (BIT.DEF | BIT.ATK))) {
+    let def = false;
+    for (let i = 0; i < f.hist.length; i++) if (f.hist[i] & BIT.DEF) def = true;
+    if (!def) k = jumpStepKind(raw, f.face);
+  }
+  if (k) {
+    f.sreq = k;
+    f.sreqT = w.tick;
+  }
+}
+
+function startStep(f, w, k) {
+  const sp = STEP_SPEC[k];
+  if (f.stepP < sp.cost * FX) return false;
+  f.stepP -= sp.cost * FX;
+  f.stepN = (f.state === S.STEP ? f.stepN : 0) + 1;
+  f.stepK = k;
+  f.stepLk = 0;
+  f.stepRt = 0;
+  f.sreq = 0;
+  f.state = S.STEP;
+  f.st = 0;
+  f.move = null;
+  f.vx = 0;
+  f.vz = 0;
+  return true;
+}
+
+// 目前有新鮮的月步請求且步力夠 → 起步(待機 / 走 / 跑 / 急停 / 普攻取消窗呼叫)
+function tryStep(f, w) {
+  if (!f.sreq || f.silence > 0 || w.tick - f.sreqT > SREQ_TTL) return false;
+  return startStep(f, w, f.sreq);
+}
+
+// STEP 狀態每 tick:起步 → 移動 → 收招;段末有請求且步力夠就連踏下一段;第 6 tick 起可取消進必殺
+function stepTick(f, def, w, pr, inb, dirZ) {
+  const sp = STEP_SPEC[f.stepK];
+  const act = sp.su + sp.mv;
+  f.vx = 0;
+  f.vz = 0;
+  if (!f.stepLk && f.st >= STEP_WIN && pr & (BIT.ATK | BIT.JUMP) && tryCommand(f, def, w, pr)) {
+    stepAttack(f, def, w); // 取消進必殺:與其他起手相同
+    return;
+  }
+  if (f.st < act) {
+    if (f.st >= sp.su) {
+      f.vx = f.face * Math.round(sp.dx * FX);
+      f.vz = sp.dz ? Math.round(sp.dz * FX) : dirZ * Math.round(sp.sz * FX);
+    }
+    return;
+  }
+  if (!f.stepLk && f.sreq && f.stepN < STEP_CHAIN && f.sreqT >= w.tick - f.st + STEP_WIN) {
+    const k = f.sreq;
+    if (!((k === STEP_UP || k === STEP_DOWN) && (f.stepK === STEP_UP || f.stepK === STEP_DOWN)) && startStep(f, w, k)) return;
+  }
+  if (f.st === act) f.stepLk = f.stepN >= 3 || f.stepP < 15 * FX ? 1 : 0; // 沒接下一段:連 3 段以上 / 步力用盡 → 收招 16 tick 破綻,不可連踏、不可取消
+  if (f.st >= act + (f.stepLk ? STEP_BREATH : sp.rec)) {
+    f.state = S.IDLE;
+    f.stepN = 0;
+    f.stepLk = 0;
+    f.stepRt = 0;
+  }
 }
 
 function startJump(f, def, dirX, dash) {
@@ -454,8 +558,8 @@ export function takeHit(w, d, attX, itr, owner, isProj) {
   }
 
   if (itr.kind !== 'grab' && !itr.unb && d.state === S.DEFEND && -dirAway === d.face) {
-    // 防住正面:傷害只吃 10%(大招 25%,見角色名單設計第 2 節),擦傷不致死、不累積爆氣,累積 bdef
-    d.hp = Math.max(FX, d.hp - Math.floor((itr.dmg * FX * (itr.ult ? 25 : 10)) / 100));
+    // 防住正面:傷害只吃 10%(大招 25%,見角色名單設計第 2 節),擦傷不致死、不累積爆氣,累積 bdef;普攻被擋 0 傷害
+    if (!itr.basic) d.hp = Math.max(FX, d.hp - Math.floor((itr.dmg * FX * (itr.ult ? 25 : 10)) / 100));
     d.vx = dirAway * (toFx(itr.kx) >> 1);
     d.bdef += itr.bdef;
     if (d.bdef >= 100) {
@@ -471,9 +575,10 @@ export function takeHit(w, d, attX, itr, owner, isProj) {
   d.hp = Math.max(0, d.hp - dmg);
   d.gray += Math.floor((dmg * GRAY_RATIO) / 10);
   if (d.gray > def.hp - d.hp) d.gray = def.hp - d.hp;
-  d.mp = Math.min(def.mp, d.mp + 3 * FX);
+  d.mp = Math.min(def.mp, d.mp + 5 * FX); // 被打回 MP +5(設計 7-2)
   if (def.hasUlt && w.ult.on) d.rage = Math.min(RAGE_MAX, d.rage + Math.floor((dmg * 3) / 10)); // 受傷每 10 點 +3
-  d.fall += itr.fall;
+  const unbal = d.state === S.STEP && d.stepK === STEP_BACK; // 後滑中被打 = 失衡:fall +20、硬直 ×1.5
+  d.fall += itr.fall + (unbal ? 20 : 0);
   d.lastAtk = owner;
   d.lastAtkTick = w.tick;
   if (d.hp <= 0 && !d.dead) {
@@ -509,7 +614,7 @@ export function takeHit(w, d, attX, itr, owner, isProj) {
   } else {
     d.state = S.HURT;
     d.st = 0;
-    let stun = itr.stun;
+    let stun = unbal ? Math.floor((itr.stun * 3) / 2) : itr.stun;
     if (stun >= LONG_STUN || itr.lock) {
       // 控制遞減(E4):3 s 內第二次(含)長硬直減半;擒抓(lock)不減,但會刷新計時
       if (!itr.lock && d.ctlT > 0 && w.tick + 1 - d.ctlT < CTL_WINDOW) stun = Math.floor(stun / 2);
@@ -523,12 +628,15 @@ export function takeHit(w, d, attX, itr, owner, isProj) {
 // ---- 每 tick 更新 ----
 export function updateFighter(f, w, inb) {
   const def = w.defs[f.charId];
+  const raw = inb;
+  const prev = f.prev;
   if ((inb & (BIT.LEFT | BIT.RIGHT)) === (BIT.LEFT | BIT.RIGHT)) inb &= ~(BIT.LEFT | BIT.RIGHT);
   if ((inb & (BIT.UP | BIT.DOWN)) === (BIT.UP | BIT.DOWN)) inb &= ~(BIT.UP | BIT.DOWN);
   const pr = (inb & ~f.prev) | f.pend;
   f.prev = inb;
   f.hist.push(inb);
   if (f.hist.length > 16) f.hist.shift();
+  captureStep(f, w, raw, prev);
 
   f.hf = -1;
   f.hm = null;
@@ -540,6 +648,7 @@ export function updateFighter(f, w, inb) {
   if (f.hitstop > 0) {
     f.hitstop--;
     f.pend = pr;
+    if (f.sreq) f.sreqT = w.tick; // 頓幀中的月步請求保持新鮮
     return;
   }
   f.pend = 0;
@@ -561,6 +670,9 @@ export function updateFighter(f, w, inb) {
     f.gray -= heal;
   }
   if (f.rollCd > 0) f.rollCd--;
+  if (f.state === S.STEP) f.stepRt = 0;
+  else if (f.stepRt < STEP_REGEN_DELAY) f.stepRt++;
+  else if (f.stepP < STEP_MAX) f.stepP = Math.min(STEP_MAX, f.stepP + STEP_REGEN);
   const missing10 = Math.floor(((def.hp - f.hp) * 10) / def.hp);
   f.mp = Math.min(def.mp, f.mp + Math.floor((def.mpRegen * (10 + missing10)) / 10));
 
@@ -577,7 +689,8 @@ export function updateFighter(f, w, inb) {
       break;
 
     case S.RUN:
-      if (pr & BIT.JUMP) startJump(f, def, dirX, true);
+      if (!RULES.noJump && pr & BIT.JUMP) startJump(f, def, dirX, true);
+      else if (tryStep(f, w)) break;
       else if (pr & BIT.ATK) {
         startMove(f, def, w, 'runatk', S.ATTACK);
         stepAttack(f, def, w);
@@ -594,7 +707,8 @@ export function updateFighter(f, w, inb) {
       break;
 
     case S.RUNSTOP:
-      f.vx = Math.floor((f.face * def.runX * (def.runStop - f.st)) / def.runStop);
+      if (tryStep(f, w)) break;
+      f.vx =Math.floor((f.face * def.runX * (def.runStop - f.st)) / def.runStop);
       if (f.st >= def.runStop) {
         f.state = S.IDLE;
         f.vx = 0;
@@ -613,7 +727,7 @@ export function updateFighter(f, w, inb) {
 
     case S.JUMP:
     case S.DASH:
-      if (!f.move && pr & BIT.ATK) startMove(f, def, w, f.state === S.DASH ? 'dashatk' : 'jumpatk');
+      if (!RULES.noJump && !f.move && pr & BIT.ATK) startMove(f, def, w, f.state === S.DASH ? 'dashatk' : 'jumpatk');
       if (f.move) stepMove(f, def, w, true);
       f.y += f.vy;
       f.vy -= def.gravity;
@@ -629,6 +743,10 @@ export function updateFighter(f, w, inb) {
     case S.ATTACK:
     case S.SPECIAL:
       stepAttack(f, def, w, pr);
+      break;
+
+    case S.STEP:
+      stepTick(f, def, w, pr, inb, dirZ);
       break;
 
     case S.DEFEND:
@@ -734,6 +852,13 @@ export function respawnFighter(f, def, x, z) {
   f.buf = '';
   f.bufT = 0;
   f.aftT = 0;
+  f.stepP = STEP_MAX;
+  f.stepK = 0;
+  f.stepN = 0;
+  f.stepRt = STEP_REGEN_DELAY;
+  f.stepLk = 0;
+  f.sreq = 0;
+  f.nHit = 0;
 }
 
 function groundFree(f, def, w, pr, inb, dirX, dirZ) {
@@ -741,10 +866,11 @@ function groundFree(f, def, w, pr, inb, dirX, dirZ) {
     stepAttack(f, def, w);
     return;
   }
-  if (pr & BIT.JUMP) {
+  if (!RULES.noJump && pr & BIT.JUMP) {
     startJump(f, def, dirX, false);
     return;
   }
+  if (tryStep(f, w)) return;
   if (pr & BIT.ATK) {
     startMove(f, def, w, 'attack1', S.ATTACK);
     stepAttack(f, def, w);
@@ -800,11 +926,13 @@ function defendActions(f, def, w, pr, inb) {
 function stepAttack(f, def, w, pr) {
   if (f.ult === 1) return;
   if (f.state === S.JUMP) return; // 空中必殺(大跳壓)由空中分支推進
-  if (pr && f.move) {
+  if ((pr || f.sreq) && f.move) {
     const m = def.moves[f.move];
     if (m.total - f.mtot <= m.cancel) {
-      if (tryCommand(f, def, w, pr)) {
+      if (pr && tryCommand(f, def, w, pr)) {
         if (f.state === S.JUMP) return;
+      } else if (f.state === S.ATTACK && tryStep(f, w)) {
+        return; // 普攻取消窗接月步
       } else if (pr & BIT.ATK && m.next) {
         startMove(f, def, w, m.next, S.ATTACK);
       }

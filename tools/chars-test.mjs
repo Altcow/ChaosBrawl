@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { createWorld, stepWorld, serializeWorld, restoreWorld, hashWorld } from '../js/sim/world.js';
 import { layoutSpawns } from '../js/sim/modes.js';
-import { BIT } from '../js/core/input.js';
+import { BIT, STEP_BYTE } from '../js/core/input.js';
 import { S, isInvuln, takeHit, atkPct, buffSpec } from '../js/sim/fighter.js';
 import { RAGE_MAX } from '../js/sim/ult.js';
 import { commandMacro, ULT_MACRO } from '../js/sim/command.js';
@@ -168,7 +168,7 @@ const fakeItr = (o) => Object.assign({ dmg: 10, fall: 20, bdef: 10, kx: 1, ky: 0
   w.fighters[0].mp = 500 * FX;
   cast(w, 'sp_up_atk');
   run(w, 70, nil);
-  check('轅門射戟:穿透一路 3 人各中一次', [1, 2, 3].every((i) => lost(w, i) === 40), [1, 2, 3].map((i) => lost(w, i)).join(','));
+  check('轅門射戟:穿透一路 3 人各中一次', [1, 2, 3].every((i) => lost(w, i) === 48), [1, 2, 3].map((i) => lost(w, i)).join(','));
   const noMore = w.projectiles.length === 0;
   check('箭飛完後消失', noMore);
 }
@@ -712,10 +712,10 @@ for (const id of WAVE1.concat(NEW6)) {
   {
     const w = casting('piggy', [D(440, 100), D(360, 100, { team: 5 })], 'sp_fwd_atk');
     run(w, 120, nil);
-    check('雙刀亂剁:前後都打(前方 80、身後 50,最後交叉斬只打前方)', lost(w, 1) === 80 && lost(w, 2) === 50, lost(w, 1) + '/' + lost(w, 2));
+    check('雙刀亂剁:前後都打(前方 96、身後 60,最後交叉斬只打前方)', lost(w, 1) === 96 && lost(w, 2) === 60, lost(w, 1) + '/' + lost(w, 2));
     const w2 = casting('piggy', [D(450, 100), D(550, 100, { team: 5 }), D(650, 100, { team: 6 })], 'sp_fwd_jump');
     run(w2, 120, nil);
-    check('豬突猛進:路上 3 人各中 50 一次', [1, 2, 3].every((i) => lost(w2, i) === 50), [1, 2, 3].map((i) => lost(w2, i)).join(','));
+    check('豬突猛進:路上 3 人各中 60 一次', [1, 2, 3].every((i) => lost(w2, i) === 60), [1, 2, 3].map((i) => lost(w2, i)).join(','));
     const w3 = casting('piggy', [D(430, 100)], 'sp_up_atk');
     run(w3, 120, nil);
     check('旋風豬上天:空中旋轉總傷害約 61(40~70)', lost(w3, 1) >= 40 && lost(w3, 1) <= 70, lost(w3, 1));
@@ -736,7 +736,7 @@ for (const id of WAVE1.concat(NEW6)) {
   {
     const w = casting('qiyu', [D(440, 100)], 'sp_fwd_atk');
     run(w, 120, nil);
-    check('隨便連打:9 連拳 + 直拳 = 84', lost(w, 1) === 84, lost(w, 1));
+    check('隨便連打:9 連拳 + 直拳 = 99', lost(w, 1) === 99, lost(w, 1));
     const w2 = mk([P('qiyu', 400, 100), D(1300, 100), D(1000, 160, { team: 5 }), D(1000, 100, { team: 6 })]);
     full(w2.fighters[0]);
     ult(w2);
@@ -760,17 +760,17 @@ for (const id of WAVE1.concat(NEW6)) {
   {
     const w = casting('xiaozhi', [D(600, 100)], 'sp_fwd_atk');
     run(w, 100, nil);
-    check('劈哩啪啦:閃電 40、硬直 30(長於一般)', lost(w, 1) === 40 && w.fighters[1].stunT === 30, lost(w, 1) + ' stun=' + w.fighters[1].stunT);
+    check('劈哩啪啦:閃電 48、硬直 30(長於一般)', lost(w, 1) === 48 && w.fighters[1].stunT === 30, lost(w, 1) + ' stun=' + w.fighters[1].stunT);
     const w2 = casting('xiaozhi', [D(450, 100)], 'sp_fwd_jump');
     run(w2, 140, nil);
-    check('消防水柱:共 60(連續推擠 + 最後擊倒)', lost(w2, 1) === 60, lost(w2, 1));
+    check('消防水柱:共 71(連續推擠 + 最後擊倒)', lost(w2, 1) === 71, lost(w2, 1));
     const w3 = casting('xiaozhi', [D(480, 100)], 'sp_down_atk');
     let hurt = 0;
     for (let t = 0; t < 150; t++) {
       stepWorld(w3, nil());
       if (w3.fighters[1].state === S.HURT) hurt++;
     }
-    check('藤蔓絆腳:纏住約 60 tick、20 傷害、陷阱踩中後消失', hurt >= 58 && hurt <= 66 && lost(w3, 1) === 20 && w3.projectiles.length === 0, 'hurt=' + hurt);
+    check('藤蔓絆腳:纏住約 60 tick、24 傷害、陷阱踩中後消失', hurt >= 58 && hurt <= 66 && lost(w3, 1) === 24 && w3.projectiles.length === 0, 'hurt=' + hurt);
     const w4 = mk([P('xiaozhi', 400, 100), D(900, 100), D(1100, 100, { team: 5 })]);
     full(w4.fighters[0]);
     ult(w4);
@@ -791,7 +791,7 @@ for (const id of WAVE1.concat(NEW6)) {
   {
     const w = casting('kenan', [D(700, 100)], 'sp_fwd_atk');
     run(w, 80, nil);
-    check('強力射門:足球 50 擊倒', lost(w, 1) === 50, lost(w, 1));
+    check('強力射門:足球 60 擊倒', lost(w, 1) === 60, lost(w, 1));
     const w2 = casting('kenan', [D(550, 100), D(500, 160, { team: 5 }), D(380, 100, { team: 6 })], 'sp_fwd_jump');
     run(w2, 40, nil);
     check('伸縮皮帶:前方 220 px 內拉到身前 30 px、不傷害;縱深外與身後的人不受影響', Math.abs((w2.fighters[1].x - w2.fighters[0].x) / FX - 30) <= 1 && lost(w2, 1) === 0 && w2.fighters[2].x === 500 * FX && w2.fighters[3].x === 380 * FX);
@@ -801,7 +801,7 @@ for (const id of WAVE1.concat(NEW6)) {
       stepWorld(w3, nil());
       if (w3.fighters[1].state === S.HURT) hurt++;
     }
-    check('麻痺飛針:命中 10、麻痺約 75 tick;縱深錯開 30 閃得掉(zr 8)', lost(w3, 1) === 10 && hurt >= 73 && hurt <= 82 && lost(w3, 2) === 0, 'hurt=' + hurt);
+    check('麻痺飛針:命中 12、麻痺約 75 tick;縱深錯開 30 閃得掉(zr 8)', lost(w3, 1) === 12 && hurt >= 73 && hurt <= 82 && lost(w3, 2) === 0, 'hurt=' + hurt);
     const w4 = mk([P('kenan', 400, 100), D(800, 100), D(1100, 100, { team: 5 })]);
     full(w4.fighters[0]);
     ult(w4);
@@ -812,14 +812,14 @@ for (const id of WAVE1.concat(NEW6)) {
   {
     const w = casting('longjuan', [D(700, 100), D(900, 100, { team: 5 })], 'sp_fwd_atk');
     run(w, 100, nil);
-    check('翠綠旋風刃:360 px 內命中 35、更遠不中', lost(w, 1) === 35 && lost(w, 2) === 0, lost(w, 1));
+    check('翠綠旋風刃:360 px 內命中 42、更遠不中', lost(w, 1) === 42 && lost(w, 2) === 0, lost(w, 1));
     const w2 = casting('longjuan', [D(470, 100), D(700, 100, { team: 5 })], 'sp_fwd_jump');
     let held = 0;
     for (let t = 0; t < 150; t++) {
       stepWorld(w2, nil());
       if (w2.fighters[1].held === 0) held++;
     }
-    check('念力擒拋:抓到 → 釘住約 24 tick;被抓者共 65(20 + 15 + 30);丟出路上的人 30', held >= 22 && held <= 28 && lost(w2, 1) === 65 && lost(w2, 2) === 30, 'held=' + held + ' ' + lost(w2, 1) + '/' + lost(w2, 2));
+    check('念力擒拋:抓到 → 釘住約 24 tick;被抓者共 78(24 + 18 + 36);丟出路上的人 36', held >= 22 && held <= 28 && lost(w2, 1) === 78 && lost(w2, 2) === 36, 'held=' + held + ' ' + lost(w2, 1) + '/' + lost(w2, 2));
     const w3 = casting('longjuan', [D(1000, 100)], 'sp_fwd_jump');
     let n = 0;
     for (let t = 0; t < 100; t++) {
@@ -838,7 +838,7 @@ for (const id of WAVE1.concat(NEW6)) {
     check('念力擒拋:不可防(防禦姿勢也被抓)', sawHeld && lost(w3b, 1) >= 20, lost(w3b, 1));
     const w4 = casting('longjuan', [D(470, 100)], 'sp_up_atk');
     run(w4, 150, nil);
-    check('迷你龍捲:捲上天連續 4 下共 48', lost(w4, 1) === 48, lost(w4, 1));
+    check('迷你龍捲:捲上天連續 4 下共 56', lost(w4, 1) === 56, lost(w4, 1));
     const w5 = mk([P('longjuan', 400, 100), D(560, 100)]);
     full(w5.fighters[0]);
     ult(w5);
@@ -854,7 +854,7 @@ for (const id of WAVE1.concat(NEW6)) {
       stepWorld(w, nil());
       if (w.projectiles.length) out = t;
     }
-    check('龜殼滑球:去程 + 回程各打一次(共 70),滑回來後消失', lost(w, 1) === 70 && out > 60 && out < 160 && w.projectiles.length === 0, lost(w, 1) + ' out=' + out);
+    check('龜殼滑球:去程 + 回程各打一次(共 84),滑回來後消失', lost(w, 1) === 84 && out > 60 && out < 160 && w.projectiles.length === 0, lost(w, 1) + ' out=' + out);
     const w2 = casting('manman', [D(500, 100), D(700, 100, { team: 5 })], 'sp_fwd_jump');
     const m2 = w2.fighters[0];
     let invT = 0;
@@ -862,7 +862,7 @@ for (const id of WAVE1.concat(NEW6)) {
       stepWorld(w2, RIGHT());
       if (isInvuln(m2, w2.defs.manman) && m2.move) invT++;
     }
-    check('星星糖無敵衝:48 tick 無敵、方向鍵可操控、撞到的人各 35', invT >= 46 && invT <= 56 && lost(w2, 1) === 35 && lost(w2, 2) === 35, 'inv=' + invT + ' ' + lost(w2, 1) + '/' + lost(w2, 2));
+    check('星星糖無敵衝:48 tick 無敵、方向鍵可操控、撞到的人各 42', invT >= 46 && invT <= 56 && lost(w2, 1) === 42 && lost(w2, 2) === 42, 'inv=' + invT + ' ' + lost(w2, 1) + '/' + lost(w2, 2));
     const wq = casting('manman', [D(900, 100)], 'sp_fwd_jump');
     const xq = wq.fighters[0].x;
     run(wq, 8, RIGHT);
@@ -872,14 +872,75 @@ for (const id of WAVE1.concat(NEW6)) {
     const f3 = w3.fighters[0];
     const r = takeHit(w3, f3, f3.x + 30 * FX, fakeItr({ fall: 20 }), 1, false);
     run(w3, 60, nil);
-    check('縮頭烏龜:近戰碰到 → 殼旋轉反擊 45', r === 'counter' && lost(w3, 1) === 45, r + ' ' + lost(w3, 1));
+    check('縮頭烏龜:近戰碰到 → 殼旋轉反擊 54', r === 'counter' && lost(w3, 1) === 54, r + ' ' + lost(w3, 1));
     check('縮頭烏龜:架式格 reflect(射彈原路彈回)', w3.defs.manman.moves.sp_down_atk.frames[0].reflect);
-    const w4 = mk([P('manman', 400, 100), D(600, 100), D(900, 100, { team: 5 }), D(700, 100, { team: 6 })]);
-    w4.fighters[2].y = 40 * FX;
+    // 改版:從漫漫身上向外擴散的震波(半徑 700 px、30 tick 擴到最遠),不可防;範圍外、翻滾抓時機、倒地者不吃
+    const w4 = mk([P('manman', 400, 100), D(600, 100), D(1150, 100, { team: 5 }), D(1000, 100, { team: 6 }), D(300, 100, { team: 7 })]);
+    w4.fighters[4].state = S.LYING;
+    w4.fighters[4].st = -300; // 躺到震波過去(測「倒地不吃」)
     full(w4.fighters[0]);
     ult(w4);
     run(w4, 200, nil);
-    check('星光殼大地震:全場地面敵人各 70;腳離地 40 px(跳起)的人碰不到', lost(w4, 1) === 70 && lost(w4, 2) === 0 && lost(w4, 3) === 70, lost(w4, 1) + '/' + lost(w4, 2) + '/' + lost(w4, 3));
+    check('星光殼大地震:700 px 內地面敵人各 70(200 / 600 px);範圍外(750 px)與倒地者不吃', lost(w4, 1) === 70 && lost(w4, 3) === 70 && lost(w4, 2) === 0 && lost(w4, 4) === 0, [1, 2, 3, 4].map((i) => lost(w4, i)).join('/'));
+    {
+      // 震波是「掃過」的:近的先中、遠的後中(依距離排時間)
+      const wt = mk([P('manman', 400, 100), D(500, 100, { team: 5 }), D(1000, 100, { team: 6 })]);
+      full(wt.fighters[0]);
+      ult(wt);
+      let t1 = -1;
+      let t2 = -1;
+      for (let t = 0; t < 120; t++) {
+        stepWorld(wt, nil());
+        if (t1 < 0 && lost(wt, 1) > 0) t1 = t;
+        if (t2 < 0 && lost(wt, 2) > 0) t2 = t;
+      }
+      check('大地震:震波由近而遠擴散(100 px 處 vs 600 px 處,相差約 25 tick)', t1 >= 0 && t2 > t1 + 18 && t2 - t1 < 30, 't1=' + t1 + ' t2=' + t2);
+      // 翻滾抓時機:掃描翻滾起始 tick,應同時存在「躲掉」與「吃到」(時機窗有限,不是永遠躲得掉)
+      let dodged = 0;
+      let got = 0;
+      for (let s = 30; s <= 60; s++) {
+        const wr = mk([P('manman', 400, 100), P('ada', 500, 100, { team: 5, face: -1 })]);
+        wr.fighters[1].hp = 5000 * FX;
+        wr.fighters[1].mp = 0;
+        full(wr.fighters[0]);
+        ult(wr);
+        const hp0 = wr.fighters[1].hp;
+        for (let t = 0; t < 120; t++) {
+          const arr = nil();
+          if (t === s) arr[1] = BIT.DEF | BIT.RIGHT;
+          stepWorld(wr, arr);
+        }
+        if (wr.fighters[1].hp < hp0) got++;
+        else dodged++;
+      }
+      check('大地震:翻滾抓時機可躲(掃描起始 tick:有躲掉的、也有吃到的)', dodged >= 2 && got >= 10, 'dodged=' + dodged + ' got=' + got);
+      // 跑出範圍 / 後滑:震波擴散(30 tick 內 700 px,約 23 px/tick)比跑速快,所以只能靠「起手 50 tick」先拉開;實測 d0 ≥ 約 250 px 的人往外跑才逃得出,
+      // 100 px 內的人連後滑 4 段(拉開 440 px)也只能晚幾 tick 才被掃到(與設計文件 4-6「≥100 px 逃得出」不符,見回報)
+      const escape = (d0, mode) => {
+        const we = mk([P('manman', 300, 100), P('ada', 300 + d0, 100, { team: 5, face: -1 })]);
+        we.fighters[1].mp = 0;
+        const fl = we.fighters[1];
+        const hp0 = fl.hp;
+        ult(we); // 排隊 + 跑完 60 tick 特寫暫停;這之後起手還剩 50 tick 才放震波
+        const press = { 0: 1, 10: 1, 22: 1, 34: 1 }; // 後滑 4 段(段長 12 tick,第 6 tick 後可接)
+        let hitT = -1;
+        for (let t = 0; t < 200; t++) {
+          const a = nil();
+          if (mode === 'run') a[1] = t === 1 ? 0 : BIT.RIGHT; // 雙擊右 → 跑
+          else if (mode === 'step') a[1] = press[t] ? STEP_BYTE.back : t === 64 || t > 65 ? BIT.RIGHT : 0; // 後滑 4 段、16 tick 喘完再跑
+          stepWorld(we, a);
+          if (hitT < 0 && fl.hp < hp0) hitT = t;
+        }
+        return hitT;
+      };
+      const e300 = escape(300, 'run');
+      const e600 = escape(600, 'run');
+      const e100r = escape(100, 'run');
+      const e100s = escape(100, 'step');
+      const e100w = escape(100, 'walk');
+      check('大地震:往外跑可逃出震波(300 / 600 px 起跑,場地夠寬)', e300 < 0 && e600 < 0, e300 + '/' + e600);
+      check('大地震:100 px 內被掃到(後滑 4 段只是晚被掃到;不動最早)', e100r >= 0 && e100s > e100r && e100w >= 0 && e100w <= e100r, 'run=' + e100r + ' step=' + e100s + ' stand=' + e100w);
+    }
   }
   // E4 控制遞減
   {

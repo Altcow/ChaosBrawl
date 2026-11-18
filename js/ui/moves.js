@@ -1,16 +1,26 @@
 // 招式表面板:列出角色的普攻連段、必殺(名稱 + 指令 + 說明)、大招(名稱 + 說明 + 發動條件)與爆氣累積方式。
-// 資料來自 data/chars/*.json 的 info 欄位(顯示用);指令依輸入裝置顯示。
+// 資料來自 data/chars/*.json 的 info 欄位(顯示用);指令依輸入裝置顯示。手機('touch')顯示手勢動畫(需要 gd = data/gestures.json)。
+import { buildSet, seqSym } from './gesture.js';
+import { gestureSvg, seqText } from './guide.js';
+
 const DEVICES = ['kb', 'p2', 'pad', 'touch'];
 const DEV_NAME = { kb: '鍵盤', p2: '鍵盤 P2', pad: '手把', touch: '手機' };
 
 // 各裝置的按鍵標示
 const KEYS = {
-  kb: { def: '防(L)', atk: '攻(J)', jump: '跳(K)', up: '↑(W)', down: '↓(S)', fwd: '→', ult: '鍵盤 U' },
-  p2: { def: '防(小鍵盤 3)', atk: '攻(小鍵盤 1)', jump: '跳(小鍵盤 2)', up: '↑', down: '↓', fwd: '→', ult: '小鍵盤 4' },
-  pad: { def: '防(B)', atk: '攻(X)', jump: '跳(A)', up: '↑', down: '↓', fwd: '→', ult: '手把 Y' },
-  touch: { def: '防', atk: '攻', jump: '跳', up: '↑', down: '↓', fwd: '→', ult: '「最強」鈕' }
+  kb: { def: '防(L)', atk: '攻(J)', jump: '技(K)', up: '↑(W)', down: '↓(S)', fwd: '→', ult: '鍵盤 U' },
+  p2: { def: '防(小鍵盤 3)', atk: '攻(小鍵盤 1)', jump: '技(小鍵盤 2)', up: '↑', down: '↓', fwd: '→', ult: '小鍵盤 4' },
+  pad: { def: '防(B)', atk: '攻(X)', jump: '技(A)', up: '↑', down: '↓', fwd: '→', ult: '手把 Y' },
+  touch: { def: '防', atk: '攻', jump: '技', up: '↑', down: '↓', fwd: '→', ult: '手勢圈' }
 };
-const SHORT = { def: '防', atk: '攻', jump: '跳', up: '↑', down: '↓', fwd: '→' };
+const SHORT = { def: '防', atk: '攻', jump: '技', up: '↑', down: '↓', fwd: '→' };
+// 月步(取消跳躍後的移動)說明;鍵位依 docs/引擎介面.md 1-2
+const STEP_KEYS = {
+  kb: 'E 前衝、Q 後滑、R / F 縱步上 / 下(或 K 單按 = 前衝、K + 後 / 上 / 下);耗 HUD 青色「步力條」,不吃 MP',
+  p2: '小鍵盤 6 前衝、5 後滑、8 / 9 縱步上 / 下(或 2 單按 = 前衝);耗步力條',
+  pad: 'A 單按 = 前衝;A + 搖桿往後 = 後滑;A + 搖桿上 / 下 = 縱步;耗步力條',
+  touch: '手勢圈畫一筆:→ 前衝、← 後滑、↑ ↓ 縱步(面向左時左右相反)'
+};
 
 export const RAGE_HELP = '出招命中:造成傷害每 10 點 +2;被打:受到傷害每 10 點 +3、被擊倒 +5(防禦擋下的不算);最強必殺技命中不加。每局從 0 開始,時間賽復活保留一半。';
 export const ULT_COND = '爆氣條滿(100)、人在地面且站 / 走 / 跑 / 防的時候才能發動;受擊、倒地、空中、被封招時不行。';
@@ -24,7 +34,7 @@ export function cmdText(cmd, dev, short) {
 
 export function ultKeyText(dev) {
   const k = KEYS[dev] || KEYS.kb;
-  if (dev === 'touch') return '點右側「最強」鈕(爆氣滿了會亮起閃爍)';
+  if (dev === 'touch') return '在右下手勢圈畫最強必殺技的手勢(爆氣滿了,圈外框會亮金光)';
   return k.def + '+' + k.atk + '+' + k.jump + ' 同時按,或單按 ' + k.ult;
 }
 
@@ -58,7 +68,7 @@ export function defaultDevice(srcKind, hasTouch) {
   return 'kb';
 }
 
-export function setupMoves(root, { chars, charIds, onToggle }) {
+export function setupMoves(root, { chars, charIds, onToggle, gd, onGuide }) {
   const $ = (s) => root.querySelector(s);
   const tabs = $('#mv-tabs');
   const body = $('#mv-body');
@@ -89,26 +99,40 @@ export function setupMoves(root, { chars, charIds, onToggle }) {
     const n = chainLen(j);
     const basic = h('ul');
     for (const t of [
-      '連按 ' + k.atk + ' 打出 ' + n + ' 段連段,最後一下把對手擊倒',
-      '跑步中按 ' + k.atk + ':衝刺攻擊;跳起後按 ' + k.atk + ':空中攻擊',
-      k.def + ':按住擋住正面攻擊(擦傷不致死)'
+      '連按 ' + k.atk + ' 打出 ' + n + ' 段連段,最後一下把對手擊倒(傷害低,用來牽制與補刀)',
+      '跑步中按 ' + k.atk + ':衝刺攻擊',
+      k.def + ':按住擋住正面攻擊(擦傷不致死)',
+      '月步:' + STEP_KEYS[dev]
     ]) basic.append(h('li', null, t));
     left.append(basic);
 
     // 必殺
     left.append(h('h3', null, '必殺技(吃 MP,MP 上限 ' + j.mp + ',會自動回復)'));
     const list = h('div', 'mv-list');
+    const gset = dev === 'touch' && gd ? buildSet(j, gd) : null;
     for (const m of listMoves(j)) {
       const row = h('div', 'mv-row');
       const top = h('div', 'mv-top');
       top.append(h('b', null, m.name), h('span', 'mv-cost', 'MP ' + m.cost));
       row.append(top);
-      row.append(h('div', 'mv-cmd', dev === 'touch' ? '點畫面上這招的按鈕(指令 ' + cmdText(m.cmd, dev, true) + ')' : cmdText(m.cmd, dev)));
-      row.append(h('div', 'mv-desc', m.desc));
+      const gi = gset && gset.find((x) => x.id === m.cmd);
+      if (gi) {
+        const gw = h('div', 'mv-gest');
+        const sw = h('div', 'gd-svg');
+        sw.append(gestureSvg(gi.seq));
+        const tx = h('div');
+        tx.append(h('div', 'mv-cmd', '手勢圈畫:' + seqSym(gi.seq)), h('div', 'mv-desc', seqText(gi.seq)), h('div', 'mv-desc', m.desc));
+        gw.append(sw, tx);
+        row.append(gw);
+      } else {
+        row.append(h('div', 'mv-cmd', cmdText(m.cmd, dev)));
+        row.append(h('div', 'mv-desc', m.desc));
+      }
       list.append(row);
     }
     left.append(list);
-    if (dev !== 'touch') left.append(h('div', 'mv-note', '→ 指面對的方向(面右按 D、面左按 A;P2 為 → / ←)。防、方向、攻 / 跳 在 0.25 秒內按完即可,順序不拘。'));
+    if (dev !== 'touch') left.append(h('div', 'mv-note', '→ 指面對的方向(面右按 D、面左按 A;P2 為 → / ←)。防、方向、攻 / 技 在 0.25 秒內按完即可,順序不拘。'));
+    else left.append(h('div', 'mv-note', '一筆畫完、放開才出招;弧形要畫夠半圓。MP 不夠會變灰並震動。更多說明看「手勢書」。'));
 
     // 大招
     right.append(h('h3', null, '最強必殺技'));
@@ -116,7 +140,16 @@ export function setupMoves(root, { chars, charIds, onToggle }) {
     const ur = h('div', 'mv-row mv-ult');
     ur.append(h('div', 'mv-top', ''));
     ur.firstChild.append(h('b', null, u ? u.name : '(無)'), h('span', 'mv-cost', '爆氣 100'));
-    ur.append(h('div', 'mv-cmd', ultKeyText(dev)));
+    const ugi = dev === 'touch' && gd ? buildSet(j, gd).find((x) => x.id === 'ultimate') : null;
+    if (ugi) {
+      const gw = h('div', 'mv-gest');
+      const sw = h('div', 'gd-svg');
+      sw.append(gestureSvg(ugi.seq));
+      const tx = h('div');
+      tx.append(h('div', 'mv-cmd', '手勢圈畫:' + seqSym(ugi.seq)), h('div', 'mv-desc', seqText(ugi.seq)));
+      gw.append(sw, tx);
+      ur.append(gw);
+    } else ur.append(h('div', 'mv-cmd', ultKeyText(dev)));
     if (u) ur.append(h('div', 'mv-desc', u.desc));
     ur.append(h('div', 'mv-desc', '發動條件:' + ULT_COND));
     right.append(ur);
@@ -161,6 +194,7 @@ export function setupMoves(root, { chars, charIds, onToggle }) {
     isOpen: () => !root.classList.contains('hide')
   };
   $('#mv-close').onclick = () => api.close();
+  $('#mv-guide').onclick = () => onGuide && onGuide(cur);
   $('#mv-dev').onclick = () => {
     dev = DEVICES[(DEVICES.indexOf(dev) + 1) % DEVICES.length];
     render();

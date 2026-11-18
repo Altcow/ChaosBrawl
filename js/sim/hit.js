@@ -1,5 +1,5 @@
 import { FX, px } from '../core/fixed.js';
-import { takeHit, startMove, atkPct, S } from './fighter.js';
+import { takeHit, startMove, atkPct, S, BASIC_WINDOW } from './fighter.js';
 import { RAGE_MAX, ULT_GUARD, ultCap } from './ult.js';
 import { boxRect, overlaps } from './box.js';
 
@@ -19,6 +19,20 @@ export function resolveHits(w) {
     const fr = w.defs[a.charId].moves[a.hm].frames[a.hf];
     if (!fr.itr) continue;
     for (const itr of fr.itr) {
+      if (itr.wave) {
+        // 震波:從施放者向外擴散的環帶(不吃身高、不可擋由 ult.unblockable 決定);帶子掃過時不是無敵 / 倒地的人才吃
+        const age = a.mt === 0 ? fr.wait : a.mt;
+        const T = itr.wave.t;
+        const r1 = Math.floor((itr.wave.r * Math.min(age, T)) / T);
+        const r0 = Math.floor((itr.wave.r * (Math.min(age, T) - 1)) / T);
+        for (const d of w.fighters) {
+          if (d === a || !friendlyOk(w, a, d, false) || d.state === 16) continue;
+          if (Math.abs(px(a.z) - px(d.z)) > itr.zr) continue;
+          const dist = Math.abs(px(d.x) - px(a.x));
+          if (dist >= r0 && (dist < r1 || (age >= T && dist <= r1))) cands.push({ a, p: null, d, itr, key: a.mseq, log: a.hitLog });
+        }
+        continue;
+      }
       const ar = boxRect(px(a.x), px(a.y), a.face, itr);
       for (const d of w.fighters) {
         if (d === a || !friendlyOk(w, a, d, false)) continue;
@@ -60,6 +74,15 @@ export function resolveHits(w) {
       const pct = atkPct(c.a, adef); // 增益 / 被動攻擊倍率(D9)
       if (pct !== 100) itr = Object.assign({}, itr, { dmg: Math.round((itr.dmg * pct) / 100) });
     }
+    // 普攻規則(設計 7-2 / 7-3):同目標 3 s 內第 4~6 下 ×0.5、第 7 下起 ×0.25(最少 1);被擋 0 傷害(takeHit 依 itr.basic);必殺 / 最強 / 射彈不受影響
+    const basic = !useq && !c.p && (!!c.itr.basic || (!!c.a.hm && !!adef.moves[c.a.hm] && adef.moves[c.a.hm].basic));
+    let bn = 0;
+    if (basic) {
+      if (c.d.nHit > 0 && w.tick - c.d.nHitT > BASIC_WINDOW) c.d.nHit = 0;
+      bn = c.d.nHit + 1;
+      const k = bn <= 3 ? 100 : bn <= 6 ? 50 : 25;
+      itr = Object.assign({}, itr, { basic: true, dmg: k === 100 ? itr.dmg : Math.max(1, Math.round((itr.dmg * k) / 100)) });
+    }
     if (useq) {
       const info = c.p ? adef.moves.ultimate.ult : adef.moves[c.a.hm].ult;
       const dealt = c.a.ultDmg[c.d.id] || 0;
@@ -87,7 +110,15 @@ export function resolveHits(w) {
       startMove(c.a, adef, w, c.itr.lock, S.SPECIAL);
       c.a.vx = 0;
     }
-    if (r === 'hit' && c.itr.gain) c.a.mp = Math.min(adef.mp, c.a.mp + c.itr.gain * FX);
+    if (basic && r === 'hit') {
+      c.d.nHit = bn;
+      c.d.nHitT = w.tick;
+    }
+    // 普攻回 MP:資料有 gain(帆帆例外)就照資料;否則只有同目標 3 s 內前 3 下各 +4(合計最多 +12),被擋 0
+    if (r === 'hit') {
+      const g = c.itr.gain || (basic && bn <= 3 ? 4 : 0);
+      if (g) c.a.mp = Math.min(adef.mp, c.a.mp + g * FX);
+    }
     if (r === 'hit' && !useq && adef.hasUlt && w.ult.on) c.a.rage = Math.min(RAGE_MAX, c.a.rage + Math.floor((itr.dmg * FX * 2) / 10)); // 造成傷害每 10 點 +2;大招命中不加
     const ex = c.p ? c.p.x : c.d.x;
     w.events.push({ t: r, x: ex, y: c.d.y + 30 * FX, z: c.d.z, stop: c.itr.stop, big: c.itr.fall >= 60, a: c.a.id, d: c.d.id });

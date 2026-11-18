@@ -31,6 +31,16 @@ export function normalizeFighter(f) {
   if (f.buf === undefined) f.buf = '';
   if (f.bufT === undefined) f.bufT = 0;
   if (f.aftT === undefined) f.aftT = 0;
+  // 月步 / 普攻遞減欄位(舊快照沒有時補預設:步力滿、無請求、遞減計數 0)
+  if (f.stepP === undefined) f.stepP = 100 * FX;
+  if (f.stepK === undefined) f.stepK = 0;
+  if (f.stepN === undefined) f.stepN = 0;
+  if (f.stepRt === undefined) f.stepRt = 24;
+  if (f.stepLk === undefined) f.stepLk = 0;
+  if (f.sreq === undefined) f.sreq = 0;
+  if (f.sreqT === undefined) f.sreqT = -999;
+  if (f.nHit === undefined) f.nHit = 0;
+  if (f.nHitT === undefined) f.nHitT = -999;
 }
 
 export function ultCap(info) {

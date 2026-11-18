@@ -630,10 +630,10 @@ const fnv = (str, h = 0x811c9dc5) => {
     let fullBad = 0;
     const cov = { pause: 0, queue: 0, dmg: 0, projUlt: 0, cd: 0 };
     for (let t = 1; t <= 10800; t++) { // 3 分鐘
-      if (t % 20 === 0) for (let i = 0; i < 4; i++) cur4[i] = r.next() & 127;
+      if (t % 20 === 0) for (let i = 0; i < 4; i++) cur4[i] = r.next() & 255; // 含月步位元(BIT.STEP = 128)
       if (t % 240 === 1) for (const f of w.fighters) f.rage = RAGE_MAX; // 讓大招持續發生
-      if (t % 240 === 2) cur4[0] = BIT.DEF | BIT.ATK | BIT.JUMP;
-      if (t % 240 === 3) cur4[0] = 0;
+      if (t % 240 === 2) { cur4[0] = BIT.DEF | BIT.ATK | BIT.JUMP; cur4[1] = BIT.DEF | BIT.ATK | BIT.JUMP; } // 兩人同時發動 → 一人特寫、一人排隊(覆蓋排隊狀態)
+      if (t % 240 === 3) { cur4[0] = 0; cur4[1] = 0; }
       stepWorld(w, cur4);
       if (w.ult.cur >= 0) cov.pause++;
       if (w.ult.q.length) cov.queue++;

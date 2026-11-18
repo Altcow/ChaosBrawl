@@ -1,0 +1,412 @@
+{
+ "families": {
+  "shoot": {
+   "name": "射擊",
+   "seq": [
+    "AU<",
+    "F"
+   ],
+   "image": "往後拉弓、往前送出",
+   "type": "從手上直線射出的飛行物"
+  },
+  "lift": {
+   "name": "上挑",
+   "seq": [
+    "AU>"
+   ],
+   "image": "上鉤拳的弧線",
+   "type": "上鉤、上踢、上挑擊飛(連打最後擊飛也算)"
+  },
+  "low": {
+   "name": "下盤",
+   "seq": [
+    "AD>"
+   ],
+   "image": "掃堂腿、貼地",
+   "type": "貼地滑行、掃腿、貼地滾動的射彈"
+  },
+  "dash": {
+   "name": "突進",
+   "seq": [
+    "B",
+    "F"
+   ],
+   "image": "先退一步再衝",
+   "type": "衝刺、衝撞、瞬移到前方"
+  },
+  "grab": {
+   "name": "抓拉",
+   "seq": [
+    "F",
+    "B"
+   ],
+   "image": "伸手抓、往回拉",
+   "type": "抓取、拉人"
+  },
+  "spin": {
+   "name": "迴旋",
+   "seq": [
+    "C1"
+   ],
+   "image": "繞身一圈",
+   "type": "原地 / 繞身 / 近身解圍 / 旋風 / 架式"
+  },
+  "combo": {
+   "name": "連打",
+   "seq": [
+    "U",
+    "D",
+    "U"
+   ],
+   "image": "快速鋸齒",
+   "type": "原地多段連擊、最後往前擊倒"
+  },
+  "counter": {
+   "name": "閃反",
+   "seq": [
+    "AB↓"
+   ],
+   "image": "往後繞一圈再回來",
+   "type": "先退 / 先無敵,再反擊"
+  },
+  "slash": {
+   "name": "揮砍",
+   "seq": [
+    "AF↓"
+   ],
+   "image": "刀在身前劈出大弧",
+   "type": "身前大範圍揮砍"
+  },
+  "bind": {
+   "name": "定身",
+   "seq": [
+    "D",
+    "F"
+   ],
+   "image": "壓低瞄準",
+   "type": "定身、陷阱、控制"
+  }
+ },
+ "common": {
+  "step_f": {
+   "name": "前衝",
+   "seq": [
+    "F"
+   ],
+   "desc": "往前畫一筆:往前衝一段,可連踏 2~4 段追人"
+  },
+  "step_b": {
+   "name": "後滑",
+   "seq": [
+    "B"
+   ],
+   "desc": "往後畫一筆:面向不變往後滑,可連用逃跑"
+  },
+  "step_u": {
+   "name": "縱步上",
+   "seq": [
+    "U"
+   ],
+   "desc": "往上畫一筆:在縱深往上(遠離鏡頭)閃一步,錯開射彈"
+  },
+  "step_d": {
+   "name": "縱步下",
+   "seq": [
+    "D"
+   ],
+   "desc": "往下畫一筆:在縱深往下(靠近鏡頭)閃一步,錯開射彈"
+  }
+ },
+ "chars": {
+  "fanfan": {
+   "sp_fwd_atk": {
+    "family": "shoot",
+    "tip": "帽子拉回再甩出"
+   },
+   "sp_up_atk": {
+    "family": "lift",
+    "tip": "翻身上踢的弧線"
+   },
+   "sp_fwd_jump": {
+    "family": "low",
+    "tip": "貼著浪底滑過去"
+   },
+   "ultimate": {
+    "seq": [
+     "AU>",
+     "AD>",
+     "AU>"
+    ],
+    "tip": "畫一道往前的浪"
+   }
+  },
+  "areh": {
+   "sp_fwd_atk": {
+    "family": "shoot",
+    "tip": "吸一口氣再喊"
+   },
+   "sp_fwd_jump": {
+    "family": "dash",
+    "tip": "起跑線後退一步"
+   },
+   "sp_up_atk": {
+    "family": "lift",
+    "tip": "背越式跳高的弧"
+   },
+   "ultimate": {
+    "seq": [
+     "U",
+     "D",
+     "U",
+     "D"
+    ],
+    "tip": "比連打多一下"
+   }
+  },
+  "guanyu": {
+   "sp_fwd_atk": {
+    "family": "slash",
+    "tip": "大刀在身前劈一大弧"
+   },
+   "sp_fwd_jump": {
+    "family": "counter",
+    "tip": "刀往後拖再轉身"
+   },
+   "sp_down_atk": {
+    "family": "spin",
+    "tip": "原地坐下翻書"
+   },
+   "ultimate": {
+    "seq": [
+     "AF↓",
+     "F",
+     "B"
+    ],
+    "tip": "揮刀、一閃、回座"
+   }
+  },
+  "lubu": {
+   "sp_fwd_atk": {
+    "family": "combo",
+    "tip": "戟快速連刺"
+   },
+   "sp_fwd_jump": {
+    "family": "dash",
+    "tip": "勒馬後退再衝"
+   },
+   "sp_up_atk": {
+    "family": "shoot",
+    "tip": "拉弓射戟"
+   },
+   "ultimate": {
+    "seq": [
+     "C2",
+     "F"
+    ],
+    "tip": "旋風兩圈再往前推"
+   }
+  },
+  "magnet": {
+   "sp_fwd_atk": {
+    "family": "shoot",
+    "tip": "彈幣拉回再射"
+   },
+   "sp_down_atk": {
+    "family": "spin",
+    "tip": "電弧繞身一圈"
+   },
+   "sp_up_atk": {
+    "family": "lift",
+    "tip": "鞭子上撩"
+   },
+   "ultimate": {
+    "seq": [
+     "F",
+     "D",
+     "F"
+    ],
+    "tip": "畫一道閃電"
+   }
+  },
+  "sun": {
+   "sp_fwd_atk": {
+    "family": "shoot",
+    "tip": "雙手收到腰後再推"
+   },
+   "sp_fwd_jump": {
+    "family": "dash",
+    "tip": "一閃到對手背後"
+   },
+   "sp_up_atk": {
+    "family": "lift",
+    "tip": "最後一棒往上挑"
+   },
+   "ultimate": {
+    "seq": [
+     "U",
+     "C1",
+     "F"
+    ],
+    "tip": "舉手、聚氣、丟出去"
+   }
+  },
+  "piggy": {
+   "sp_fwd_atk": {
+    "family": "combo",
+    "tip": "亂砍"
+   },
+   "sp_fwd_jump": {
+    "family": "dash",
+    "tip": "後腳刨地再衝"
+   },
+   "sp_up_atk": {
+    "family": "lift",
+    "tip": "轉著飛上去"
+   },
+   "ultimate": {
+    "seq": [
+     "C8"
+    ],
+    "tip": "滿場亂跑"
+   }
+  },
+  "qiyu": {
+   "sp_fwd_atk": {
+    "family": "combo",
+    "tip": "隨便畫畫就好"
+   },
+   "sp_fwd_jump": {
+    "family": "counter",
+    "tip": "往後閃一下再出拳"
+   },
+   "sp_up_atk": {
+    "family": "lift",
+    "tip": "順手一勾"
+   },
+   "ultimate": {
+    "seq": [
+     "H",
+     "F"
+    ],
+    "tip": "淡定按著,認真推出去"
+   }
+  },
+  "xiaozhi": {
+   "sp_fwd_atk": {
+    "family": "shoot",
+    "tip": "丟球"
+   },
+   "sp_fwd_jump": {
+    "family": "spin",
+    "tip": "水柱沖開身邊"
+   },
+   "sp_down_atk": {
+    "family": "bind",
+    "tip": "往地上種往前長"
+   },
+   "ultimate": {
+    "seq": [
+     "U",
+     "F",
+     "D"
+    ],
+    "tip": "飛上去、橫越、俯衝"
+   }
+  },
+  "kenan": {
+   "sp_fwd_atk": {
+    "family": "shoot",
+    "tip": "腳往後擺再踢"
+   },
+   "sp_fwd_jump": {
+    "family": "grab",
+    "tip": "甩出去拉回來"
+   },
+   "sp_down_atk": {
+    "family": "bind",
+    "tip": "壓低手錶瞄準"
+   },
+   "ultimate": {
+    "seq": [
+     "C1",
+     "F"
+    ],
+    "tip": "球膨脹一圈再踢"
+   }
+  },
+  "longjuan": {
+   "sp_fwd_atk": {
+    "family": "shoot",
+    "tip": "揮手送出風刃"
+   },
+   "sp_fwd_jump": {
+    "family": "grab",
+    "tip": "念力抓住拉回"
+   },
+   "sp_up_atk": {
+    "family": "spin",
+    "tip": "小龍捲一圈"
+   },
+   "ultimate": {
+    "seq": [
+     "U",
+     "C2"
+    ],
+    "tip": "高舉雙手轉兩圈"
+   }
+  },
+  "manman": {
+   "sp_fwd_atk": {
+    "family": "low",
+    "tip": "殼貼地滑出"
+   },
+   "sp_fwd_jump": {
+    "family": "dash",
+    "tip": "吃糖後暴衝"
+   },
+   "sp_down_atk": {
+    "family": "spin",
+    "tip": "縮成一顆殼"
+   },
+   "ultimate": {
+    "seq": [
+     "C1",
+     "U",
+     "D"
+    ],
+    "tip": "轉殼、跳起、砸地"
+   }
+  }
+ },
+ "rules": [
+  "一筆畫完,手指放開才算數;畫的時候不會出招",
+  "起筆要在右下的大圈裡,畫出圈外也算同一筆",
+  "「前」是你面對的方向;面向左時所有左右相反,上下不變",
+  "半月要畫夠半個圓,弧度太小會被當成沒畫好",
+  "點一下大圈不會有任何事;普攻在大圈左邊的小鈕"
+ ],
+ "stepsHelp": [
+  "前衝:往前畫一筆,可連畫 2~4 次追人;從跑步中直接畫也行",
+  "後滑:往後畫一筆,連用可以拉開距離逃跑",
+  "縱步:往上或往下畫一筆,錯開射彈",
+  "月步靠「步力條」(HUD 青色細條),不吃 MP;鍵盤用 K 鍵"
+ ],
+ "tutorial": [
+  {
+   "title": "1/4 走路",
+   "text": "左半邊畫面按住滑動就能走,推到最外圈會自動跑"
+  },
+  {
+   "title": "2/4 普攻",
+   "text": "點右邊的小「攻」鈕出拳,連點出連段(傷害低,用來牽制)"
+  },
+  {
+   "title": "3/4 月步",
+   "text": "在右下大圈往右畫一筆 = 前衝,再畫一次連續前衝;往左畫 = 後滑"
+  },
+  {
+   "title": "4/4 必殺技",
+   "text": "沿著虛線範本,在大圈畫出第一招的手勢,放開就出招"
+  }
+ ]
+}

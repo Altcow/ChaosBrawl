@@ -70,7 +70,11 @@ class Reader {
 
 const F_INTS = ['id', 'team', 'x', 'y', 'z', 'vx', 'vy', 'vz', 'face', 'state', 'st', 'nextState', 'takeoffVx',
   'hp', 'gray', 'mp', 'rage', 'ult', 'ultSeq', 'ultGuard', 'ultGuardBy', 'held', 'mkx', 'mkz', 'bufT', 'aftT', 'fall', 'bdef', 'sinceHit', 'hitstop', 'rollCd', 'getupDir', 'stunT', 'airHits', 'inv', 'silence', 'ctlT',
-  'deadTick', 'kills', 'lastAtk', 'lastAtkTick', 'mf', 'mt', 'mtot', 'mseq', 'hf', 'prev', 'pend', 'tapDir', 'tapT'];
+  'deadTick', 'kills', 'lastAtk', 'lastAtkTick', 'mf', 'mt', 'mtot', 'mseq', 'hf', 'prev', 'pend', 'tapDir', 'tapT',
+  // 月步與普攻遞減(新增於「手機滑動出招」改版;舊快照物件缺這些欄位時由 normalizeFighter / 此處補預設)
+  'stepP', 'stepK', 'stepN', 'stepRt', 'stepLk', 'sreq', 'sreqT', 'nHit', 'nHitT'];
+const F_DEFAULT = { stepP: 100 * 256, stepRt: 24, sreqT: -999, nHitT: -999 };
+const fInt = (f, k) => (f[k] === undefined ? F_DEFAULT[k] || 0 : f[k]);
 const P_INTS = ['id', 'owner', 'x', 'y', 'z', 'face', 'vx', 'vz', 'life'];
 
 function writeMap(w, m) {
@@ -146,7 +150,7 @@ export function encodeWorld(snap, ctx) {
   writeList(w, u.q);
   w.int(snap.fighters.length);
   for (const f of snap.fighters) {
-    for (const k of F_INTS) w.int(f[k]);
+    for (const k of F_INTS) w.int(fInt(f, k));
     w.byte((f.dead ? 1 : 0) | (f.seatHuman ? 2 : 0));
     w.str(ctx, f.charId);
     w.str(ctx, f.kind);
@@ -233,7 +237,7 @@ function modeFromVec(v, ctx) {
   return { type: strAt(ctx, v[0]), t: v[1], limit: v[2], over: !!v[3], winner: v[4], overtime: !!v[5], ff: v[6] };
 }
 function vecF(f, ctx) {
-  const v = F_INTS.map((k) => f[k]);
+  const v = F_INTS.map((k) => fInt(f, k));
   v.push((f.dead ? 1 : 0) | (f.seatHuman ? 2 : 0), strIdx(ctx, f.charId), strIdx(ctx, f.kind), strIdx(ctx, f.move), strIdx(ctx, f.hm), f.ai.lvl, f.ai.tgt, f.buf ? strIdx(ctx, f.buf) : 0);
   return v;
 }

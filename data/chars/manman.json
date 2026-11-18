@@ -10,8 +10,8 @@
   "color": "#e6a817",
   "hp": 530,
   "mp": 500,
-  "mpStart": 200,
-  "mpRegen": 6,
+  "mpStart": 300,
+  "mpRegen": 14,
   "assist": "sp_fwd_atk",
   "ai": {
     "style": "melee",
@@ -37,7 +37,7 @@
       }
     ],
     "ult": {
-      "range": 2000,
+      "range": 700,
       "zr": 240,
       "n": 2
     }
@@ -97,16 +97,17 @@
               "w": 52,
               "h": 20,
               "zr": 12,
-              "dmg": 30,
+              "dmg": 12,
               "fall": 20,
-              "bdef": 17,
+              "bdef": 9,
               "kx": 2,
               "ky": 0,
               "stun": 12,
               "stop": 3,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
@@ -114,7 +115,8 @@
           "wait": 12,
           "mvx": 0
         }
-      ]
+      ],
+      "basic": true
     },
     "attack2": {
       "next": "attack3",
@@ -134,16 +136,17 @@
               "w": 52,
               "h": 20,
               "zr": 12,
-              "dmg": 30,
+              "dmg": 12,
               "fall": 20,
-              "bdef": 17,
+              "bdef": 9,
               "kx": 2,
               "ky": 0,
               "stun": 12,
               "stop": 3,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
@@ -151,7 +154,8 @@
           "wait": 12,
           "mvx": 0
         }
-      ]
+      ],
+      "basic": true
     },
     "attack3": {
       "cancel": 8,
@@ -170,16 +174,17 @@
               "w": 56,
               "h": 24,
               "zr": 12,
-              "dmg": 40,
+              "dmg": 16,
               "fall": 60,
-              "bdef": 35,
+              "bdef": 18,
               "kx": 4,
               "ky": 6,
               "stun": 20,
               "stop": 6,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
@@ -187,7 +192,8 @@
           "wait": 16,
           "mvx": 0
         }
-      ]
+      ],
+      "basic": true
     },
     "runatk": {
       "cancel": 0,
@@ -206,16 +212,17 @@
               "w": 56,
               "h": 24,
               "zr": 12,
-              "dmg": 45,
+              "dmg": 16,
               "fall": 100,
-              "bdef": 35,
+              "bdef": 18,
               "kx": 5,
               "ky": 6,
               "stun": 20,
               "stop": 6,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
@@ -223,7 +230,8 @@
           "wait": 14,
           "mvx": 1
         }
-      ]
+      ],
+      "basic": true
     },
     "jumpatk": {
       "cancel": 0,
@@ -240,23 +248,25 @@
               "w": 48,
               "h": 30,
               "zr": 12,
-              "dmg": 35,
+              "dmg": 14,
               "fall": 60,
-              "bdef": 20,
+              "bdef": 10,
               "kx": 3,
               "ky": 3,
               "stun": 14,
               "stop": 4,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
         {
           "wait": 8
         }
-      ]
+      ],
+      "basic": true
     },
     "dashatk": {
       "cancel": 0,
@@ -273,26 +283,28 @@
               "w": 54,
               "h": 30,
               "zr": 12,
-              "dmg": 40,
+              "dmg": 16,
               "fall": 100,
-              "bdef": 35,
+              "bdef": 18,
               "kx": 5,
               "ky": 5,
               "stun": 20,
               "stop": 6,
               "rehit": 0,
               "gain": 0,
-              "kind": "hit"
+              "kind": "hit",
+              "basic": true
             }
           ]
         },
         {
           "wait": 8
         }
-      ]
+      ],
+      "basic": true
     },
     "sp_fwd_atk": {
-      "cost": 100,
+      "cost": 70,
       "cancel": 0,
       "frames": [
         {
@@ -312,7 +324,7 @@
       ]
     },
     "sp_fwd_jump": {
-      "cost": 175,
+      "cost": 125,
       "cancel": 0,
       "steer": {
         "x": 6,
@@ -333,7 +345,7 @@
               "w": 50,
               "h": 55,
               "zr": 18,
-              "dmg": 35,
+              "dmg": 42,
               "fall": 100,
               "bdef": 50,
               "kx": 7,
@@ -356,7 +368,7 @@
               "w": 50,
               "h": 55,
               "zr": 18,
-              "dmg": 35,
+              "dmg": 42,
               "fall": 100,
               "bdef": 50,
               "kx": 7,
@@ -379,7 +391,7 @@
               "w": 50,
               "h": 55,
               "zr": 18,
-              "dmg": 35,
+              "dmg": 42,
               "fall": 100,
               "bdef": 50,
               "kx": 7,
@@ -402,7 +414,7 @@
               "w": 50,
               "h": 55,
               "zr": 18,
-              "dmg": 35,
+              "dmg": 42,
               "fall": 100,
               "bdef": 50,
               "kx": 7,
@@ -425,7 +437,7 @@
               "w": 50,
               "h": 55,
               "zr": 18,
-              "dmg": 35,
+              "dmg": 42,
               "fall": 100,
               "bdef": 50,
               "kx": 7,
@@ -448,7 +460,7 @@
               "w": 50,
               "h": 55,
               "zr": 18,
-              "dmg": 35,
+              "dmg": 42,
               "fall": 100,
               "bdef": 50,
               "kx": 7,
@@ -468,7 +480,7 @@
       ]
     },
     "sp_down_atk": {
-      "cost": 100,
+      "cost": 70,
       "cancel": 0,
       "frames": [
         {
@@ -498,7 +510,7 @@
               "w": 60,
               "h": 50,
               "zr": 20,
-              "dmg": 45,
+              "dmg": 54,
               "fall": 100,
               "bdef": 50,
               "kx": 6,
@@ -539,14 +551,18 @@
           "wait": 20
         },
         {
-          "wait": 4,
+          "wait": 30,
           "shake": 40,
           "itr": [
             {
-              "x": -1000,
+              "wave": {
+                "r": 700,
+                "t": 30
+              },
+              "x": 0,
               "y": 0,
-              "w": 2000,
-              "h": 20,
+              "w": 0,
+              "h": 0,
               "zr": 240,
               "dmg": 70,
               "fall": 100,
@@ -554,7 +570,7 @@
               "kx": 0,
               "ky": 6,
               "stun": 20,
-              "stop": 5,
+              "stop": 0,
               "rehit": 0,
               "gain": 0,
               "kind": "hit"
@@ -562,10 +578,10 @@
           ]
         },
         {
-          "wait": 14
+          "wait": 7
         },
         {
-          "wait": 26
+          "wait": 7
         }
       ]
     }
@@ -587,7 +603,7 @@
         "w": 30,
         "h": 22,
         "zr": 14,
-        "dmg": 35,
+        "dmg": 42,
         "fall": 60,
         "bdef": 30,
         "kx": 5,
@@ -619,7 +635,7 @@
     },
     "ult": {
       "name": "星光殼大地震",
-      "desc": "變成金色星光殼旋轉(無敵,全場看得到預告)後跳起砸地,全場地面上的敵人都跌倒受傷、不可防;看到預告抓時機跳起、翻滾或已倒地都能躲過"
+      "desc": "變成金色星光殼旋轉(無敵,全場看得到預告)後砸地,從漫漫身上向外擴散出半徑 700 px 的震波(約 0.5 秒擴到最遠),被掃到的敵人跌倒受傷、不可防;看到預告往外跑出範圍、後滑拉開、抓時機翻滾或已倒地都能躲過"
     }
   },
   "art": {

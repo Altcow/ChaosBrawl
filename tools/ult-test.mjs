@@ -43,12 +43,13 @@ const full = (f) => {
   const d = w.fighters[1];
   let t = 0;
   while (a.rage === 0 && t++ < 60) stepWorld(w, [t === 1 ? BIT.ATK : 0]);
-  check('普攻命中:造成 30 傷害 → 爆氣 +6', a.rage === 6 * FX, a.rage / FX);
-  const dmgPart = Math.floor((30 * FX * 3) / 10);
+  const A1 = fan.moves.attack1.frames.find((f) => f.itr).itr[0].dmg; // 第一下普攻傷害(降傷後 12;第 1 下不遞減)
+  check('普攻命中:造成 ' + A1 + ' 傷害 → 爆氣 +' + (A1 * 0.2), a.rage === Math.floor((A1 * FX * 2) / 10), a.rage / FX);
+  const dmgPart = Math.floor((A1 * FX * 3) / 10);
   const w2 = mk([F(400, 100, { kind: 'post' }), F(436, 100, { kind: 'human', face: -1 })]);
   let tt = 0;
   while (w2.fighters[0].rage === 0 && tt++ < 60) stepWorld(w2, [0, tt === 1 ? BIT.ATK : 0]);
-  check('受傷每 10 點 +3(30 傷害 → +9)', w2.fighters[0].rage === dmgPart, w2.fighters[0].rage / FX);
+  check('受傷每 10 點 +3(' + A1 + ' 傷害 → +' + (A1 * 0.3) + ')', w2.fighters[0].rage === dmgPart, w2.fighters[0].rage / FX);
   check('無大招角色不累積爆氣', d.rage === 0);
 }
 
