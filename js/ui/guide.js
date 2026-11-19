@@ -15,7 +15,7 @@ const h = (tag, cls, text) => {
   return e;
 };
 
-// 手勢動畫:灰色路徑 + 金色筆跡逐步畫出 + 白點沿路徑移動;起點綠點、終點箭頭、多筆時標筆順數字、按住時顯示環
+// 手勢動畫:灰色路徑 + 金色筆跡逐步畫出 + 白點沿路徑移動;起點小白點、終點綠點+箭頭、多筆時標筆順數字、按住時顯示環
 export function gestureSvg(seq, opts) {
   opts = opts || {};
   const W = 120;
@@ -46,8 +46,9 @@ export function gestureSvg(seq, opts) {
     fill: '#ffd23a'
   });
   svg.append(arrow);
-  // 起點
-  svg.append(sv('circle', { cx: pts[0].x, cy: pts[0].y, r: 4.5, fill: '#5f5' }));
+  // 起點(小白點)與終點(綠點 = 在這裡放開手指)
+  svg.append(sv('circle', { cx: pts[0].x, cy: pts[0].y, r: 3, fill: '#fff' }));
+  svg.append(sv('circle', { cx: pts[n - 1].x, cy: pts[n - 1].y, r: 5.5, fill: '#5f5' }));
   if (ft.hold) {
     const hp = { x: ft.hold.x + ox, y: ft.hold.y };
     svg.append(sv('circle', { cx: hp.x, cy: hp.y, r: 10, fill: 'none', stroke: '#ffd23a', 'stroke-width': 2.5, 'stroke-dasharray': '4 3' }));

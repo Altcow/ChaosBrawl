@@ -417,7 +417,7 @@ export function setupTouch(root, input, onAssist, getSpecials, ext) {
     return Math.min(1, Math.max(0, (performance.now() - down) / PARAMS.holdMs));
   }
 
-  // 範本:虛線 + 起點綠點 + 沿路徑移動的亮點 + 筆順數字
+  // 範本:虛線 + 終點綠點 + 沿路徑移動的亮點 + 筆順數字
   function drawTemplate(tpl, pc, now) {
     const size = 110;
     const ft = fitTemplate(templatePath(tpl.seq), size, 8);
@@ -438,11 +438,16 @@ export function setupTouch(root, input, onAssist, getSpecials, ext) {
     });
     g2.stroke();
     g2.setLineDash([]);
-    // 起點
+    // 起點(小白點)與終點(綠點 = 在這裡放開手指)
     const s = Q(ft.pts[0]);
+    g2.fillStyle = '#fff';
+    g2.beginPath();
+    g2.arc(s.x, s.y, 3.5, 0, 7);
+    g2.fill();
+    const en = Q(ft.pts[ft.pts.length - 1]);
     g2.fillStyle = '#5f5';
     g2.beginPath();
-    g2.arc(s.x, s.y, 5, 0, 7);
+    g2.arc(en.x, en.y, 6, 0, 7);
     g2.fill();
     if (ft.hold) {
       const h = Q(ft.hold);
