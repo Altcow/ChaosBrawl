@@ -3,7 +3,7 @@ const LS = 'chaosbrawl-touchset';
 const LS_MASTER = 'chaosbrawl-gesture-master';
 const LS_BATTLES = 'chaosbrawl-battles';
 const LS_TUT = 'chaosbrawl-tut2-seen';
-const DEFAULTS = { assist: false, ring: 'auto' }; // assist:新手輔助鈕(僅單機 / 練習場);ring:手勢小抄環 auto = 前 5 場 / on / off
+const DEFAULTS = { assist: false, ring: 'on' }; // assist:新手輔助鈕(僅單機 / 練習場);ring:手勢小抄環 auto = 前 5 場 / on / off
 
 let mem = null;
 const memStore = {};
